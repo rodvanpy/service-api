@@ -15,14 +15,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
  * @author Miguel
  */
 @Entity
-@Table(name = "VINCULO")
+@Table(name = "PERSONA")
 public class Persona extends Base {
 
     private static final long serialVersionUID = -9149680520407250259L;
@@ -33,28 +35,33 @@ public class Persona extends Base {
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
-
+    
+    @NotEmpty(message = "Ingrese Primer Nombre")
     @Column(name = "PRIMER_NOMBRE", nullable = false, length = 128)
     private String primerNombre;
 
     @Column(name = "SEGUNDO_NOMBRE")
     private String segundoNombre;
 
+    @NotEmpty(message = "Ingrese Primer Apellido")
     @Column(name = "PRIMER_APELLIDO", nullable = false, length = 128)
     private String primerApellido;
 
     @Column(name = "SEGUNDO_APELLIDO")
     private String segundoApellido;
-
+    
+    @NotEmpty(message = "Ingrese Documento")
     @Column(name = "DOCUMENTO", nullable = false)
     private String documento;
 
     @Column(name = "RUC")
     private String ruc;
 
+    @NotNull(message = "Ingrese Fecha Nacimiento")
     @Column(name = "FECHA_NACIMIENTO")
     private Timestamp fechaNacimiento;
 
+    @NotEmpty(message = "Ingrese Tipo Persona")
     @Column(name = "TIPO_PERSONA")
     private String tipoPersona;    
 
@@ -68,12 +75,14 @@ public class Persona extends Base {
     @Column(name = "NUMERO_DEPENDIENTES")
     private Integer numeroDependientes;
 
+    @NotEmpty(message = "Ingrese Estado Civil")
     @Column(name = "ESTADO_CIVIL", nullable = false)
     private String estadoCivil;
     
     @Column(name = "SEPARACION_BIENES")
     private Boolean separacionBienes;
-
+    
+    @NotEmpty(message = "Ingrese Email")
     @Column(name = "EMAIL")
     private String email;
 
@@ -82,7 +91,8 @@ public class Persona extends Base {
 
     @Column(name = "TELEFONO_SECUNDARIO")
     private String telefonoSecundario;
-
+    
+    @NotEmpty(message = "Ingrese Direccion Particular")
     @Column(name = "DIRECCION_PARTICULAR", nullable = false)
     private String direccionParticular;
 

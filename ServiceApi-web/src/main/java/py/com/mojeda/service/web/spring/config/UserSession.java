@@ -44,13 +44,15 @@ public class UserSession implements AuthenticationProvider {
             String passwordLogin = authentication.getCredentials().toString();
             
             Usuario ejObjeto = new Usuario();
-            
+            ejObjeto.setAlias(userLogin);
             
             ejObjeto = usuarioManager.get(ejObjeto);
             
             if (ejObjeto != null) {
                                 
                 User userDetails = new User();
+                userDetails.setId(ejObjeto.getId());
+                
                 
                 Authentication customAuthentication = new UsernamePasswordAuthenticationToken(userDetails,
                         passwordLogin, autoridades);
@@ -83,7 +85,7 @@ public class UserSession implements AuthenticationProvider {
         if (usuarioManager == null) {
             try {
 
-                usuarioManager = (UsuarioManager) context.lookup("java:app/ServiceApi-web/UsuarioManagerImpl");
+                usuarioManager = (UsuarioManager) context.lookup("java:app/ServiceApi-ejb/UsuarioManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

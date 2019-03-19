@@ -14,6 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 
@@ -24,6 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "usuario_alias_uq", columnNames = { "alias" }) )
 public class Usuario extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;
@@ -35,30 +39,35 @@ public class Usuario extends Base{
     @Column(name = "id")
     private Long id;
     
-    @NotNull
-    @NotEmpty
+    //@NotNull(message = "Ingrese Alias")
+    @NotEmpty(message = "Ingrese Alias")
     @Column(name = "ALIAS")
     private String alias;
 
-    @NotNull
-    @NotEmpty
+    //@NotNull(message = " Ingrese Clave Acceso")
+    @NotEmpty(message = "Ingrese Clave Acceso")
     @Column(name = "CLAVE_ACCESO")
     private String claveAcceso;
     
     @Column(name = "SUPER_USUARIO")
     private Boolean superUsuario; 
     
+    @NotNull(message = "Ingrese Tiempo de Expiracion del Tokens")
     @Column(name = "EXPIRATION_TIME_TOKENS")
     private Long expirationTimeTokens;
     
+    
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
+    @Valid
     private Persona persona;
     
+    @NotNull(message = "Ingrese Rol")
     @ManyToOne
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
     private Rol rol;
     
+    @NotNull(message = "Ingrese Empresa")
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresa empresa;
