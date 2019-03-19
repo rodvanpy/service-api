@@ -18,6 +18,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
@@ -36,9 +38,11 @@ public class OcupacionPersona extends Base {
     @Column(name = "id")
     private Long id;
 
+    @NotEmpty(message = "Ingrese Cargo")
     @Column(name = "CARGO")
     private String cargo;
-
+    
+    @NotEmpty(message = "Ingrese Direccion")
     @Column(name = "DIRECCION")
     private String direccion;
 
@@ -58,7 +62,8 @@ public class OcupacionPersona extends Base {
 
     @Column(name = "INTERNO")
     private String interno;
-
+    
+    @NotNull(message = "Ingrese Ingreso Mensual")
     @Column(name = "INGRESOS_MENSUALES")
     private BigDecimal ingresosMensuales;
 
@@ -67,6 +72,7 @@ public class OcupacionPersona extends Base {
     private Persona persona;
 
     @ManyToOne
+    @NotNull(message = "Ingrese Ocupacion")
     @JoinColumn(name = "ID_OCUPACION", referencedColumnName = "id")
     private Ocupacion ocupacion;
 

@@ -14,6 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
@@ -32,6 +34,7 @@ public class Referencia extends Base {
     @Column(name = "id")
     private Long id;
     
+    @NotEmpty(message = "Ingrese Nombre Contacto")
     @Column(name = "NOMBRE_CONTACTO")
     private String nombreContacto;
     
@@ -42,6 +45,7 @@ public class Referencia extends Base {
     private String telefonoCelular;
     
     @ManyToOne
+    @NotNull(message = "Ingrese Tipo Referencia")
     @JoinColumn(name = "ID_TIPO_REFERENCIA", referencedColumnName = "id")
     private TipoReferencia tipoReferencia;
     

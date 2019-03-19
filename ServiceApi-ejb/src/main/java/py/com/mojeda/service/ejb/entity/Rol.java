@@ -23,8 +23,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 public class Rol extends Base {
-    private static long serialVersionUID = 85387603479861808L;
-    
+    private static long serialVersionUID = 85387603479861808L;    
     private static final String SECUENCIA = "seq_rol_id";
     
     @Id
@@ -33,8 +32,7 @@ public class Rol extends Base {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
-    @NotEmpty
+    @NotEmpty(message = "Ingrese Nombre")
     @Column(name = "nombre")
     private String nombre;
     

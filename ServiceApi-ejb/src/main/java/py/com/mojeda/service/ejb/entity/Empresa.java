@@ -13,7 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -23,6 +25,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author daniel
  */
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = { "ruc" }) )
 public class Empresa extends Base {
 
     private static final long serialVersionUID = 79861856088L;
@@ -33,18 +36,19 @@ public class Empresa extends Base {
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
-
-    @NotNull
-    @NotEmpty
+    
+    @NotEmpty(message = "Ingrese Nombre")
     @Column(name = "NOMBRE")
     private String nombre;
 
     @Column(name = "DESCRIPCION")
     private String descripcion;
-
+    
+    @NotEmpty(message = "Ingrese Ruc")
     @Column(name = "RUC")
     private String ruc;
 
+    @NotEmpty(message = "Ingrese Direccion")
     @Column(name = "DIRECCION")
     private String direccion;
     
@@ -56,7 +60,8 @@ public class Empresa extends Base {
 
     @Column(name = "telefono_movil")
     private String telefonoMovil;
-
+    
+    @NotEmpty(message = "Ingrese Email")
     @Column(name = "EMAIL")
     private String email;
     

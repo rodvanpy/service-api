@@ -26,7 +26,7 @@ public class User implements UserDetails {
     private String rol;
     private String idMovil;
     private String empresa;
-    private String idEmpresa;
+    private Long idEmpresa;
     private Collection<GrantedAuthority> list;
     
     public User() {
@@ -110,11 +110,11 @@ public class User implements UserDetails {
         this.empresa = empresa;
     }
 
-    public String getIdEmpresa() {
+    public Long getIdEmpresa() {
         return idEmpresa;
     }
 
-    public void setIdEmpresa(String idEmpresa) {
+    public void setIdEmpresa(Long idEmpresa) {
         this.idEmpresa = idEmpresa;
     }
        

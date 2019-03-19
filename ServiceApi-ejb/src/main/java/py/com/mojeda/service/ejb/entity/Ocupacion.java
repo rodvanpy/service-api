@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @author Miguel Ojeda
@@ -18,8 +19,7 @@ import javax.persistence.Table;
 @Table()
 public class Ocupacion extends Base {
 
-    private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 1546546546L;
     private static final String SECUENCIA = "seq_ocupacion_id";
     
     @Id
@@ -27,12 +27,17 @@ public class Ocupacion extends Base {
     @SequenceGenerator(name=SECUENCIA, sequenceName=SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id; 
-
+    
+    @NotEmpty(message = "Ingrese Ocupacion")
     @Column(name = "OCUPACION", nullable = false, length = 128)
     private String ocupacion;
     
     @Column(name = "DESCRIPCION")
     private String descripcion;
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
+    private Empresa empresa;
 
     public Ocupacion() {
     }
@@ -81,6 +86,20 @@ public class Ocupacion extends Base {
      */
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    /**
+     * @return the empresa
+     */
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    /**
+     * @param empresa the empresa to set
+     */
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
     }
 
     

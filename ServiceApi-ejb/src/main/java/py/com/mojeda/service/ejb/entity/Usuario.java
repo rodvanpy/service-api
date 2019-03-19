@@ -55,8 +55,7 @@ public class Usuario extends Base{
     @NotNull(message = "Ingrese Tiempo de Expiracion del Tokens")
     @Column(name = "EXPIRATION_TIME_TOKENS")
     private Long expirationTimeTokens;
-    
-    
+        
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @Valid

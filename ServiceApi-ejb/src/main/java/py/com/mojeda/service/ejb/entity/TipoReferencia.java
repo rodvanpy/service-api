@@ -11,8 +11,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
@@ -31,9 +34,14 @@ public class TipoReferencia {
     @Column(name = "id")
     private Long id;
     
+    @NotEmpty(message = "Ingrese Nombre")
     @Basic(optional = false)
-    @Column(name = "DESCRIPCION")
-    private String descripcion;
+    @Column(name = "NOMBRE")
+    private String nombre;
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
+    private Empresa empresa;
     
     public TipoReferencia() {
     }
@@ -57,18 +65,34 @@ public class TipoReferencia {
     }
 
     /**
-     * @return the descripcion
+     * @return the nombre
      */
-    public String getDescripcion() {
-        return descripcion;
+    public String getNombre() {
+        return nombre;
     }
 
     /**
-     * @param descripcion the descripcion to set
+     * @param nombre the nombre to set
      */
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
+
+    /**
+     * @return the empresa
+     */
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    /**
+     * @param empresa the empresa to set
+     */
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
+
+    
     
     
 }
