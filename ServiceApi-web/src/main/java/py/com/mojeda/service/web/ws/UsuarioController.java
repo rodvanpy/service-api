@@ -117,7 +117,7 @@ public class UsuarioController extends BaseController {
      * @param id de la entidad
      * @return
      */
-    @GetMapping("/usuarios/{id}")
+    @GetMapping("/{id}")
     public @ResponseBody
     ResponseDTO getObject(
             @ModelAttribute("id") Long id) {        
@@ -195,7 +195,7 @@ public class UsuarioController extends BaseController {
      * @param errors
      * @return
      */
-    @PutMapping("/usuarios/{id}")
+    @PutMapping("/{id}")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,

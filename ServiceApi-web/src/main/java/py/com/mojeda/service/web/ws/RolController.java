@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresa;
+import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Usuario;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -31,8 +32,8 @@ import py.com.mojeda.service.web.spring.config.User;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/usuarios")
-public class UsuarioController extends BaseController {
+@RequestMapping(value = "/roles")
+public class RolController extends BaseController {
     
     @GetMapping
     public @ResponseBody
@@ -47,10 +48,10 @@ public class UsuarioController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Usuario ejUsuario = new Usuario();
+        Rol model = new Rol();
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarUsuarioManager();
+            inicializarEmpresaManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -77,7 +78,7 @@ public class UsuarioController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(usuarioManager.list(ejUsuario).size() + "");
+                total = Long.parseLong(rolManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -87,11 +88,9 @@ public class UsuarioController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = usuarioManager.listAtributos(ejUsuario, "id".split(","), todos, inicio, cantidad,
+            listMapGrupos = rolManager.listAtributos(model, "id".split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
-            
             
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
@@ -112,21 +111,21 @@ public class UsuarioController extends BaseController {
     }
     
     /**
-     * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Rol)
      *
      * @param id de la entidad
      * @return
      */
-    @GetMapping("/usuarios/{id}")
+    @GetMapping("/{id}")
     public @ResponseBody
     ResponseDTO getObject(
             @ModelAttribute("id") Long id) {        
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarUsuarioManager();
+            inicializarEmpresaManager();
                         
-            Usuario model = usuarioManager.get(id);
+            Rol model = rolManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -140,23 +139,22 @@ public class UsuarioController extends BaseController {
     }
 
     /**
-     * Mapping para el metodo POST de la vista crear.(crear Usuario)
+     * Mapping para el metodo POST de la vista crear.(crear Rol)
      *
-     * @param model entidad Usuario recibida de la vista
+     * @param model entidad Rol recibida de la vista
      * @param errors
      * @return
      */
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @Valid Usuario model,
+            @Valid Rol model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
-        Usuario ejUsuario = new Usuario();
         try {
-            inicializarUsuarioManager();
+            inicializarEmpresaManager();
             
             if(errors.hasErrors()){
                 
@@ -173,9 +171,8 @@ public class UsuarioController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
-            model.setEmpresa(new Empresa(userDetail.getIdEmpresa()));
             
-            usuarioManager.save(model);
+            rolManager.save(model);
 
             response.setStatus(200);
             response.setMessage("OK");
@@ -188,24 +185,24 @@ public class UsuarioController extends BaseController {
     }
     
     /**
-     * Mapping para el metodo PUT de la vista actualizar.(actualizar Usuario)
+     * Mapping para el metodo PUT de la vista actualizar.(actualizar Rol)
      *
      * @param id de la entidad
-     * @param model entidad Usuario recibida de la vista
+     * @param model entidad Rol recibida de la vista
      * @param errors
      * @return
      */
-    @PutMapping("/usuarios/{id}")
+    @PutMapping("/{id}")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @Valid Usuario model,
+            @Valid Rol model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarUsuarioManager();
+            inicializarEmpresaManager();
             
             if(errors.hasErrors()){
                 
@@ -220,7 +217,7 @@ public class UsuarioController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            usuarioManager.update(model);
+            rolManager.update(model);
             
             response.setStatus(200);
             response.setMessage("OK");
