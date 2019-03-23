@@ -1,4 +1,4 @@
-package py.com.mojeda.service.web.tokens;
+package py.com.mojeda.service.web.jwt;
 
 
 import java.io.IOException;
@@ -8,12 +8,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
-import py.com.mojeda.service.web.tokens.service.TokenAuthenticationService;
-import py.com.mojeda.service.web.tokens.service.TokenAuthenticationServiceImpl;
+import py.com.mojeda.service.web.jwt.service.TokenAuthenticationService;
+import py.com.mojeda.service.web.jwt.service.TokenAuthenticationServiceImpl;
 
 
 
@@ -29,6 +30,8 @@ public class JWTAuthenticationFilter extends GenericFilterBean {
 		
 		// Apply the authentication to the SecurityContextHolder
 		SecurityContextHolder.getContext().setAuthentication(authentication);
+                
+                tokenAuthenticationService.addUpdateTokensAuthentication((HttpServletResponse) response, authentication);
 		
 		// Go on processing the request
 		filterChain.doFilter(request,response);

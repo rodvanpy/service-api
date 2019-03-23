@@ -13,9 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.ComponentScan;
-import py.com.mojeda.service.web.tokens.JWTAuthenticationEntryPoint;
-import py.com.mojeda.service.web.tokens.JWTAuthenticationFilter;
-import py.com.mojeda.service.web.tokens.JWTLoginFilter;
+import py.com.mojeda.service.web.jwt.JWTAuthenticationEntryPoint;
+import py.com.mojeda.service.web.jwt.JWTAuthenticationFilter;
+import py.com.mojeda.service.web.jwt.JWTLoginFilter;
 
 
 @Configuration

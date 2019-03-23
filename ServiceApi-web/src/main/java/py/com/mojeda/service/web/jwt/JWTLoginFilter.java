@@ -1,4 +1,4 @@
-package py.com.mojeda.service.web.tokens;
+package py.com.mojeda.service.web.jwt;
 
 
 import java.io.IOException;
@@ -18,8 +18,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import py.com.mojeda.service.web.spring.config.User;
-import py.com.mojeda.service.web.tokens.service.TokenAuthenticationService;
-import py.com.mojeda.service.web.tokens.service.TokenAuthenticationServiceImpl;
+import py.com.mojeda.service.web.jwt.service.TokenAuthenticationService;
+import py.com.mojeda.service.web.jwt.service.TokenAuthenticationServiceImpl;
 
 
 
@@ -39,6 +39,7 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 		
 		// Verify if the correctness of login details.
 		// If correct, the successfulAuthentication() method is executed.
+                res.setHeader("Access-Control-Allow-Origin", "*");
 		return getAuthenticationManager().authenticate(
 				new UsernamePasswordAuthenticationToken(
 						account.getUsername(),

@@ -12,7 +12,7 @@ import py.com.mojeda.service.web.spring.config.User;
  *
  * @author mojeda
  */
-public class LoginResponse {
+public class TokensResponse {
     
     private Token token;
     

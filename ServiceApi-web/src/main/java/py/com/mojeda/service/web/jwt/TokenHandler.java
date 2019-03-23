@@ -1,4 +1,4 @@
-package py.com.mojeda.service.web.tokens;
+package py.com.mojeda.service.web.jwt;
 
 
 import java.util.Date;
@@ -20,7 +20,7 @@ public class TokenHandler {
     final String SECRET = "Coomecipar";			// private key, better read it from an external file
     final public String UPDATE_SECRET = "UPDATE_*/*_TOKENS";
     final public String TOKEN_PREFIX = "X-Token";		// the prefix of the token in the http header
-    final public String HEADER_STRING = "Authorization";	// the http header containing the prexif + the token
+    final public String HEADER_STRING = "authorization";	// the http header containing the prexif + the token
 
     private final UserDetailsService userDetailsService = new UserDetailService();
 

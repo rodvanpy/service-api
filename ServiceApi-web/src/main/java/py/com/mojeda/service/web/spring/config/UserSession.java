@@ -20,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import py.com.mojeda.service.ejb.entity.Usuario;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 
-
 /**
  *
  * @author Miguel
@@ -39,27 +38,36 @@ public class UserSession implements AuthenticationProvider {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
             inicializarUsuarioManager();
-            
+
             String userLogin = authentication.getPrincipal().toString();
             String passwordLogin = authentication.getCredentials().toString();
-            
+
             Usuario ejObjeto = new Usuario();
             ejObjeto.setAlias(userLogin);
-            
+
             ejObjeto = usuarioManager.get(ejObjeto);
-            
+            String cod = passwordEncoder.encode(passwordLogin);
             if (ejObjeto != null) {
-                                
-                User userDetails = new User();
-                userDetails.setId(ejObjeto.getId());
                 
-                
-                Authentication customAuthentication = new UsernamePasswordAuthenticationToken(userDetails,
-                        passwordLogin, autoridades);
-                
-                return customAuthentication;
+                if (passwordEncoder.matches(passwordLogin, ejObjeto.getClaveAcceso())) {
+                    
+                    User userDetails = new User();
+                    userDetails.setId(ejObjeto.getId());
+                    userDetails.setApellido(ejObjeto.getPersona().getPrimerApellido() + " " + ejObjeto.getPersona().getSegundoApellido() == null ? "" : ejObjeto.getPersona().getSegundoApellido());
+                    userDetails.setNombre(ejObjeto.getPersona().getPrimerNombre()+ " " + ejObjeto.getPersona().getSegundoNombre()== null ? "" : ejObjeto.getPersona().getSegundoNombre());
+                    userDetails.setIdEmpresa(ejObjeto.getEmpresa().getId());
+                    userDetails.setNombreRol(ejObjeto.getRol().getNombre());
+                    userDetails.setUsername(ejObjeto.getAlias());
+                    
+                    Authentication customAuthentication = new UsernamePasswordAuthenticationToken(userDetails,
+                            passwordLogin, autoridades);
+
+                    return customAuthentication;
+                } else {
+                    throw new BadCredentialsException("Usuario o Contraseña Inválidos.");
+                }
+
             } else {
-                System.out.println("Usuario o Contraseña Inválidos.");
                 throw new BadCredentialsException("Usuario o Contraseña Inválidos.");
             }
 
@@ -91,5 +99,5 @@ public class UserSession implements AuthenticationProvider {
             }
         }
     }
-   
+
 }

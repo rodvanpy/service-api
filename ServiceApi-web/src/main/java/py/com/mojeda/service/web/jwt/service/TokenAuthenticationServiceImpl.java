@@ -1,4 +1,4 @@
-package py.com.mojeda.service.web.tokens.service;
+package py.com.mojeda.service.web.jwt.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,9 +22,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
+import py.com.mojeda.service.ejb.entity.Tokens;
 import py.com.mojeda.service.web.spring.config.User;
-import py.com.mojeda.service.web.tokens.TokenHandler;
-import py.com.mojeda.service.web.utils.LoginResponse;
+import py.com.mojeda.service.web.jwt.TokenHandler;
+import py.com.mojeda.service.web.utils.TokensResponse;
 import py.com.mojeda.service.web.utils.Token;
 
 
@@ -47,7 +48,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
      */
     @Override
     public void addAuthentication(HttpServletResponse res, Authentication authentication) {
-        LoginResponse response = new LoginResponse();
+        TokensResponse response = new TokensResponse();
         try {
             
             User userDetail = ((User) authentication.getPrincipal());
@@ -58,6 +59,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
             response.setToken(JWT);
             response.setUsuario(userDetail);
 
+            res.setHeader("Access-Control-Allow-Origin", "*");
             res.addHeader(tokenHandler.HEADER_STRING, tokenHandler.TOKEN_PREFIX + " " + JWT.getAccess_token());
             res.setHeader("Content-Type", "application/json;charset=UTF-8");
             PrintWriter writer = res.getWriter();           
@@ -121,6 +123,53 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
 
         return null;
 
-    }   
+    }  
+    
+    @Override
+    public void addUpdateTokensAuthentication(HttpServletResponse res, Authentication authentication) {
+        Tokens ejTokens = new Tokens();
+        TokensResponse response = new TokensResponse();
+        try {
+//            inicializarTokensManager();
+//
+//            User userDetail = ((User) authentication.getPrincipal());
+//            userDetail.setPassword("xxxxxxx");
+//
+//            Token JWT = tokenHandler.build(userDetail.getId() + "");
+//
+//            //Se verifica si el tokens esta insertado
+//            ejTokens.setIdUsuario(userDetail.getId());
+//
+//            ejTokens = tokensManager.get(ejTokens);
+//
+//            if (ejTokens != null) {
+//
+//                ejTokens.setToken(tokenHandler.UPDATE_SECRET + " " + JWT.getAccess_token());
+//                ejTokens.setUpdateToken(JWT.getRefresh_token());
+//
+//                tokensManager.update(ejTokens);
+//                
+//            } else {
+//                
+//                ejTokens.setToken(tokenHandler.UPDATE_SECRET + " " + JWT.getAccess_token());
+//                ejTokens.setUpdateToken(JWT.getRefresh_token());
+//                ejTokens.setUsuario(userDetail.getUsername());
+//                ejTokens.setIdUsuario(userDetail.getId());
+//
+//                tokensManager.save(ejTokens);
+//            }
+//
+//            response.setToken(JWT);
+//            response.setUsuario(userDetail);
+            res.setHeader("Access-Control-Allow-Origin", "*");
+//            res.addHeader(tokenHandler.UPDATE_SECRET, tokenHandler.TOKEN_PREFIX + " " + JWT.getAccess_token());
+
+
+//        } catch (IOException ex) {
+//            Logger.getLogger(TokenAuthenticationServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(TokenAuthenticationServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
 }

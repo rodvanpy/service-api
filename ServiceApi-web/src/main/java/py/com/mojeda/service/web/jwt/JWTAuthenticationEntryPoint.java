@@ -1,4 +1,4 @@
-package py.com.mojeda.service.web.tokens;
+package py.com.mojeda.service.web.jwt;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

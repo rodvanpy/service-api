@@ -1,4 +1,4 @@
-package py.com.mojeda.service.web.tokens.service;
+package py.com.mojeda.service.web.jwt.service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +14,8 @@ public interface TokenAuthenticationService {
          * @param authentication
 	 */
 	void addAuthentication(HttpServletResponse res, Authentication authentication);
+        
+        void addUpdateTokensAuthentication(HttpServletResponse res, Authentication authentication);
 
 	/**
 	 * The JWTAuthenticationFilter calls this method to verify the user authentication.
