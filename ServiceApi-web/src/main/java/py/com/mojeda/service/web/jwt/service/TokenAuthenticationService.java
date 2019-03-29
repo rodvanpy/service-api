@@ -15,7 +15,7 @@ public interface TokenAuthenticationService {
 	 */
 	void addAuthentication(HttpServletResponse res, Authentication authentication);
         
-        void addUpdateTokensAuthentication(HttpServletResponse res, Authentication authentication);
+        void addUpdateTokensAuthentication(HttpServletRequest request, HttpServletResponse res, Authentication authentication);
 
 	/**
 	 * The JWTAuthenticationFilter calls this method to verify the user authentication.

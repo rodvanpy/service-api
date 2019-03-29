@@ -12,14 +12,11 @@ import java.util.List;
  * @author miguel.ojeda
  */
 public class ResponseListDTO<T> {
+       
     
-    private Long id;    
+    private Integer status;
     
-    private boolean error;
-    
-    private String mensaje;
-    
-    private T entidad;
+    private String message;
     
     /**
      * Total number of pages
@@ -32,67 +29,12 @@ public class ResponseListDTO<T> {
     /**
      * Total number of records
      */
-    private int records;
+    private Long records;
     /**
      * The actual data
      */
     private List<T> rows;
 
-    /**
-     * @return the id
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    /**
-     * @return the error
-     */
-    public boolean isError() {
-        return error;
-    }
-
-    /**
-     * @param error the error to set
-     */
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
-    /**
-     * @return the mensaje
-     */
-    public String getMensaje() {
-        return mensaje;
-    }
-
-    /**
-     * @param mensaje the mensaje to set
-     */
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
-    }
-
-    /**
-     * @return the entidad
-     */
-    public T getEntidad() {
-        return entidad;
-    }
-
-    /**
-     * @param entidad the entidad to set
-     */
-    public void setEntidad(T entidad) {
-        this.entidad = entidad;
-    }
 
     /**
      * @return the total
@@ -125,14 +67,14 @@ public class ResponseListDTO<T> {
     /**
      * @return the records
      */
-    public int getRecords() {
+    public Long getRecords() {
         return records;
     }
 
     /**
      * @param records the records to set
      */
-    public void setRecords(int records) {
+    public void setRecords(Long records) {
         this.records = records;
     }
 
@@ -148,6 +90,34 @@ public class ResponseListDTO<T> {
      */
     public void setRows(List<T> rows) {
         this.rows = rows;
+    }
+
+    /**
+     * @return the status
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
     }
     
     

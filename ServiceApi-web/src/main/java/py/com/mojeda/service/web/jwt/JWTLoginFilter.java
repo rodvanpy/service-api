@@ -39,7 +39,7 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 		
 		// Verify if the correctness of login details.
 		// If correct, the successfulAuthentication() method is executed.
-                res.setHeader("Access-Control-Allow-Origin", "*");
+                //res.setHeader("Access-Control-Allow-Origin", "*");
 		return getAuthenticationManager().authenticate(
 				new UsernamePasswordAuthenticationToken(
 						account.getUsername(),

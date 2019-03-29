@@ -59,7 +59,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
             response.setToken(JWT);
             response.setUsuario(userDetail);
 
-            res.setHeader("Access-Control-Allow-Origin", "*");
+            //res.setHeader("Access-Control-Allow-Origin", "*");
             res.addHeader(tokenHandler.HEADER_STRING, tokenHandler.TOKEN_PREFIX + " " + JWT.getAccess_token());
             res.setHeader("Content-Type", "application/json;charset=UTF-8");
             PrintWriter writer = res.getWriter();           
@@ -126,18 +126,18 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
     }  
     
     @Override
-    public void addUpdateTokensAuthentication(HttpServletResponse res, Authentication authentication) {
+    public void addUpdateTokensAuthentication(HttpServletRequest request, HttpServletResponse res, Authentication authentication) {
         Tokens ejTokens = new Tokens();
         TokensResponse response = new TokensResponse();
         try {
-//            inicializarTokensManager();
-//
-//            User userDetail = ((User) authentication.getPrincipal());
-//            userDetail.setPassword("xxxxxxx");
-//
-//            Token JWT = tokenHandler.build(userDetail.getId() + "");
-//
-//            //Se verifica si el tokens esta insertado
+            //inicializarTokensManager();
+
+            User userDetail = ((User) authentication.getPrincipal());
+            userDetail.setPassword("xxxxxxx");
+
+            Token JWT = tokenHandler.build(userDetail.getId() + "");
+
+            //Se verifica si el tokens esta insertado
 //            ejTokens.setIdUsuario(userDetail.getId());
 //
 //            ejTokens = tokensManager.get(ejTokens);
@@ -161,12 +161,9 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
 //
 //            response.setToken(JWT);
 //            response.setUsuario(userDetail);
-            res.setHeader("Access-Control-Allow-Origin", "*");
-//            res.addHeader(tokenHandler.UPDATE_SECRET, tokenHandler.TOKEN_PREFIX + " " + JWT.getAccess_token());
+            res.setHeader("Access-Control-Expose-Headers", "Update-Token");
+            res.addHeader("Update-Token", JWT.getAccess_token());
 
-
-//        } catch (IOException ex) {
-//            Logger.getLogger(TokenAuthenticationServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(TokenAuthenticationServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }

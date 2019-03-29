@@ -34,6 +34,8 @@ import py.com.mojeda.service.web.spring.config.User;
 @RequestMapping(value = "/usuarios")
 public class UsuarioController extends BaseController {
     
+    String atributos = "id";
+    
     @GetMapping
     public @ResponseBody
     ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
@@ -97,9 +99,10 @@ public class UsuarioController extends BaseController {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
             
+            
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
-            retorno.setRecords(listMapGrupos.size());
+            retorno.setRecords(total);
             retorno.setTotal(totalPaginas + 1);
             retorno.setRows(listMapGrupos);
             retorno.setPage(pagina);

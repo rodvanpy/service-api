@@ -40,6 +40,10 @@ public class Empresa extends Base {
     @NotEmpty(message = "Ingrese Nombre")
     @Column(name = "NOMBRE")
     private String nombre;
+    
+    //@NotEmpty(message = "Ingrese Nombre Fantasia")
+    @Column(name = "NOMBRE_FANTASIA")
+    private String nombreFantasia;
 
     @Column(name = "DESCRIPCION")
     private String descripcion;
@@ -214,6 +218,20 @@ public class Empresa extends Base {
      */
     public void setObservacion(String observacion) {
         this.observacion = observacion;
+    }
+
+    /**
+     * @return the nombreFantasia
+     */
+    public String getNombreFantasia() {
+        return nombreFantasia;
+    }
+
+    /**
+     * @param nombreFantasia the nombreFantasia to set
+     */
+    public void setNombreFantasia(String nombreFantasia) {
+        this.nombreFantasia = nombreFantasia;
     }
     
     

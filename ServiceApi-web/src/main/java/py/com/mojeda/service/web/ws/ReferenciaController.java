@@ -98,7 +98,7 @@ public class ReferenciaController extends BaseController {
             
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
-            retorno.setRecords(listMapGrupos.size());
+            retorno.setRecords(total);
             retorno.setTotal(totalPaginas + 1);
             retorno.setRows(listMapGrupos);
             retorno.setPage(pagina);

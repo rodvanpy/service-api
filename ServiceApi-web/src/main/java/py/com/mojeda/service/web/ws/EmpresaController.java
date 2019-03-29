@@ -14,10 +14,12 @@ import javax.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresa;
@@ -33,6 +35,8 @@ import py.com.mojeda.service.web.spring.config.User;
 @Controller
 @RequestMapping(value = "/empresas")
 public class EmpresaController extends BaseController {
+    
+    String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
     
     @GetMapping
     public @ResponseBody
@@ -87,7 +91,7 @@ public class EmpresaController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = empresaManager.listAtributos(model, "id".split(","), todos, inicio, cantidad,
+            listMapGrupos = empresaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -97,13 +101,16 @@ public class EmpresaController extends BaseController {
             
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
-            retorno.setRecords(listMapGrupos.size());
+            retorno.setRecords(total);
             retorno.setTotal(totalPaginas + 1);
             retorno.setRows(listMapGrupos);
             retorno.setPage(pagina);
-
+            retorno.setStatus(200);
+            retorno.setMessage("OK");
+            
         } catch (Exception e) {
-
+            retorno.setStatus(500);
+            retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
@@ -145,9 +152,10 @@ public class EmpresaController extends BaseController {
      * @return
      */
     @PostMapping
+    @CrossOrigin(origins = "http://localhost:4599")
     public @ResponseBody
     ResponseDTO create(
-            @Valid Empresa model,
+            @RequestBody @Valid Empresa model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -174,7 +182,7 @@ public class EmpresaController extends BaseController {
             empresaManager.save(model);
 
             response.setStatus(200);
-            response.setMessage("OK");
+            response.setMessage("La empresa ha sido guardada");
         } catch (Exception e) {
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
@@ -192,10 +200,11 @@ public class EmpresaController extends BaseController {
      * @return
      */
     @PutMapping("/{id}")
+    @CrossOrigin(origins = "http://localhost:4599")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @Valid Empresa model,
+            @RequestBody @Valid Empresa model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -213,13 +222,18 @@ public class EmpresaController extends BaseController {
                 return response;
             }
             
+            Empresa dato = empresaManager.get(id);
+            
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
+            model.setFechaCreacion(dato.getFechaCreacion());
+            model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
+            model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
             
             empresaManager.update(model);
             
             response.setStatus(200);
-            response.setMessage("OK");
+            response.setMessage("La empresa ha sido guardada");
         } catch (Exception e) {
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
