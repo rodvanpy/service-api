@@ -180,9 +180,14 @@ public class EmpresaController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             
             empresaManager.save(model);
-
+            
+            Empresa empresa = new Empresa();
+            empresa.setRuc(model.getRuc());
+            
             response.setStatus(200);
-            response.setMessage("La empresa ha sido guardada");
+            response.setMessage("La empresa ha sido guardada");           
+            response.setModel(empresaManager.get(empresa));
+            
         } catch (Exception e) {
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
