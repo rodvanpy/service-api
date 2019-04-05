@@ -176,7 +176,6 @@ public class UsuarioController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
-            model.setEmpresa(new Empresa(userDetail.getIdEmpresa()));
             
             usuarioManager.save(model);
 

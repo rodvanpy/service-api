@@ -25,9 +25,9 @@ public class User implements UserDetails {
     private String email;
     private String rol;
     private String idMovil;
-    private String empresa;
     private Long idEmpresa;
-    private Collection<GrantedAuthority> list;
+    private Long idSusursal;
+    private Collection<GrantedAuthority> authorities;
     
     public User() {
     }
@@ -102,14 +102,6 @@ public class User implements UserDetails {
         this.idMovil = idMovil;
     }
 
-    public String getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(String empresa) {
-        this.empresa = empresa;
-    }
-
     public Long getIdEmpresa() {
         return idEmpresa;
     }
@@ -117,8 +109,15 @@ public class User implements UserDetails {
     public void setIdEmpresa(Long idEmpresa) {
         this.idEmpresa = idEmpresa;
     }
-       
-    
+
+    public Long getIdSusursal() {
+        return idSusursal;
+    }
+
+    public void setIdSusursal(Long idSusursal) {
+        this.idSusursal = idSusursal;
+    }
+           
     @Override
     public int hashCode() {
         int hash = 0;
@@ -166,7 +165,7 @@ public class User implements UserDetails {
      */
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return list;
+        return authorities;
     }
 
     /**
@@ -174,8 +173,8 @@ public class User implements UserDetails {
      *
      * @param roles
      */
-    public void setAuthorities(Collection<GrantedAuthority> roles) {
-        this.list = roles;
+    public void setAuthorities(Collection<GrantedAuthority> authorities) {
+        this.authorities = authorities;
     }
 
     /**

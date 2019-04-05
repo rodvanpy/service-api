@@ -14,10 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -25,11 +23,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author daniel
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = { "ruc" }) )
-public class Empresa extends Base {
+@Table(uniqueConstraints = @UniqueConstraint(name = "sucursal_cod_uq", columnNames = { "codigo_sucursal" }) )
+public class Sucursal extends Base {
 
     private static final long serialVersionUID = 79861856088L;
-    private static final String SECUENCIA = "seq_empresa_id";
+    private static final String SECUENCIA = "seq_sucursal_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
@@ -38,19 +36,15 @@ public class Empresa extends Base {
     private Long id;
     
     @NotEmpty(message = "Ingrese Nombre")
+    @Column(name = "CODIGO_SUCURSAL")
+    private String codigoSucursal;
+    
+    @NotEmpty(message = "Ingrese Nombre")
     @Column(name = "NOMBRE")
     private String nombre;
-    
-    //@NotEmpty(message = "Ingrese Nombre Fantasia")
-    @Column(name = "NOMBRE_FANTASIA")
-    private String nombreFantasia;
 
     @Column(name = "DESCRIPCION")
-    private String descripcion;
-    
-    @NotEmpty(message = "Ingrese Ruc")
-    @Column(name = "RUC")
-    private String ruc;
+    private String descripcion;   
 
     @NotEmpty(message = "Ingrese Direccion")
     @Column(name = "DIRECCION")
@@ -71,12 +65,17 @@ public class Empresa extends Base {
     
     @Column(name = "OBSERVACION")
     private String observacion;
+    
+    @NotNull(message = "Ingrese Empresa")
+    @ManyToOne
+    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
+    private Empresa empresa;
 
-    public Empresa() {
+    public Sucursal() {
 
     }
 
-    public Empresa(Long id) {
+    public Sucursal(Long id) {
         this.setId(id);
     }
 
@@ -120,20 +119,6 @@ public class Empresa extends Base {
      */
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    /**
-     * @return the ruc
-     */
-    public String getRuc() {
-        return ruc;
-    }
-
-    /**
-     * @param ruc the ruc to set
-     */
-    public void setRuc(String ruc) {
-        this.ruc = ruc;
     }
 
     /**
@@ -221,19 +206,32 @@ public class Empresa extends Base {
     }
 
     /**
-     * @return the nombreFantasia
+     * @return the codigoSucursal
      */
-    public String getNombreFantasia() {
-        return nombreFantasia;
+    public String getCodigoSucursal() {
+        return codigoSucursal;
     }
 
     /**
-     * @param nombreFantasia the nombreFantasia to set
+     * @param codigoSucursal the codigoSucursal to set
      */
-    public void setNombreFantasia(String nombreFantasia) {
-        this.nombreFantasia = nombreFantasia;
+    public void setCodigoSucursal(String codigoSucursal) {
+        this.codigoSucursal = codigoSucursal;
     }
-    
-    
 
+    /**
+     * @return the empresa
+     */
+    public Empresa getEmpresa() {
+        return empresa;
+    }
+
+    /**
+     * @param empresa the empresa to set
+     */
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+    }
+      
+    
 }

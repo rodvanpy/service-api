@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Empresa;
-import py.com.mojeda.service.ejb.entity.Usuario;
+import py.com.mojeda.service.ejb.entity.Sucursal;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -33,10 +32,10 @@ import py.com.mojeda.service.web.spring.config.User;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/empresas")
-public class EmpresaController extends BaseController {
+@RequestMapping(value = "/sucursales")
+public class SucursalController extends BaseController {
     
-    String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
+    String atributos = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
     
     @GetMapping
     public @ResponseBody
@@ -51,10 +50,10 @@ public class EmpresaController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Empresa model = new Empresa();
+        Sucursal model = new Sucursal();
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarEmpresaManager();
+            inicializarSucursalManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -81,7 +80,7 @@ public class EmpresaController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(empresaManager.list(model).size() + "");
+                total = Long.parseLong(sucursalManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -91,7 +90,7 @@ public class EmpresaController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = empresaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = sucursalManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -131,7 +130,7 @@ public class EmpresaController extends BaseController {
         try {
             inicializarEmpresaManager();
                         
-            Empresa model = empresaManager.get(id);
+            Sucursal model = sucursalManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -155,7 +154,7 @@ public class EmpresaController extends BaseController {
     @CrossOrigin(origins = "http://localhost:4599")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Empresa model,
+            @RequestBody @Valid Sucursal model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -179,14 +178,14 @@ public class EmpresaController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            empresaManager.save(model);
+            sucursalManager.save(model);
             
-            Empresa empresa = new Empresa();
-            empresa.setRuc(model.getRuc());
+            Sucursal empresa = new Sucursal();
+            empresa.setCodigoSucursal(model.getCodigoSucursal());
             
             response.setStatus(200);
-            response.setMessage("La empresa ha sido guardada");           
-            response.setModel(empresaManager.get(empresa));
+            response.setMessage("La sucursal ha sido guardada");           
+            response.setModel(sucursalManager.get(empresa));
             
         } catch (Exception e) {
             response.setStatus(500);
@@ -209,7 +208,7 @@ public class EmpresaController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Empresa model,
+            @RequestBody @Valid Sucursal model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -227,7 +226,7 @@ public class EmpresaController extends BaseController {
                 return response;
             }
             
-            Empresa dato = empresaManager.get(id);
+            Sucursal dato = sucursalManager.get(id);
             
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
@@ -235,10 +234,10 @@ public class EmpresaController extends BaseController {
             model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
             
-            empresaManager.update(model);
+            sucursalManager.update(model);
             
             response.setStatus(200);
-            response.setMessage("La empresa ha sido guardada");
+            response.setMessage("La sucursal ha sido guardada");
         } catch (Exception e) {
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");

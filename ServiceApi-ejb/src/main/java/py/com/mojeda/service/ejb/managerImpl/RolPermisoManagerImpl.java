@@ -6,8 +6,8 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.Rol;
-import py.com.mojeda.service.ejb.manager.RolManager;
+import py.com.mojeda.service.ejb.entity.RolPermiso;
+import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 
 
 /**
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.RolManager;
  * @author Miguel
  */
 @Stateless
-public class RolManagerImpl extends GenericDaoImpl<Rol, Long>
-        implements RolManager {
+public class RolPermisoManagerImpl extends GenericDaoImpl<RolPermiso, Long>
+        implements RolPermisoManager {
 
     @Override
-    protected Class<Rol> getEntityBeanType() {
-        return Rol.class;
+    protected Class<RolPermiso> getEntityBeanType() {
+        return RolPermiso.class;
     }
 }

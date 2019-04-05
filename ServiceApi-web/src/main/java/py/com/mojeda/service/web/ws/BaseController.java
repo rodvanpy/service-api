@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
+import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 
 /**
@@ -24,6 +25,8 @@ public class BaseController {
     protected UsuarioManager usuarioManager;
     
     protected EmpresaManager empresaManager;
+    
+    protected SucursalManager sucursalManager;
     
     protected ReferenciaManager referenciaManager;
     
@@ -59,6 +62,24 @@ public class BaseController {
             try {
 
                 empresaManager = (EmpresaManager) context.lookup("java:app/ServiceApi-ejb/EmpresaManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarSucursalManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (sucursalManager == null) {
+            try {
+
+                sucursalManager = (SucursalManager) context.lookup("java:app/ServiceApi-ejb/SucursalManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

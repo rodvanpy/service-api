@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import py.com.mojeda.service.ejb.entity.Tokens;
+import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.jwt.TokenHandler;
 import py.com.mojeda.service.web.utils.TokensResponse;
@@ -48,7 +49,8 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
      */
     @Override
     public void addAuthentication(HttpServletResponse res, Authentication authentication) {
-        TokensResponse response = new TokensResponse();
+        TokensResponse tokens = new TokensResponse();
+        ResponseDTO response = new ResponseDTO();
         try {
             
             User userDetail = ((User) authentication.getPrincipal());
@@ -56,9 +58,13 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
             
             Token JWT = tokenHandler.build(userDetail.getId()+"");
             
-            response.setToken(JWT);
-            response.setUsuario(userDetail);
-
+            tokens.setToken(JWT);
+            tokens.setUsuario(userDetail);
+            
+            response.setModel(tokens);
+            response.setStatus(200);
+            response.setMessage("Bienvenido a la aplicacion.");
+            
             //res.setHeader("Access-Control-Allow-Origin", "*");
             res.addHeader(tokenHandler.HEADER_STRING, tokenHandler.TOKEN_PREFIX + " " + JWT.getAccess_token());
             res.setHeader("Content-Type", "application/json;charset=UTF-8");

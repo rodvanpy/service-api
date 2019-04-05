@@ -27,11 +27,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(name = "usuario_alias_uq", columnNames = { "alias" }) )
-public class Usuario extends Base{
+@Table(uniqueConstraints = @UniqueConstraint(name = "departamento_alias_uq", columnNames = { "alias" }) )
+public class Departamento extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;
-    private static final String SECUENCIA = "seq_usuario_id";
+    private static final String SECUENCIA = "seq_departamento_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
@@ -45,33 +45,19 @@ public class Usuario extends Base{
     private String alias;
 
     //@NotNull(message = " Ingrese Clave Acceso")
-    @NotEmpty(message = "Ingrese Clave Acceso")
-    @Column(name = "CLAVE_ACCESO")
-    private String claveAcceso;
+    @NotEmpty(message = "Ingrese Nombre")
+    @Column(name = "NOMBRE")
+    private String nombre;
     
-    @Column(name = "SUPER_USUARIO")
-    private Boolean superUsuario; 
+    @Column(name = "DESCRIPCION")
+    private String descripcion; 
     
-    @NotNull(message = "Ingrese Tiempo de Expiracion del Tokens")
-    @Column(name = "EXPIRATION_TIME_TOKENS")
-    private Long expirationTimeTokens;
-        
+    @NotNull(message = "Ingrese Sucursal")
     @ManyToOne
-    @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
-    @Valid
-    private Persona persona;
+    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
+    private Sucursal sucursal;
     
-    @NotNull(message = "Ingrese Rol")
-    @ManyToOne
-    @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
-    private Rol rol;
-    
-    @NotNull(message = "Ingrese Empresa")
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
-    
-    public Usuario() {
+    public Departamento() {
 
     }
 
@@ -79,7 +65,7 @@ public class Usuario extends Base{
      * @param id
      *            el id de Usuario
      */
-    public Usuario(Long id) {
+    public Departamento(Long id) {
             this.setId(id);
     }
     
@@ -112,81 +98,47 @@ public class Usuario extends Base{
     }
 
     /**
-     * @return the claveAcceso
+     * @return the nombre
      */
-    public String getClaveAcceso() {
-        return claveAcceso;
+    public String getNombre() {
+        return nombre;
     }
 
     /**
-     * @param claveAcceso the claveAcceso to set
+     * @param nombre the nombre to set
      */
-    public void setClaveAcceso(String claveAcceso) {
-        this.claveAcceso = claveAcceso;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     /**
-     * @return the superUsuario
+     * @return the descripcion
      */
-    public Boolean getSuperUsuario() {
-        return superUsuario;
+    public String getDescripcion() {
+        return descripcion;
     }
 
     /**
-     * @param superUsuario the superUsuario to set
+     * @param descripcion the descripcion to set
      */
-    public void setSuperUsuario(Boolean superUsuario) {
-        this.superUsuario = superUsuario;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     /**
-     * @return the rol
+     * @return the sucursal
      */
-    public Rol getRol() {
-        return rol;
+    public Sucursal getSucursal() {
+        return sucursal;
     }
 
     /**
-     * @param rol the rol to set
+     * @param sucursal the sucursal to set
      */
-    public void setRol(Rol rol) {
-        this.rol = rol;
+    public void setSucursal(Sucursal sucursal) {
+        this.sucursal = sucursal;
     }
 
-    /**
-     * @return the empresa
-     */
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-    }
-
-    /**
-     * @return the persona
-     */
-    public Persona getPersona() {
-        return persona;
-    }
-
-    /**
-     * @param persona the persona to set
-     */
-    public void setPersona(Persona persona) {
-        this.persona = persona;
-    }
-
-    public Long getExpirationTimeTokens() {
-        return expirationTimeTokens;
-    }
-
-    public void setExpirationTimeTokens(Long expirationTimeTokens) {
-        this.expirationTimeTokens = expirationTimeTokens;
-    }
+    
            
 }

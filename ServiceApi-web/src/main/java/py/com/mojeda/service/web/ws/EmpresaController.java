@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresa;
+import py.com.mojeda.service.ejb.entity.Sucursal;
 import py.com.mojeda.service.ejb.entity.Usuario;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -37,6 +38,7 @@ import py.com.mojeda.service.web.spring.config.User;
 public class EmpresaController extends BaseController {
     
     String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
+    String atributos_sucursales = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
     
     @GetMapping
     public @ResponseBody
@@ -92,6 +94,89 @@ public class EmpresaController extends BaseController {
             }
 
             listMapGrupos = empresaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+                    ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
+                    null, null, null, null, null, null, null, null, true);
+            
+            if (todos) {
+                total = Long.parseLong(listMapGrupos.size() + "");
+            }
+            
+            Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
+
+            retorno.setRecords(total);
+            retorno.setTotal(totalPaginas + 1);
+            retorno.setRows(listMapGrupos);
+            retorno.setPage(pagina);
+            retorno.setStatus(200);
+            retorno.setMessage("OK");
+            
+        } catch (Exception e) {
+            retorno.setStatus(500);
+            retorno.setMessage("Error interno del servidor.");
+        }
+
+        return retorno;
+    }
+    
+   
+    
+    @GetMapping("/sucursales")
+    public @ResponseBody
+    ResponseListDTO listarSucursalesEmpresa(@ModelAttribute("_search") boolean filtrar,
+            @ModelAttribute("filters") String filtros,
+            @ModelAttribute("page") Integer pagina,
+            @ModelAttribute("rows") Integer cantidad,
+            @ModelAttribute("sidx") String ordenarPor,
+            @ModelAttribute("sord") String sentidoOrdenamiento,
+            @ModelAttribute("fk") String fkEmpresa,
+            @ModelAttribute("all") boolean todos) {
+
+        ResponseListDTO retorno = new ResponseListDTO();
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+        Sucursal model = new Sucursal();
+        model.setEmpresa(new Empresa(Long.parseLong(fkEmpresa)));
+        
+        List<Map<String, Object>> listMapGrupos = null;
+        try {
+            inicializarSucursalManager();
+            Gson gson = new Gson();
+            String camposFiltros = null;
+            String valorFiltro = null;
+
+//            if (filtrar) {
+//                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
+//                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
+//                    for (ReglaDTO regla : filtro.getRules()) {
+//                        if (camposFiltros == null) {
+//                            camposFiltros = regla.getField();
+//                            valorFiltro = regla.getData();
+//                        } else {
+//                            camposFiltros += "," + regla.getField();
+//                        }
+//                    }
+//                } else {
+//                    //ejemplo = generarEjemplo(filtro, ejemplo);
+//                }
+//
+//            }
+            // ejemplo.setActivo("S");
+
+            pagina = pagina != null ? pagina : 1;
+            Long total = 0L;
+
+            if (!todos) {
+                total = Long.parseLong(sucursalManager.list(model).size() + "");
+            }
+
+            Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
+
+            if (total < inicio) {
+                inicio = Integer.parseInt(total.toString()) - Integer.parseInt(total.toString()) % cantidad;
+                pagina = Integer.parseInt(total.toString()) / cantidad;
+            }
+
+            listMapGrupos = sucursalManager.listAtributos(model, atributos_sucursales.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             

@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
@@ -20,7 +21,8 @@ import javax.persistence.Transient;
  * @author Miguel
  */
 @Entity
-public class RolPermiso{
+@Table(name = "USUARIO_DEPARTAMENTO")
+public class UsuarioDepartamento{
     
     private static final long serialVersionUID = 7986185608L;
     
@@ -30,16 +32,13 @@ public class RolPermiso{
     private Long id;
     
     @ManyToOne(optional = false)
-    @JoinColumn(name = "empresa", referencedColumnName = "id")
-    private Empresa empresa;
+    @JoinColumn(name = "ID_DEPARTAMENTO", referencedColumnName = "id")
+    private Departamento departamento;
    
     @ManyToOne(optional = false)
-    @JoinColumn(name = "permiso", referencedColumnName = "id")
-    private Permiso permiso; 
+    @JoinColumn(name = "ID_USUARIO", referencedColumnName = "id")
+    private Usuario usuario; 
     
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "rol", referencedColumnName = "id")
-    private Rol rol;
     
 
     public Long getId() {
@@ -49,50 +48,36 @@ public class RolPermiso{
     public void setId(Long id) {
         this.id = id;
     }
+
+    /**
+     * @return the departamento
+     */
+    public Departamento getDepartamento() {
+        return departamento;
+    }
+
+    /**
+     * @param departamento the departamento to set
+     */
+    public void setDepartamento(Departamento departamento) {
+        this.departamento = departamento;
+    }
+
+    /**
+     * @return the usuario
+     */
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    /**
+     * @param usuario the usuario to set
+     */
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
     
     
-
-    /**
-     * @return the empresa
-     */
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-    }
-
-    /**
-     * @return the permiso
-     */
-    public Permiso getPermiso() {
-        return permiso;
-    }
-
-    /**
-     * @param permiso the permiso to set
-     */
-    public void setPermiso(Permiso permiso) {
-        this.permiso = permiso;
-    }
-
-    /**
-     * @return the rol
-     */
-    public Rol getRol() {
-        return rol;
-    }
-
-    /**
-     * @param rol the rol to set
-     */
-    public void setRol(Rol rol) {
-        this.rol = rol;
-    }   
 
     
 }

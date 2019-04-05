@@ -66,10 +66,10 @@ public class Usuario extends Base{
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
     private Rol rol;
     
-    @NotNull(message = "Ingrese Empresa")
+    @NotNull(message = "Ingrese Sucursal")
     @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
+    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
+    private Sucursal sucursal;
     
     public Usuario() {
 
@@ -153,19 +153,7 @@ public class Usuario extends Base{
         this.rol = rol;
     }
 
-    /**
-     * @return the empresa
-     */
-    public Empresa getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-    }
+    
 
     /**
      * @return the persona
@@ -187,6 +175,20 @@ public class Usuario extends Base{
 
     public void setExpirationTimeTokens(Long expirationTimeTokens) {
         this.expirationTimeTokens = expirationTimeTokens;
+    }
+
+    /**
+     * @return the sucursal
+     */
+    public Sucursal getSucursal() {
+        return sucursal;
+    }
+
+    /**
+     * @param sucursal the sucursal to set
+     */
+    public void setSucursal(Sucursal sucursal) {
+        this.sucursal = sucursal;
     }
            
 }
