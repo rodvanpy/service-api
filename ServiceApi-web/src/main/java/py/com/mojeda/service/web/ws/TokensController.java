@@ -57,6 +57,7 @@ public class TokensController extends BaseController {
             response.setMessage("OK");
 
         } catch (Exception e) {
+            logger.error("Error: ",e);
             res.setStatus(401);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");

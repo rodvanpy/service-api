@@ -26,6 +26,7 @@ import py.com.mojeda.service.ejb.entity.Usuario;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
+import static py.com.mojeda.service.web.ws.BaseController.logger;
 
 /**
  *
@@ -104,7 +105,7 @@ public class ReferenciaController extends BaseController {
             retorno.setPage(pagina);
 
         } catch (Exception e) {
-
+            logger.error("Error: ",e);
         }
 
         return retorno;
@@ -131,6 +132,7 @@ public class ReferenciaController extends BaseController {
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -177,6 +179,7 @@ public class ReferenciaController extends BaseController {
             response.setStatus(200);
             response.setMessage("OK");
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -222,6 +225,7 @@ public class ReferenciaController extends BaseController {
             response.setStatus(200);
             response.setMessage("OK");
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }

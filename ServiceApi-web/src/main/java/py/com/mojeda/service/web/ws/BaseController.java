@@ -13,6 +13,7 @@ import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
+import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 
 /**
  *
@@ -31,6 +32,8 @@ public class BaseController {
     protected ReferenciaManager referenciaManager;
     
     protected RolManager rolManager;
+    
+    protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
     protected void inicializarUsuarioManager() throws Exception {
         if (context == null) {

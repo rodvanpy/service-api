@@ -128,7 +128,7 @@ public class SucursalController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarEmpresaManager();
+            inicializarSucursalManager();
                         
             Sucursal model = sucursalManager.get(id);
                
@@ -136,6 +136,7 @@ public class SucursalController extends BaseController {
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -160,7 +161,7 @@ public class SucursalController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarEmpresaManager();
+            inicializarSucursalManager();
             
             if(errors.hasErrors()){
                 
@@ -172,6 +173,21 @@ public class SucursalController extends BaseController {
                 return response;
             }
             
+            String[] codigo = model.getNombre().split(" ");
+            String codigoNombre = "";
+            for(int i = 0; i<= codigo.length ; i++){
+                codigoNombre = codigoNombre + codigo[i].substring(0, 1);
+            }
+            
+            Sucursal sucursal = new Sucursal();
+            sucursal.setEmpresa(model.getEmpresa());
+            
+            //Numero Sucursal
+            Integer numeroSucursal = sucursalManager.total(sucursal);
+            //Cantidad Sucursales
+            Integer cantidadSucursal = sucursalManager.total(new Sucursal());
+            
+            model.setCodigoSucursal(codigoNombre+"-"+numeroSucursal+"-"+cantidadSucursal);
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -180,14 +196,15 @@ public class SucursalController extends BaseController {
             
             sucursalManager.save(model);
             
-            Sucursal empresa = new Sucursal();
-            empresa.setCodigoSucursal(model.getCodigoSucursal());
+            sucursal = new Sucursal();
+            sucursal.setCodigoSucursal(model.getCodigoSucursal());
             
             response.setStatus(200);
             response.setMessage("La sucursal ha sido guardada");           
-            response.setModel(sucursalManager.get(empresa));
+            response.setModel(sucursalManager.get(sucursal));
             
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -214,7 +231,7 @@ public class SucursalController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarEmpresaManager();
+            inicializarSucursalManager();
             
             if(errors.hasErrors()){
                 
@@ -239,6 +256,7 @@ public class SucursalController extends BaseController {
             response.setStatus(200);
             response.setMessage("La sucursal ha sido guardada");
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }

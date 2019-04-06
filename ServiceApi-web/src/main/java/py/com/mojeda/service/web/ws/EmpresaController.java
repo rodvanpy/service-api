@@ -111,6 +111,7 @@ public class EmpresaController extends BaseController {
             retorno.setMessage("OK");
             
         } catch (Exception e) {
+            logger.error("Error: ",e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }
@@ -194,6 +195,7 @@ public class EmpresaController extends BaseController {
             retorno.setMessage("OK");
             
         } catch (Exception e) {
+            logger.error("Error: ",e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }
@@ -222,6 +224,7 @@ public class EmpresaController extends BaseController {
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -274,6 +277,7 @@ public class EmpresaController extends BaseController {
             response.setModel(empresaManager.get(empresa));
             
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -325,6 +329,7 @@ public class EmpresaController extends BaseController {
             response.setStatus(200);
             response.setMessage("La empresa ha sido guardada");
         } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
