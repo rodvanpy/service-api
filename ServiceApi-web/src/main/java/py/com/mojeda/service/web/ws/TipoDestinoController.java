@@ -57,7 +57,7 @@ public class TipoDestinoController extends BaseController {
         TipoDestinos model = new TipoDestinos();
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoDestinosManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -134,7 +134,7 @@ public class TipoDestinoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoDestinosManager();
                         
             TipoDestinos model = tipoDestinosManager.get(id);
                
@@ -167,7 +167,7 @@ public class TipoDestinoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoDestinosManager();
             
             if(errors.hasErrors()){
                 
@@ -231,7 +231,7 @@ public class TipoDestinoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoDestinosManager();
             
             if(errors.hasErrors()){
                 
