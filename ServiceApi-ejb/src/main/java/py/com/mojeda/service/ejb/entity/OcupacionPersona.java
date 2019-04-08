@@ -69,16 +69,16 @@ public class OcupacionPersona extends Base {
 
     @JoinColumn(name = "ID_CLIENTE", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Persona persona;
+    private Personas persona;
 
     @ManyToOne
     @NotNull(message = "Ingrese Ocupacion")
     @JoinColumn(name = "ID_OCUPACION", referencedColumnName = "id")
-    private Ocupacion ocupacion;
+    private Ocupaciones ocupacion;
 
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
+    private Empresas empresa;
 
     public OcupacionPersona() {
 
@@ -217,42 +217,42 @@ public class OcupacionPersona extends Base {
     /**
      * @return the persona
      */
-    public Persona getPersona() {
+    public Personas getPersona() {
         return persona;
     }
 
     /**
      * @param persona the persona to set
      */
-    public void setPersona(Persona persona) {
+    public void setPersona(Personas persona) {
         this.persona = persona;
     }
 
     /**
      * @return the ocupacion
      */
-    public Ocupacion getOcupacion() {
+    public Ocupaciones getOcupacion() {
         return ocupacion;
     }
 
     /**
      * @param ocupacion the ocupacion to set
      */
-    public void setOcupacion(Ocupacion ocupacion) {
+    public void setOcupacion(Ocupaciones ocupacion) {
         this.ocupacion = ocupacion;
     }
 
     /**
      * @return the empresa
      */
-    public Empresa getEmpresa() {
+    public Empresas getEmpresa() {
         return empresa;
     }
 
     /**
      * @param empresa the empresa to set
      */
-    public void setEmpresa(Empresa empresa) {
+    public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
     }
 

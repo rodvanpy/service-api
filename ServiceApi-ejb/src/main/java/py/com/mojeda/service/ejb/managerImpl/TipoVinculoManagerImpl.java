@@ -6,7 +6,7 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.TipoVinculo;
+import py.com.mojeda.service.ejb.entity.TipoVinculos;
 import py.com.mojeda.service.ejb.manager.TipoVinculoManager;
 
 
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.TipoVinculoManager;
  * @author Miguel
  */
 @Stateless
-public class TipoVinculoManagerImpl extends GenericDaoImpl<TipoVinculo, Long>
+public class TipoVinculoManagerImpl extends GenericDaoImpl<TipoVinculos, Long>
         implements TipoVinculoManager {
 
     @Override
-    protected Class<TipoVinculo> getEntityBeanType() {
-        return TipoVinculo.class;
+    protected Class<TipoVinculos> getEntityBeanType() {
+        return TipoVinculos.class;
     }
 }

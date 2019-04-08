@@ -6,7 +6,7 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.Persona;
+import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 
 
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.PersonaManager;
  * @author Miguel
  */
 @Stateless
-public class PersonaManagerImpl extends GenericDaoImpl<Persona, Long>
+public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
         implements PersonaManager {
 
     @Override
-    protected Class<Persona> getEntityBeanType() {
-        return Persona.class;
+    protected Class<Personas> getEntityBeanType() {
+        return Personas.class;
     }
 }

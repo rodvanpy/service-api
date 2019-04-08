@@ -22,8 +22,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "VINCULO")
-public class Vinculo extends Base {
+@Table(name = "VINCULOS")
+public class Vinculos extends Base {
 
     private static final long serialVersionUID = -9149680520407250259L;
     private static final String SECUENCIA = "seq_vinculo_id";
@@ -37,25 +37,25 @@ public class Vinculo extends Base {
     @ManyToOne
     @NotNull(message = "Ingrese Tipo Vinculo")
     @JoinColumn(name = "ID_TIPO_VINCULO", referencedColumnName = "id")
-    private TipoVinculo tipoVinculo;
+    private TipoVinculos tipoVinculo;
     
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
-    private Persona persona;
+    private Personas persona;
     
     @ManyToOne
     @JoinColumn(name = "ID_VINCULO", referencedColumnName = "id")
-    private Persona personaVinculo;
+    private Personas personaVinculo;
     
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
+    private Empresas empresa;
     
-    public Vinculo() {
+    public Vinculos() {
 
     }
 
-    public Vinculo(Long id) {
+    public Vinculos(Long id) {
         this.setId(id);
     }
 
@@ -76,56 +76,56 @@ public class Vinculo extends Base {
     /**
      * @return the tipoVinculo
      */
-    public TipoVinculo getTipoVinculo() {
+    public TipoVinculos getTipoVinculo() {
         return tipoVinculo;
     }
 
     /**
      * @param tipoVinculo the tipoVinculo to set
      */
-    public void setTipoVinculo(TipoVinculo tipoVinculo) {
+    public void setTipoVinculo(TipoVinculos tipoVinculo) {
         this.tipoVinculo = tipoVinculo;
     }
 
     /**
      * @return the persona
      */
-    public Persona getPersona() {
+    public Personas getPersona() {
         return persona;
     }
 
     /**
      * @param persona the persona to set
      */
-    public void setPersona(Persona persona) {
+    public void setPersona(Personas persona) {
         this.persona = persona;
     }
 
     /**
      * @return the personaVinculo
      */
-    public Persona getPersonaVinculo() {
+    public Personas getPersonaVinculo() {
         return personaVinculo;
     }
 
     /**
      * @param personaVinculo the personaVinculo to set
      */
-    public void setPersonaVinculo(Persona personaVinculo) {
+    public void setPersonaVinculo(Personas personaVinculo) {
         this.personaVinculo = personaVinculo;
     }
 
     /**
      * @return the empresa
      */
-    public Empresa getEmpresa() {
+    public Empresas getEmpresa() {
         return empresa;
     }
 
     /**
      * @param empresa the empresa to set
      */
-    public void setEmpresa(Empresa empresa) {
+    public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
     }
     

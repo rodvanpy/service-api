@@ -5,46 +5,49 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
-import java.io.Serializable;
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
- * @author Miguel
+ * @author miguel.ojeda
  */
 @Entity
-public class Permiso implements Serializable {
+@Table(name = "TIPO_REFERENCIAS")
+public class TipoReferencias extends Base{
 
-    private static long serialVersionUID = -9149680520407250259L;
-    private static final String SECUENCIA = "seq_permiso_id";
-
+    private static final long serialVersionUID = 1574657L;
+    private static final String SECUENCIA = "seq_tipo_referencia_id";
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
-    @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
+    @SequenceGenerator(name=SECUENCIA, sequenceName=SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
-
-    @NotNull
-    @NotEmpty
-    @Column(name = "nombre")
+    
+    @NotEmpty(message = "Ingrese Nombre")
+    @Basic(optional = false)
+    @Column(name = "NOMBRE")
     private String nombre;
-
-    @Column(name = "descripcion")
-    private String descripcion;
-
-    public Permiso() {
-
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
+    private Empresas empresa;
+    
+    public TipoReferencias() {
     }
 
-    public Permiso(Long id) {
-        this.setId(id);
+    public TipoReferencias(Long id) {
+            this.setId(id);
     }
 
     /**
@@ -76,17 +79,20 @@ public class Permiso implements Serializable {
     }
 
     /**
-     * @return the descripcion
+     * @return the empresa
      */
-    public String getDescripcion() {
-        return descripcion;
+    public Empresas getEmpresa() {
+        return empresa;
     }
 
     /**
-     * @param descripcion the descripcion to set
+     * @param empresa the empresa to set
      */
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setEmpresa(Empresas empresa) {
+        this.empresa = empresa;
     }
 
+    
+    
+    
 }

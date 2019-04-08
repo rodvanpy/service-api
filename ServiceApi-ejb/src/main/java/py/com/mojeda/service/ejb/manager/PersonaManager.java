@@ -8,7 +8,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.Persona;
+import py.com.mojeda.service.ejb.entity.Personas;
 
 
 /**
@@ -16,6 +16,6 @@ import py.com.mojeda.service.ejb.entity.Persona;
  * @author Miguel
  */
 @Local
-public interface PersonaManager extends GenericDao<Persona, Long>{   
+public interface PersonaManager extends GenericDao<Personas, Long>{   
     
 }

@@ -22,8 +22,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "REFERENCIA")
-public class Referencia extends Base {
+@Table(name = "REFERENCIAS")
+public class Referencias extends Base {
 
     private static final long serialVersionUID = -9149680520407250259L;
     private static final String SECUENCIA = "seq_referencia_id";
@@ -47,17 +47,17 @@ public class Referencia extends Base {
     @ManyToOne
     @NotNull(message = "Ingrese Tipo Referencia")
     @JoinColumn(name = "ID_TIPO_REFERENCIA", referencedColumnName = "id")
-    private TipoReferencia tipoReferencia;
+    private TipoReferencias tipoReferencia;
     
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
-    private Persona persona;
+    private Personas persona;
     
-    public Referencia() {
+    public Referencias() {
 
     }
 
-    public Referencia(Long id) {
+    public Referencias(Long id) {
         this.setId(id);
     }
 
@@ -120,28 +120,28 @@ public class Referencia extends Base {
     /**
      * @return the tipoReferencia
      */
-    public TipoReferencia getTipoReferencia() {
+    public TipoReferencias getTipoReferencia() {
         return tipoReferencia;
     }
 
     /**
      * @param tipoReferencia the tipoReferencia to set
      */
-    public void setTipoReferencia(TipoReferencia tipoReferencia) {
+    public void setTipoReferencia(TipoReferencias tipoReferencia) {
         this.tipoReferencia = tipoReferencia;
     }
 
     /**
      * @return the persona
      */
-    public Persona getPersona() {
+    public Personas getPersona() {
         return persona;
     }
 
     /**
      * @param persona the persona to set
      */
-    public void setPersona(Persona persona) {
+    public void setPersona(Personas persona) {
         this.persona = persona;
     }
     

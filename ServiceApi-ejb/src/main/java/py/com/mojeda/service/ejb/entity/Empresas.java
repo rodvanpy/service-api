@@ -25,8 +25,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author daniel
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = { "ruc" }) )
-public class Empresa extends Base {
+@Table(name = "EMPRESAS", uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = { "ruc" }) )
+public class Empresas extends Base {
 
     private static final long serialVersionUID = 79861856088L;
     private static final String SECUENCIA = "seq_empresa_id";
@@ -72,11 +72,11 @@ public class Empresa extends Base {
     @Column(name = "OBSERVACION")
     private String observacion;
 
-    public Empresa() {
+    public Empresas() {
 
     }
 
-    public Empresa(Long id) {
+    public Empresas(Long id) {
         this.setId(id);
     }
 

@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Empresa;
-import py.com.mojeda.service.ejb.entity.Sucursal;
-import py.com.mojeda.service.ejb.entity.Usuario;
+import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -53,7 +53,7 @@ public class EmpresaController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Empresa model = new Empresa();
+        Empresas model = new Empresas();
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarEmpresaManager();
@@ -135,8 +135,8 @@ public class EmpresaController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Sucursal model = new Sucursal();
-        model.setEmpresa(new Empresa(Long.parseLong(fkEmpresa)));
+        Sucursales model = new Sucursales();
+        model.setEmpresa(new Empresas(Long.parseLong(fkEmpresa)));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -218,7 +218,7 @@ public class EmpresaController extends BaseController {
         try {
             inicializarEmpresaManager();
                         
-            Empresa model = empresaManager.get(id);
+            Empresas model = empresaManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -243,7 +243,7 @@ public class EmpresaController extends BaseController {
     @CrossOrigin(origins = "http://localhost:4599")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Empresa model,
+            @RequestBody @Valid Empresas model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -269,7 +269,7 @@ public class EmpresaController extends BaseController {
             
             empresaManager.save(model);
             
-            Empresa empresa = new Empresa();
+            Empresas empresa = new Empresas();
             empresa.setRuc(model.getRuc());
             
             response.setStatus(200);
@@ -298,7 +298,7 @@ public class EmpresaController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Empresa model,
+            @RequestBody @Valid Empresas model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -316,7 +316,7 @@ public class EmpresaController extends BaseController {
                 return response;
             }
             
-            Empresa dato = empresaManager.get(id);
+            Empresas dato = empresaManager.get(id);
             
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());

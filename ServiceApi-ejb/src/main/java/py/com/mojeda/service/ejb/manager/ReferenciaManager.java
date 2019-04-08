@@ -8,7 +8,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.Referencia;
+import py.com.mojeda.service.ejb.entity.Referencias;
 
 
 /**
@@ -16,6 +16,6 @@ import py.com.mojeda.service.ejb.entity.Referencia;
  * @author Miguel
  */
 @Local
-public interface ReferenciaManager extends GenericDao<Referencia, Long>{   
+public interface ReferenciaManager extends GenericDao<Referencias, Long>{   
     
 }

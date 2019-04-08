@@ -8,7 +8,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.Vinculo;
+import py.com.mojeda.service.ejb.entity.Vinculos;
 
 
 /**
@@ -16,6 +16,6 @@ import py.com.mojeda.service.ejb.entity.Vinculo;
  * @author Miguel
  */
 @Local
-public interface VinculoManager extends GenericDao<Vinculo, Long>{   
+public interface VinculoManager extends GenericDao<Vinculos, Long>{   
     
 }

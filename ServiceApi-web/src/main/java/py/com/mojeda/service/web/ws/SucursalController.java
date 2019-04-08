@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Sucursal;
+import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -50,7 +50,7 @@ public class SucursalController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Sucursal model = new Sucursal();
+        Sucursales model = new Sucursales();
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarSucursalManager();
@@ -130,7 +130,7 @@ public class SucursalController extends BaseController {
         try {
             inicializarSucursalManager();
                         
-            Sucursal model = sucursalManager.get(id);
+            Sucursales model = sucursalManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -155,7 +155,7 @@ public class SucursalController extends BaseController {
     @CrossOrigin(origins = "http://localhost:4599")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Sucursal model,
+            @RequestBody @Valid Sucursales model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -175,17 +175,17 @@ public class SucursalController extends BaseController {
             
             String[] codigo = model.getNombre().split(" ");
             String codigoNombre = "";
-            for(int i = 0; i<= codigo.length ; i++){
+            for(int i = 0; i < codigo.length ; i++){
                 codigoNombre = codigoNombre + codigo[i].substring(0, 1);
             }
             
-            Sucursal sucursal = new Sucursal();
+            Sucursales sucursal = new Sucursales();
             sucursal.setEmpresa(model.getEmpresa());
             
             //Numero Sucursal
-            Integer numeroSucursal = sucursalManager.total(sucursal);
+            Integer numeroSucursal = sucursalManager.total(sucursal) + 1;
             //Cantidad Sucursales
-            Integer cantidadSucursal = sucursalManager.total(new Sucursal());
+            Integer cantidadSucursal = sucursalManager.total(new Sucursales()) + 1;
             
             model.setCodigoSucursal(codigoNombre+"-"+numeroSucursal+"-"+cantidadSucursal);
             model.setActivo("S");
@@ -196,7 +196,7 @@ public class SucursalController extends BaseController {
             
             sucursalManager.save(model);
             
-            sucursal = new Sucursal();
+            sucursal = new Sucursales();
             sucursal.setCodigoSucursal(model.getCodigoSucursal());
             
             response.setStatus(200);
@@ -225,7 +225,7 @@ public class SucursalController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Sucursal model,
+            @RequestBody @Valid Sucursales model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -243,7 +243,7 @@ public class SucursalController extends BaseController {
                 return response;
             }
             
-            Sucursal dato = sucursalManager.get(id);
+            Sucursales dato = sucursalManager.get(id);
             
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());

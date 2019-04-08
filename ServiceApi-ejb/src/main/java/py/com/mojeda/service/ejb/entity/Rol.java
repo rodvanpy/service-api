@@ -38,7 +38,7 @@ public class Rol extends Base {
     
     @ManyToOne
     @JoinColumn
-    private Empresa empresa;
+    private Empresas empresa;
 
     
     public Rol() {
@@ -84,14 +84,14 @@ public class Rol extends Base {
     /**
      * @return the empresa
      */
-    public Empresa getEmpresa() {
+    public Empresas getEmpresa() {
         return empresa;
     }
 
     /**
      * @param empresa the empresa to set
      */
-    public void setEmpresa(Empresa empresa) {
+    public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
     }
 

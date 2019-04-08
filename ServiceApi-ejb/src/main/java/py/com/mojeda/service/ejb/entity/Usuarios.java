@@ -27,8 +27,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(name = "usuario_alias_uq", columnNames = { "alias" }) )
-public class Usuario extends Base{
+@Table(name = "USUARIOS", uniqueConstraints = @UniqueConstraint(name = "usuario_alias_uq", columnNames = { "alias" }) )
+public class Usuarios extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;
     private static final String SECUENCIA = "seq_usuario_id";
@@ -59,7 +59,7 @@ public class Usuario extends Base{
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @Valid
-    private Persona persona;
+    private Personas persona;
     
     @NotNull(message = "Ingrese Rol")
     @ManyToOne
@@ -69,9 +69,9 @@ public class Usuario extends Base{
     @NotNull(message = "Ingrese Sucursal")
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
-    private Sucursal sucursal;
+    private Sucursales sucursal;
     
-    public Usuario() {
+    public Usuarios() {
 
     }
 
@@ -79,7 +79,7 @@ public class Usuario extends Base{
      * @param id
      *            el id de Usuario
      */
-    public Usuario(Long id) {
+    public Usuarios(Long id) {
             this.setId(id);
     }
     
@@ -158,14 +158,14 @@ public class Usuario extends Base{
     /**
      * @return the persona
      */
-    public Persona getPersona() {
+    public Personas getPersona() {
         return persona;
     }
 
     /**
      * @param persona the persona to set
      */
-    public void setPersona(Persona persona) {
+    public void setPersona(Personas persona) {
         this.persona = persona;
     }
 
@@ -180,14 +180,14 @@ public class Usuario extends Base{
     /**
      * @return the sucursal
      */
-    public Sucursal getSucursal() {
+    public Sucursales getSucursal() {
         return sucursal;
     }
 
     /**
      * @param sucursal the sucursal to set
      */
-    public void setSucursal(Sucursal sucursal) {
+    public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
     }
            
