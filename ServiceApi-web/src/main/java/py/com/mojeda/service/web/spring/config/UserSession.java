@@ -21,7 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.RolPermiso;
-import py.com.mojeda.service.ejb.entity.Usuario;
+import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 
@@ -50,7 +50,7 @@ public class UserSession implements AuthenticationProvider {
             String userLogin = authentication.getPrincipal().toString();
             String passwordLogin = authentication.getCredentials().toString();
 
-            Usuario ejObjeto = new Usuario();
+            Usuarios ejObjeto = new Usuarios();
             ejObjeto.setAlias(userLogin);
 
             ejObjeto = usuarioManager.get(ejObjeto);

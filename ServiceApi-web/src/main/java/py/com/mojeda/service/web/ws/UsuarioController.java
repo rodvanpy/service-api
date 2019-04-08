@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Empresa;
-import py.com.mojeda.service.ejb.entity.Usuario;
+import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -49,7 +49,7 @@ public class UsuarioController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Usuario ejUsuario = new Usuario();
+        Usuarios ejUsuario = new Usuarios();
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarUsuarioManager();
@@ -129,7 +129,7 @@ public class UsuarioController extends BaseController {
         try {
             inicializarUsuarioManager();
                         
-            Usuario model = usuarioManager.get(id);
+            Usuarios model = usuarioManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -153,12 +153,12 @@ public class UsuarioController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @Valid Usuario model,
+            @Valid Usuarios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
-        Usuario ejUsuario = new Usuario();
+        Usuarios ejUsuario = new Usuarios();
         try {
             inicializarUsuarioManager();
             
@@ -203,7 +203,7 @@ public class UsuarioController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @Valid Usuario model,
+            @Valid Usuarios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());

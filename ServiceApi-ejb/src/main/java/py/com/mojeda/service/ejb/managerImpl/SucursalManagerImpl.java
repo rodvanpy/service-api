@@ -6,7 +6,7 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.Sucursal;
+import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 
 
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.SucursalManager;
  * @author Miguel
  */
 @Stateless
-public class SucursalManagerImpl extends GenericDaoImpl<Sucursal, Long>
+public class SucursalManagerImpl extends GenericDaoImpl<Sucursales, Long>
         implements SucursalManager {
 
     @Override
-    protected Class<Sucursal> getEntityBeanType() {
-        return Sucursal.class;
+    protected Class<Sucursales> getEntityBeanType() {
+        return Sucursales.class;
     }
 }

@@ -15,17 +15,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "TIPO_VINCULO")
-public class TipoVinculo {
+@Table(name = "TIPO_EGRESOS")
+public class TipoEgresos extends Base{
 
     private static final long serialVersionUID = 1574657L;
-    private static final String SECUENCIA = "seq_tipo_vinculo_id";
+    private static final String SECUENCIA = "seq_tipo_egreso_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
@@ -33,18 +34,24 @@ public class TipoVinculo {
     @Column(name = "id")
     private Long id;
     
+    @NotEmpty(message = "Ingrese Nombre")
     @Basic(optional = false)
     @Column(name = "NOMBRE")
     private String nombre;
     
+    @NotEmpty(message = "Ingrese Codigo")
+    @Basic(optional = false)
+    @Column(name = "CODIGO")
+    private String codigo;
+    
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
+    private Empresas empresa;
     
-    public TipoVinculo() {
+    public TipoEgresos() {
     }
 
-    public TipoVinculo(Long id) {
+    public TipoEgresos(Long id) {
             this.setId(id);
     }
 
@@ -79,15 +86,29 @@ public class TipoVinculo {
     /**
      * @return the empresa
      */
-    public Empresa getEmpresa() {
+    public Empresas getEmpresa() {
         return empresa;
     }
 
     /**
      * @param empresa the empresa to set
      */
-    public void setEmpresa(Empresa empresa) {
+    public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
+    }
+
+    /**
+     * @return the codigo
+     */
+    public String getCodigo() {
+        return codigo;
+    }
+
+    /**
+     * @param codigo the codigo to set
+     */
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     

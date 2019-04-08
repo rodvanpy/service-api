@@ -6,7 +6,7 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.Usuario;
+import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 
 
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.UsuarioManager;
  * @author Miguel
  */
 @Stateless
-public class UsuarioManagerImpl extends GenericDaoImpl<Usuario, Long>
+public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
         implements UsuarioManager {
 
     @Override
-    protected Class<Usuario> getEntityBeanType() {
-        return Usuario.class;
+    protected Class<Usuarios> getEntityBeanType() {
+        return Usuarios.class;
     }
 }

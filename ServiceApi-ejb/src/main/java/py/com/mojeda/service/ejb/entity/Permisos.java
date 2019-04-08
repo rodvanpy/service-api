@@ -5,49 +5,51 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
-import javax.persistence.Basic;
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
- * @author miguel.ojeda
+ * @author Miguel
  */
 @Entity
-@Table(name = "TIPO_REFERENCIA")
-public class TipoReferencia {
+@Table(name = "PERMISOS")
+public class Permisos implements Serializable {
 
-    private static final long serialVersionUID = 1574657L;
-    private static final String SECUENCIA = "seq_tipo_referencia_id";
-    
+    private static long serialVersionUID = -9149680520407250259L;
+    private static final String SECUENCIA = "seq_permiso_id";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
-    @SequenceGenerator(name=SECUENCIA, sequenceName=SECUENCIA, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
+    @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
-    
-    @NotEmpty(message = "Ingrese Nombre")
-    @Basic(optional = false)
+
+    @NotNull
+    @NotEmpty
     @Column(name = "NOMBRE")
     private String nombre;
     
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
-    
-    public TipoReferencia() {
+    @Column(name = "GRUPO")
+    private String grupo;
+
+    @Column(name = "DESCRIPCION")
+    private String descripcion;
+
+    public Permisos() {
+
     }
 
-    public TipoReferencia(Long id) {
-            this.setId(id);
+    public Permisos(Long id) {
+        this.setId(id);
     }
 
     /**
@@ -79,20 +81,27 @@ public class TipoReferencia {
     }
 
     /**
-     * @return the empresa
+     * @return the descripcion
      */
-    public Empresa getEmpresa() {
-        return empresa;
+    public String getDescripcion() {
+        return descripcion;
     }
 
     /**
-     * @param empresa the empresa to set
+     * @param descripcion the descripcion to set
      */
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
+    public String getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(String grupo) {
+        this.grupo = grupo;
+    }
     
     
-    
+
 }

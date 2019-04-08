@@ -23,8 +23,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author daniel
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(name = "sucursal_cod_uq", columnNames = { "codigo_sucursal" }) )
-public class Sucursal extends Base {
+@Table(name = "SUCURSALES" ,uniqueConstraints = @UniqueConstraint(name = "sucursal_cod_uq", columnNames = { "codigo_sucursal" }) )
+public class Sucursales extends Base {
 
     private static final long serialVersionUID = 79861856088L;
     private static final String SECUENCIA = "seq_sucursal_id";
@@ -35,7 +35,7 @@ public class Sucursal extends Base {
     @Column(name = "id")
     private Long id;
     
-    @NotEmpty(message = "Ingrese Nombre")
+    //@NotEmpty(message = "Ingrese Codigo Sucursal")
     @Column(name = "CODIGO_SUCURSAL")
     private String codigoSucursal;
     
@@ -69,13 +69,13 @@ public class Sucursal extends Base {
     @NotNull(message = "Ingrese Empresa")
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
+    private Empresas empresa;
 
-    public Sucursal() {
+    public Sucursales() {
 
     }
 
-    public Sucursal(Long id) {
+    public Sucursales(Long id) {
         this.setId(id);
     }
 
@@ -222,14 +222,14 @@ public class Sucursal extends Base {
     /**
      * @return the empresa
      */
-    public Empresa getEmpresa() {
+    public Empresas getEmpresa() {
         return empresa;
     }
 
     /**
      * @param empresa the empresa to set
      */
-    public void setEmpresa(Empresa empresa) {
+    public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
     }
       

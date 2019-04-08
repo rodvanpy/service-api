@@ -27,8 +27,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(name = "departamento_alias_uq", columnNames = { "alias" }) )
-public class Departamento extends Base{
+@Table(name = "DEPARTAMENTOS", uniqueConstraints = @UniqueConstraint(name = "departamento_alias_uq", columnNames = { "alias" }) )
+public class Departamentos extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;
     private static final String SECUENCIA = "seq_departamento_id";
@@ -55,9 +55,9 @@ public class Departamento extends Base{
     @NotNull(message = "Ingrese Sucursal")
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
-    private Sucursal sucursal;
+    private Sucursales sucursal;
     
-    public Departamento() {
+    public Departamentos() {
 
     }
 
@@ -65,7 +65,7 @@ public class Departamento extends Base{
      * @param id
      *            el id de Usuario
      */
-    public Departamento(Long id) {
+    public Departamentos(Long id) {
             this.setId(id);
     }
     
@@ -128,14 +128,14 @@ public class Departamento extends Base{
     /**
      * @return the sucursal
      */
-    public Sucursal getSucursal() {
+    public Sucursales getSucursal() {
         return sucursal;
     }
 
     /**
      * @param sucursal the sucursal to set
      */
-    public void setSucursal(Sucursal sucursal) {
+    public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
     }
 

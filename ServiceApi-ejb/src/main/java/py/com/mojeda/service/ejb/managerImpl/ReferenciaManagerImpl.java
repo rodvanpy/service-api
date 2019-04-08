@@ -6,7 +6,7 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.Referencia;
+import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 
 
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.ReferenciaManager;
  * @author Miguel
  */
 @Stateless
-public class ReferenciaManagerImpl extends GenericDaoImpl<Referencia, Long>
+public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
         implements ReferenciaManager {
 
     @Override
-    protected Class<Referencia> getEntityBeanType() {
-        return Referencia.class;
+    protected Class<Referencias> getEntityBeanType() {
+        return Referencias.class;
     }
 }

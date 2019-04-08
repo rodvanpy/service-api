@@ -31,11 +31,11 @@ public class RolPermiso{
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "empresa", referencedColumnName = "id")
-    private Empresa empresa;
+    private Empresas empresa;
    
     @ManyToOne(optional = false)
     @JoinColumn(name = "permiso", referencedColumnName = "id")
-    private Permiso permiso; 
+    private Permisos permiso; 
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "rol", referencedColumnName = "id")
@@ -55,28 +55,28 @@ public class RolPermiso{
     /**
      * @return the empresa
      */
-    public Empresa getEmpresa() {
+    public Empresas getEmpresa() {
         return empresa;
     }
 
     /**
      * @param empresa the empresa to set
      */
-    public void setEmpresa(Empresa empresa) {
+    public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
     }
 
     /**
      * @return the permiso
      */
-    public Permiso getPermiso() {
+    public Permisos getPermiso() {
         return permiso;
     }
 
     /**
      * @param permiso the permiso to set
      */
-    public void setPermiso(Permiso permiso) {
+    public void setPermiso(Permisos permiso) {
         this.permiso = permiso;
     }
 

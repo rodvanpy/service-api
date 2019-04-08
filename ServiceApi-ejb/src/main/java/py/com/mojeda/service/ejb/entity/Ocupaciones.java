@@ -16,8 +16,8 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  */
 @Entity
-@Table()
-public class Ocupacion extends Base {
+@Table(name = "OCUPACIONES")
+public class Ocupaciones extends Base {
 
     private static final long serialVersionUID = 1546546546L;
     private static final String SECUENCIA = "seq_ocupacion_id";
@@ -37,12 +37,12 @@ public class Ocupacion extends Base {
     
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresa empresa;
+    private Empresas empresa;
 
-    public Ocupacion() {
+    public Ocupaciones() {
     }
 
-    public Ocupacion(Long id) {
+    public Ocupaciones(Long id) {
             this.setId(id);
     }
     
@@ -91,14 +91,14 @@ public class Ocupacion extends Base {
     /**
      * @return the empresa
      */
-    public Empresa getEmpresa() {
+    public Empresas getEmpresa() {
         return empresa;
     }
 
     /**
      * @param empresa the empresa to set
      */
-    public void setEmpresa(Empresa empresa) {
+    public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
     }
 

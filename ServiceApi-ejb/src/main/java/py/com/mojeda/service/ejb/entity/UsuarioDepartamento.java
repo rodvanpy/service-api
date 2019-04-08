@@ -33,11 +33,11 @@ public class UsuarioDepartamento{
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_DEPARTAMENTO", referencedColumnName = "id")
-    private Departamento departamento;
+    private Departamentos departamento;
    
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_USUARIO", referencedColumnName = "id")
-    private Usuario usuario; 
+    private Usuarios usuario; 
     
     
 
@@ -52,28 +52,28 @@ public class UsuarioDepartamento{
     /**
      * @return the departamento
      */
-    public Departamento getDepartamento() {
+    public Departamentos getDepartamento() {
         return departamento;
     }
 
     /**
      * @param departamento the departamento to set
      */
-    public void setDepartamento(Departamento departamento) {
+    public void setDepartamento(Departamentos departamento) {
         this.departamento = departamento;
     }
 
     /**
      * @return the usuario
      */
-    public Usuario getUsuario() {
+    public Usuarios getUsuario() {
         return usuario;
     }
 
     /**
      * @param usuario the usuario to set
      */
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(Usuarios usuario) {
         this.usuario = usuario;
     }
     

@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import py.com.mojeda.service.ejb.entity.RolPermiso;
-import py.com.mojeda.service.ejb.entity.Usuario;
+import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 
@@ -45,7 +45,7 @@ public class UserDetailService implements UserDetailsService {
         User user = new User();
         List<GrantedAuthority> autoridades = new ArrayList<>();
         
-        Usuario ejObjeto = usuarioManager.get(Long.parseLong(idUser));
+        Usuarios ejObjeto = usuarioManager.get(Long.parseLong(idUser));
         if (ejObjeto != null) {
             user.setId(ejObjeto.getId());
             user.setId(ejObjeto.getId());
