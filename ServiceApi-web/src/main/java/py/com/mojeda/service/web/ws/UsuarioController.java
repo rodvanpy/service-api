@@ -34,7 +34,8 @@ import py.com.mojeda.service.web.spring.config.User;
 @RequestMapping(value = "/usuarios")
 public class UsuarioController extends BaseController {
     
-    String atributos = "id";
+    String atributos = "id,alias,persona.primerNombre,persona.segundoNombre,persona.primerApellido,persona.segundoApellido,"
+            + "persona.documento,persona.ruc";
     
     @GetMapping
     public @ResponseBody
@@ -89,7 +90,7 @@ public class UsuarioController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = usuarioManager.listAtributos(ejUsuario, "id".split(","), todos, inicio, cantidad,
+            listMapGrupos = usuarioManager.listAtributos(ejUsuario, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -106,9 +107,13 @@ public class UsuarioController extends BaseController {
             retorno.setTotal(totalPaginas + 1);
             retorno.setRows(listMapGrupos);
             retorno.setPage(pagina);
-
+            retorno.setStatus(200);
+            retorno.setMessage("OK");
+            
         } catch (Exception e) {
             logger.error("Error: ",e);
+            retorno.setStatus(500);
+            retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
