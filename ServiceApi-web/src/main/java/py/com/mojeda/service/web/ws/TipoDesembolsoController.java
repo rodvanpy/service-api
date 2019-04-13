@@ -155,7 +155,8 @@ public class TipoDesembolsoController extends BaseController {
      * @return
      */
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:4599")
+    //@CrossOrigin(origins = "http://localhost:4599")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
             @RequestBody @Valid TipoDesembolsos model,
@@ -217,7 +218,8 @@ public class TipoDesembolsoController extends BaseController {
      * @return
      */
     @PutMapping("/{id}")
-    @CrossOrigin(origins = "http://localhost:4599")
+    //@CrossOrigin(origins = "http://localhost:4599")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,

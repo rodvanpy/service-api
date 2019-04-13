@@ -82,15 +82,16 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
 
     /**
      * The JWTAuthenticationFilter calls this method to verify the user
-     * authentication. If the token is not valid, the authentication fails and
-     * the request will be refused.
+     * authentication.If the token is not valid, the authentication fails and
+ the request will be refused.
      *
      * @param request	An http request that will be check for authentication
      * token to verify.
+     * @param res
      * @return
      */
     @Override
-    public Authentication getAuthentication(HttpServletRequest request) {
+    public Authentication getAuthentication(HttpServletRequest request, HttpServletResponse res) {
         List<GrantedAuthority> autoridades = new ArrayList<>();       
         String token = request.getHeader(tokenHandler.HEADER_STRING);
         logger.info("TOKENS: "+ token);
@@ -102,9 +103,15 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
                 user = tokenHandler.parse(token);
                 
                 logger.info("getUsername: "+ user.getUsername());
-                logger.info("getId: "+ user.getId());            
+                logger.info("getId: "+ user.getId());       
+                
+                Token JWT = tokenHandler.build(user.getId() + "");
+                
+                res.setHeader("Access-Control-Expose-Headers", "Update-Token");
+                res.addHeader("Update-Token", JWT.getAccess_token());
                 
             } catch (ExpiredJwtException e) {
+                request.setAttribute("expired","Su sesión ha caducado."+e.getMessage().split("Current time")[0]);
                 e.printStackTrace();
             } catch (UnsupportedJwtException e) {
                 e.printStackTrace();

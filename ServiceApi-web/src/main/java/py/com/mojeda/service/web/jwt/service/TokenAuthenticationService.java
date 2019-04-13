@@ -24,6 +24,6 @@ public interface TokenAuthenticationService {
 	 * @param request	An http request that will be check for authentication token to verify.
 	 * @return
 	 */
-	Authentication getAuthentication(HttpServletRequest request);
+	Authentication getAuthentication(HttpServletRequest request, HttpServletResponse res);
 
 }

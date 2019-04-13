@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -148,6 +149,7 @@ public class ReferenciaController extends BaseController {
      * @return
      */
     @PostMapping
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
             @Valid Referencias model,
@@ -196,6 +198,7 @@ public class ReferenciaController extends BaseController {
      * @return
      */
     @PutMapping("/{id}")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
