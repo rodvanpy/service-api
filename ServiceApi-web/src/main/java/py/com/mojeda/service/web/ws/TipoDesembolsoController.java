@@ -52,6 +52,8 @@ public class TipoDesembolsoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoDesembolsos model = new TipoDesembolsos();
+        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+        
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarTipoDesembolsosManager();

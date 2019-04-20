@@ -8,7 +8,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.Departamentos;
+import py.com.mojeda.service.ejb.entity.Areas;
 
 
 /**
@@ -16,6 +16,6 @@ import py.com.mojeda.service.ejb.entity.Departamentos;
  * @author Miguel
  */
 @Local
-public interface DepartamentoManager extends GenericDao<Departamentos, Long>{   
+public interface DepartamentoManager extends GenericDao<Areas, Long>{   
     
 }

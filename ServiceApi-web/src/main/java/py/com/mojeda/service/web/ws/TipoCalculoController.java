@@ -53,8 +53,10 @@ public class TipoCalculoController extends BaseController {
 
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-
+        
         TipoCalculos model = new TipoCalculos();
+        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+        
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarTipoCalculosManager();

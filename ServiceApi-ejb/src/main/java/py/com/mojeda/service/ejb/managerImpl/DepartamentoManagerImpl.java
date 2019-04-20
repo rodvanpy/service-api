@@ -6,7 +6,7 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.Departamentos;
+import py.com.mojeda.service.ejb.entity.Areas;
 import py.com.mojeda.service.ejb.manager.DepartamentoManager;
 
 
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.DepartamentoManager;
  * @author Miguel
  */
 @Stateless
-public class DepartamentoManagerImpl extends GenericDaoImpl<Departamentos, Long>
+public class DepartamentoManagerImpl extends GenericDaoImpl<Areas, Long>
         implements DepartamentoManager {
 
     @Override
-    protected Class<Departamentos> getEntityBeanType() {
-        return Departamentos.class;
+    protected Class<Areas> getEntityBeanType() {
+        return Areas.class;
     }
 }

@@ -101,10 +101,16 @@ public class Personas extends Base {
 
     @Column(name = "OBSERVACION")
     private String observacion;
+    
+    @Column(name = "LATITUD")
+    private String latitud;
+    
+    @Column(name = "LONGITUD")
+    private String longitud;
 
     @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
+    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
+    private Sucursales sucursal;
 
     public Personas() {
 
@@ -365,21 +371,8 @@ public class Personas extends Base {
     public void setObservacion(String observacion) {
         this.observacion = observacion;
     }
-
-    /**
-     * @return the empresa
-     */
-    public Empresas getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
-    }
-
+    
+    
     /**
      * @return the tipoPersona
      */
@@ -406,6 +399,48 @@ public class Personas extends Base {
      */
     public void setSeparacionBienes(Boolean separacionBienes) {
         this.separacionBienes = separacionBienes;
+    }
+
+    /**
+     * @return the sucursal
+     */
+    public Sucursales getSucursal() {
+        return sucursal;
+    }
+
+    /**
+     * @param sucursal the sucursal to set
+     */
+    public void setSucursal(Sucursales sucursal) {
+        this.sucursal = sucursal;
+    }
+
+    /**
+     * @return the latitud
+     */
+    public String getLatitud() {
+        return latitud;
+    }
+
+    /**
+     * @param latitud the latitud to set
+     */
+    public void setLatitud(String latitud) {
+        this.latitud = latitud;
+    }
+
+    /**
+     * @return the longitud
+     */
+    public String getLongitud() {
+        return longitud;
+    }
+
+    /**
+     * @param longitud the longitud to set
+     */
+    public void setLongitud(String longitud) {
+        this.longitud = longitud;
     }
     
     

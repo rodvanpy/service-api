@@ -55,6 +55,8 @@ public class TipoVinculoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoVinculos model = new TipoVinculos();
+        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+        
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarTipoVinculoManager();

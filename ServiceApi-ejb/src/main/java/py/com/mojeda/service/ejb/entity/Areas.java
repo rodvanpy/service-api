@@ -27,11 +27,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "DEPARTAMENTOS", uniqueConstraints = @UniqueConstraint(name = "departamento_alias_uq", columnNames = { "alias" }) )
-public class Departamentos extends Base{
+@Table(name = "AREAS", uniqueConstraints = @UniqueConstraint(name = "area_alias_uq", columnNames = { "alias" }) )
+public class Areas extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;
-    private static final String SECUENCIA = "seq_departamento_id";
+    private static final String SECUENCIA = "seq_area_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
@@ -57,7 +57,7 @@ public class Departamentos extends Base{
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
     
-    public Departamentos() {
+    public Areas() {
 
     }
 
@@ -65,7 +65,7 @@ public class Departamentos extends Base{
      * @param id
      *            el id de Usuario
      */
-    public Departamentos(Long id) {
+    public Areas(Long id) {
             this.setId(id);
     }
     

@@ -71,6 +71,12 @@ public class Empresas extends Base {
     
     @Column(name = "OBSERVACION")
     private String observacion;
+    
+    @Column(name = "LATITUD")
+    private String latitud;
+    
+    @Column(name = "LONGITUD")
+    private String longitud;
 
     public Empresas() {
 
@@ -232,6 +238,34 @@ public class Empresas extends Base {
      */
     public void setNombreFantasia(String nombreFantasia) {
         this.nombreFantasia = nombreFantasia;
+    }
+
+    /**
+     * @return the latitud
+     */
+    public String getLatitud() {
+        return latitud;
+    }
+
+    /**
+     * @param latitud the latitud to set
+     */
+    public void setLatitud(String latitud) {
+        this.latitud = latitud;
+    }
+
+    /**
+     * @return the longitud
+     */
+    public String getLongitud() {
+        return longitud;
+    }
+
+    /**
+     * @param longitud the longitud to set
+     */
+    public void setLongitud(String longitud) {
+        this.longitud = longitud;
     }
     
     
