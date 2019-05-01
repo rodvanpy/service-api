@@ -6,6 +6,7 @@
 package py.com.mojeda.service.ejb.entity;
 
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;

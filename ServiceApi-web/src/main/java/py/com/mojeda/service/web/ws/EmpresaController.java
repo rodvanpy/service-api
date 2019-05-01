@@ -7,6 +7,7 @@ package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,6 +59,7 @@ public class EmpresaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         Empresas model = new Empresas();
+        model.setActivo("S");
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarEmpresaManager();
@@ -139,6 +142,7 @@ public class EmpresaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         Sucursales model = new Sucursales();
+        model.setActivo("S");
         model.setEmpresa(new Empresas(id));
         
         List<Map<String, Object>> listMapGrupos = null;
@@ -296,7 +300,7 @@ public class EmpresaController extends BaseController {
             logger.info("getCodigoSucursal: " + sucursal.getCodigoSucursal());
             logger.info("getNombre: " + sucursal.getNombre());
             
-            for(DepartamentosSucursal rpm : model.getDepartamentos()){
+            for(DepartamentosSucursal rpm : model.getDepartamentos() == null ? new ArrayList<DepartamentosSucursal>() : model.getDepartamentos()){
                 rpm.setSucursal(sucursal);
                 departamentosSucursalManager.save(rpm);
             }
@@ -484,6 +488,38 @@ public class EmpresaController extends BaseController {
         return response;
     }
     
-    
+    /**
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Empresa)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO deleteObject(
+            @ModelAttribute("id") Long id) {        
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarEmpresaManager();
+                        
+            Empresas model = empresaManager.get(id);
+            model.setActivo("N");
+            model.setIdUsuarioEliminacion(userDetail.getId());
+            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+            
+            empresaManager.update(model);
+            
+            response.setModel(model);
+            response.setStatus(200);
+            response.setMessage("Registro eliminado con exito.");
+        } catch (Exception e) {
+            logger.error("Error: ",e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
     
 }
