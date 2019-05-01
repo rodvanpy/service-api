@@ -36,7 +36,9 @@ import py.com.mojeda.service.web.spring.config.User;
 @RequestMapping(value = "/sucursales")
 public class SucursalController extends BaseController {
     
-    String atributos = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
+    String atributos = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,"
+            + "observacion,activo,longitud,latitud";
+    String atributos_departamento = "id,alias,nombreArea,descripcionArea,activo";
     
     @GetMapping
     public @ResponseBody
@@ -92,6 +94,87 @@ public class SucursalController extends BaseController {
             }
 
             listMapGrupos = sucursalManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+                    ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
+                    null, null, null, null, null, null, null, null, true);
+            
+            if (todos) {
+                total = Long.parseLong(listMapGrupos.size() + "");
+            }
+            
+            Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
+
+            retorno.setRecords(total);
+            retorno.setTotal(totalPaginas + 1);
+            retorno.setRows(listMapGrupos);
+            retorno.setPage(pagina);
+            retorno.setStatus(200);
+            retorno.setMessage("OK");
+            
+        } catch (Exception e) {
+            retorno.setStatus(500);
+            retorno.setMessage("Error interno del servidor.");
+        }
+
+        return retorno;
+    }
+    
+    @GetMapping("/{id}/departamentos")
+    public @ResponseBody
+    ResponseListDTO listarDepartamentos(@ModelAttribute("id") Long id,
+            @ModelAttribute("_search") boolean filtrar,
+            @ModelAttribute("filters") String filtros,
+            @ModelAttribute("page") Integer pagina,
+            @ModelAttribute("rows") Integer cantidad,
+            @ModelAttribute("sidx") String ordenarPor,
+            @ModelAttribute("sord") String sentidoOrdenamiento,
+            @ModelAttribute("all") boolean todos) {
+
+        ResponseListDTO retorno = new ResponseListDTO();
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+        DepartamentosSucursal model = new DepartamentosSucursal();
+        model.setSucursal(new Sucursales(id));
+        
+        List<Map<String, Object>> listMapGrupos = null;
+        try {
+            inicializarDepartamentosSucursalManager();
+            Gson gson = new Gson();
+            String camposFiltros = null;
+            String valorFiltro = null;
+
+//            if (filtrar) {
+//                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
+//                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
+//                    for (ReglaDTO regla : filtro.getRules()) {
+//                        if (camposFiltros == null) {
+//                            camposFiltros = regla.getField();
+//                            valorFiltro = regla.getData();
+//                        } else {
+//                            camposFiltros += "," + regla.getField();
+//                        }
+//                    }
+//                } else {
+//                    //ejemplo = generarEjemplo(filtro, ejemplo);
+//                }
+//
+//            }
+            // ejemplo.setActivo("S");
+
+            pagina = pagina != null ? pagina : 1;
+            Long total = 0L;
+
+            if (!todos) {
+                total = Long.parseLong(departamentosSucursalManager.list(model).size() + "");
+            }
+
+            Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
+
+            if (total < inicio) {
+                inicio = Integer.parseInt(total.toString()) - Integer.parseInt(total.toString()) % cantidad;
+                pagina = Integer.parseInt(total.toString()) / cantidad;
+            }
+
+            listMapGrupos = departamentosSucursalManager.listAtributos(model, atributos_departamento.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -184,9 +267,8 @@ public class SucursalController extends BaseController {
             
             Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"nombre".split(","));
             if(sucursalMaps != null){
-                response.setStatus(200);
-                response.setMessage("Ya existe una sucursal con el mismo nombre.");           
-                response.setModel(sucursalManager.get(sucursal));                
+                response.setStatus(205);
+                response.setMessage("Ya existe una sucursal con el mismo nombre.");                         
                 return response;
             }
             
@@ -278,9 +360,8 @@ public class SucursalController extends BaseController {
             Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"id,nombre".split(","));
             if(sucursalMaps != null
                     && sucursalMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0){
-                response.setStatus(200);
-                response.setMessage("Ya existe una sucursal con el mismo nombre.");           
-                response.setModel(sucursalManager.get(sucursal));                
+                response.setStatus(205);
+                response.setMessage("Ya existe una sucursal con el mismo nombre.");                          
                 return response;
             }
             

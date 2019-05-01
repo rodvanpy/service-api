@@ -22,12 +22,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
+import static py.com.mojeda.service.web.ws.BaseController.logger;
 
 /**
  *
@@ -38,7 +40,8 @@ import py.com.mojeda.service.web.spring.config.User;
 public class EmpresaController extends BaseController {
     
     String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo";
-    String atributos_sucursales = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
+    String atributos_sucursales = "id,nombre,codigoSucursal,descripcion,direccion,telefono"
+            + ",fax,telefonoMovil,email,observacion,longitud,latitud,activo";
     
     @GetMapping
     public @ResponseBody
@@ -141,6 +144,7 @@ public class EmpresaController extends BaseController {
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarSucursalManager();
+            inicializarDepartamentosSucursalManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -186,6 +190,15 @@ public class EmpresaController extends BaseController {
             }
             
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
+            
+            for(Map<String, Object> rpm : listMapGrupos){
+                DepartamentosSucursal ejDepSucursal = new DepartamentosSucursal();
+                ejDepSucursal.setSucursal(new Sucursales(Long.parseLong(rpm.get("id").toString())));
+                List<Map<String, Object>> listMapDepart = departamentosSucursalManager.listAtributos(ejDepSucursal, "id,alias,nombreArea,descripcionArea,activo".split(","));
+                if(listMapDepart != null){
+                   rpm.put("departamentos", listMapDepart);
+                }
+            }
 
             retorno.setRecords(total);
             retorno.setTotal(totalPaginas + 1);
@@ -202,6 +215,105 @@ public class EmpresaController extends BaseController {
 
         return retorno;
     }
+    
+    /**
+     * Mapping para el metodo POST de la vista crear.(crear Empresa)
+     *
+     * @param model entidad Usuario recibida de la vista
+     * @param errors
+     * @return
+     */
+
+    @PostMapping("/{id}/sucursales")
+    //@CrossOrigin(origins = "http://localhost:4599")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public @ResponseBody
+    ResponseDTO create(
+            @ModelAttribute("id") Long id,
+            @RequestBody @Valid Sucursales model,
+            Errors errors) {
+        
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+
+        model.setEmpresa(new Empresas(id));
+        try {
+            inicializarSucursalManager();
+            inicializarDepartamentosSucursalManager();
+            
+            if(errors.hasErrors()){
+                
+                response.setStatus(400);
+                response.setMessage(errors.getAllErrors()
+				.stream()
+				.map(x -> x.getDefaultMessage())
+				.collect(Collectors.joining(",")));
+                return response;
+            }
+            
+            model.setNombre(model.getNombre().toUpperCase());
+            
+            Sucursales sucursal = new Sucursales();
+            sucursal.setNombre(model.getNombre());
+            sucursal.setEmpresa(model.getEmpresa());
+            
+            Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"nombre".split(","));
+            if(sucursalMaps != null){
+                response.setStatus(200);
+                response.setMessage("Ya existe una sucursal con el mismo nombre.");           
+                response.setModel(sucursalManager.get(sucursal));                
+                return response;
+            }
+            
+            String[] codigo = model.getNombre().split(" ");
+            String codigoNombre = "";
+            for(int i = 0; i < codigo.length ; i++){
+                codigoNombre = codigoNombre + codigo[i].substring(0, 1);
+            }            
+            sucursal = new Sucursales();
+            sucursal.setEmpresa(model.getEmpresa());            
+            //Numero Sucursal
+            Integer numeroSucursal = sucursalManager.total(sucursal) + 1;
+            //Cantidad Sucursales
+            Integer cantidadSucursal = sucursalManager.total(new Sucursales()) + 1;
+            
+            model.setCodigoSucursal(codigoNombre+"-"+numeroSucursal+"-"+cantidadSucursal);
+            model.setActivo("S");
+            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioCreacion(userDetail.getId());
+            model.setIdUsuarioModificacion(userDetail.getId());
+            
+            sucursalManager.save(model);
+            
+            sucursal = new Sucursales();
+            sucursal.setNombre(model.getNombre());
+            sucursal.setCodigoSucursal(model.getCodigoSucursal());
+            
+            sucursal = sucursalManager.get(sucursal);
+            
+            logger.info("getId: " + sucursal.getId());
+            logger.info("getCodigoSucursal: " + sucursal.getCodigoSucursal());
+            logger.info("getNombre: " + sucursal.getNombre());
+            
+            for(DepartamentosSucursal rpm : model.getDepartamentos()){
+                rpm.setSucursal(sucursal);
+                departamentosSucursalManager.save(rpm);
+            }
+            
+            response.setStatus(200);
+            response.setMessage("La sucursal ha sido guardada");           
+            response.setModel(sucursalManager.get(sucursal));
+            
+        } catch (Exception e) {
+            logger.error("Error: ",e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
     
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Empresa)
@@ -262,6 +374,39 @@ public class EmpresaController extends BaseController {
                 return response;
             }
             
+            model.setNombre(model.getNombre().toUpperCase());
+            model.setNombreFantasia(model.getNombreFantasia().toUpperCase());
+            
+            Empresas empresa = new Empresas();
+            empresa.setNombre(model.getNombre());
+            
+            Map<String,Object> sucursalMaps = empresaManager.getLike(empresa,"nombre".split(","));
+            if(sucursalMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe una empresa con el mismo nombre.");                          
+                return response;
+            }
+                
+            empresa = new Empresas();
+            empresa.setNombreFantasia(model.getNombreFantasia());
+            
+            sucursalMaps = empresaManager.getLike(empresa,"nombre".split(","));
+            if(sucursalMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe una empresa con el mismo nombre de fantasia.");                          
+                return response;
+            }
+            
+            empresa = new Empresas();
+            empresa.setRuc(model.getRuc());
+            
+            sucursalMaps = empresaManager.getLike(empresa,"nombre".split(","));
+            if(sucursalMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe una empresa con el mismo ruc.");                          
+                return response;
+            }
+            
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -270,7 +415,7 @@ public class EmpresaController extends BaseController {
             
             empresaManager.save(model);
             
-            Empresas empresa = new Empresas();
+            empresa = new Empresas();
             empresa.setRuc(model.getRuc());
             
             response.setStatus(200);
