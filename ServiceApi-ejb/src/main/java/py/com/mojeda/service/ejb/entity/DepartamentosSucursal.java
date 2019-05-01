@@ -27,11 +27,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "AREAS", uniqueConstraints = @UniqueConstraint(name = "area_alias_uq", columnNames = { "alias" }) )
-public class Areas extends Base{
+@Table(name = "DEPARTAMENTOS_SUCURSAL", uniqueConstraints = @UniqueConstraint(name = "departamento_suc_alias_uq", columnNames = { "alias" }) )
+public class DepartamentosSucursal extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;
-    private static final String SECUENCIA = "seq_area_id";
+    private static final String SECUENCIA = "seq_departamento_suc_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
@@ -47,17 +47,17 @@ public class Areas extends Base{
     //@NotNull(message = " Ingrese Clave Acceso")
     @NotEmpty(message = "Ingrese Nombre")
     @Column(name = "NOMBRE")
-    private String nombre;
+    private String nombreArea;
     
     @Column(name = "DESCRIPCION")
-    private String descripcion; 
+    private String descripcionArea; 
     
     @NotNull(message = "Ingrese Sucursal")
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
     
-    public Areas() {
+    public DepartamentosSucursal() {
 
     }
 
@@ -65,7 +65,7 @@ public class Areas extends Base{
      * @param id
      *            el id de Usuario
      */
-    public Areas(Long id) {
+    public DepartamentosSucursal(Long id) {
             this.setId(id);
     }
     
@@ -97,33 +97,7 @@ public class Areas extends Base{
         this.alias = alias;
     }
 
-    /**
-     * @return the nombre
-     */
-    public String getNombre() {
-        return nombre;
-    }
-
-    /**
-     * @param nombre the nombre to set
-     */
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    /**
-     * @return the descripcion
-     */
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    /**
-     * @param descripcion the descripcion to set
-     */
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    
 
     /**
      * @return the sucursal
@@ -137,6 +111,34 @@ public class Areas extends Base{
      */
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
+    }
+
+    /**
+     * @return the nombreArea
+     */
+    public String getNombreArea() {
+        return nombreArea;
+    }
+
+    /**
+     * @param nombreArea the nombreArea to set
+     */
+    public void setNombreArea(String nombreArea) {
+        this.nombreArea = nombreArea;
+    }
+
+    /**
+     * @return the descripcionArea
+     */
+    public String getDescripcionArea() {
+        return descripcionArea;
+    }
+
+    /**
+     * @param descripcionArea the descripcionArea to set
+     */
+    public void setDescripcionArea(String descripcionArea) {
+        this.descripcionArea = descripcionArea;
     }
 
     

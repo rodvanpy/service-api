@@ -33,10 +33,10 @@ import py.com.mojeda.service.web.spring.config.User;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/sucursales")
-public class SucursalController extends BaseController {
+@RequestMapping(value = "/departamentos_sucursal")
+public class DepartamentosSucursalController extends BaseController {
     
-    String atributos = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
+    String atributos = "id,alias,nombre,descripcion,activo";
     
     @GetMapping
     public @ResponseBody
@@ -51,10 +51,10 @@ public class SucursalController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Sucursales model = new Sucursales();
+        DepartamentosSucursal model = new DepartamentosSucursal();
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarSucursalManager();
+            inicializarDepartamentosSucursalManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -81,7 +81,7 @@ public class SucursalController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(sucursalManager.list(model).size() + "");
+                total = Long.parseLong(departamentosSucursalManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -91,7 +91,7 @@ public class SucursalController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = sucursalManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = departamentosSucursalManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -129,9 +129,9 @@ public class SucursalController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarSucursalManager();
+            inicializarDepartamentosSucursalManager();
                         
-            Sucursales model = sucursalManager.get(id);
+            DepartamentosSucursal model = departamentosSucursalManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -157,13 +157,12 @@ public class SucursalController extends BaseController {
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Sucursales model,
+            @RequestBody @Valid DepartamentosSucursal model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarSucursalManager();
             inicializarDepartamentosSucursalManager();
             
             if(errors.hasErrors()){
@@ -176,54 +175,24 @@ public class SucursalController extends BaseController {
                 return response;
             }
             
-            model.setNombre(model.getNombre().toUpperCase());
+            DepartamentosSucursal sucursal = new DepartamentosSucursal();
+            sucursal.setSucursal(model.getSucursal());
             
-            Sucursales sucursal = new Sucursales();
-            sucursal.setNombre(model.getNombre());
-            sucursal.setEmpresa(model.getEmpresa());
             
-            Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"nombre".split(","));
-            if(sucursalMaps != null){
-                response.setStatus(200);
-                response.setMessage("Ya existe una sucursal con el mismo nombre.");           
-                response.setModel(sucursalManager.get(sucursal));                
-                return response;
-            }
-            
-            String[] codigo = model.getNombre().split(" ");
-            String codigoNombre = "";
-            for(int i = 0; i < codigo.length ; i++){
-                codigoNombre = codigoNombre + codigo[i].substring(0, 1);
-            }            
-            sucursal = new Sucursales();
-            sucursal.setEmpresa(model.getEmpresa());            
-            //Numero Sucursal
-            Integer numeroSucursal = sucursalManager.total(sucursal) + 1;
-            //Cantidad Sucursales
-            Integer cantidadSucursal = sucursalManager.total(new Sucursales()) + 1;
-            
-            model.setCodigoSucursal(codigoNombre+"-"+numeroSucursal+"-"+cantidadSucursal);
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            sucursalManager.save(model);
+            departamentosSucursalManager.save(model);
             
-            sucursal = new Sucursales();
-            sucursal.setCodigoSucursal(model.getCodigoSucursal());
-            
-            sucursal = sucursalManager.get(sucursal);
-            
-            for(DepartamentosSucursal rpm : model.getAreas()){
-                rpm.setSucursal(sucursal);
-                departamentosSucursalManager.save(rpm);
-            }
+            sucursal = new DepartamentosSucursal();
+            //sucursal.setCodigoSucursal(model.getCodigoSucursal());
             
             response.setStatus(200);
             response.setMessage("La sucursal ha sido guardada");           
-            response.setModel(sucursalManager.get(sucursal));
+            response.setModel(departamentosSucursalManager.get(sucursal));
             
         } catch (Exception e) {
             logger.error("Error: ",e);
@@ -248,13 +217,12 @@ public class SucursalController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Sucursales model,
+            @RequestBody @Valid DepartamentosSucursal model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarSucursalManager();
             inicializarDepartamentosSucursalManager();
             
             if(errors.hasErrors()){
@@ -267,22 +235,7 @@ public class SucursalController extends BaseController {
                 return response;
             }
             
-            model.setNombre(model.getNombre().toUpperCase());
-            
-            Sucursales dato = sucursalManager.get(id);
-            
-            Sucursales sucursal = new Sucursales();
-            sucursal.setNombre(model.getNombre());
-            sucursal.setEmpresa(model.getEmpresa());
-            
-            Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"id,nombre".split(","));
-            if(sucursalMaps != null
-                    && sucursalMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0){
-                response.setStatus(200);
-                response.setMessage("Ya existe una sucursal con el mismo nombre.");           
-                response.setModel(sucursalManager.get(sucursal));                
-                return response;
-            }
+            DepartamentosSucursal dato = departamentosSucursalManager.get(id);
             
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
@@ -290,18 +243,10 @@ public class SucursalController extends BaseController {
             model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
             
-            sucursalManager.update(model);
+            departamentosSucursalManager.update(model);
             
-            for(DepartamentosSucursal rpm : model.getAreas()){
-                rpm.setSucursal(new Sucursales(id));
-                if(rpm.getId() != null){
-                    departamentosSucursalManager.update(rpm);
-                }else{
-                    departamentosSucursalManager.save(rpm);
-                }                
-            }            
             response.setStatus(200);
-            response.setMessage("La sucursal ha sido guardada");
+            response.setMessage("El departamento ha sido guardado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);

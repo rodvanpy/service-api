@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import java.awt.Component;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -76,6 +79,9 @@ public class Sucursales extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
+    
+    @Transient
+    private List<DepartamentosSucursal> areas;
 
     public Sucursales() {
 
@@ -266,6 +272,12 @@ public class Sucursales extends Base {
     public void setLongitud(String longitud) {
         this.longitud = longitud;
     }
-      
-    
+
+    public List<DepartamentosSucursal> getAreas() {
+        return areas;
+    }
+
+    public void setAreas(List<DepartamentosSucursal> areas) {
+        this.areas = areas;
+    }     
 }

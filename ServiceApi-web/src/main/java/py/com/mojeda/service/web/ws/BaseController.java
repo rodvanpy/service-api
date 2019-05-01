@@ -24,6 +24,7 @@ import py.com.mojeda.service.ejb.manager.TipoReferenciaManager;
 import py.com.mojeda.service.ejb.manager.TipoVinculoManager;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
+import py.com.mojeda.service.ejb.manager.DepartamentosSucursalManager;
 
 /**
  *
@@ -38,6 +39,8 @@ public class BaseController {
     protected EmpresaManager empresaManager;
     
     protected SucursalManager sucursalManager;
+    
+    protected DepartamentosSucursalManager departamentosSucursalManager;
     
     protected ReferenciaManager referenciaManager;
     
@@ -66,6 +69,24 @@ public class BaseController {
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
     
+    
+    protected void inicializarDepartamentosSucursalManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (departamentosSucursalManager == null) {
+            try {
+
+                departamentosSucursalManager = (DepartamentosSucursalManager) context.lookup("java:app/ServiceApi-ejb/DepartamentosSucursalManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarTipoEgresosManager() throws Exception {
         if (context == null) {

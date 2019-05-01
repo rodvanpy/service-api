@@ -33,7 +33,7 @@ public class UsuarioDepartamento{
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_DEPARTAMENTO", referencedColumnName = "id")
-    private Areas departamento;
+    private DepartamentosSucursal departamento;
    
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_USUARIO", referencedColumnName = "id")
@@ -52,14 +52,14 @@ public class UsuarioDepartamento{
     /**
      * @return the departamento
      */
-    public Areas getDepartamento() {
+    public DepartamentosSucursal getDepartamento() {
         return departamento;
     }
 
     /**
      * @param departamento the departamento to set
      */
-    public void setDepartamento(Areas departamento) {
+    public void setDepartamento(DepartamentosSucursal departamento) {
         this.departamento = departamento;
     }
 
