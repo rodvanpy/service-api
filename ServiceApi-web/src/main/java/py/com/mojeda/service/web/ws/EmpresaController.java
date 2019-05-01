@@ -37,7 +37,7 @@ import py.com.mojeda.service.web.spring.config.User;
 @RequestMapping(value = "/empresas")
 public class EmpresaController extends BaseController {
     
-    String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
+    String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo";
     String atributos_sucursales = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,activo";
     
     @GetMapping
@@ -121,7 +121,7 @@ public class EmpresaController extends BaseController {
     
    
     
-    @GetMapping("/sucursales")
+    @GetMapping("/{id}/sucursales")
     public @ResponseBody
     ResponseListDTO listarSucursalesEmpresa(@ModelAttribute("_search") boolean filtrar,
             @ModelAttribute("filters") String filtros,
@@ -129,14 +129,14 @@ public class EmpresaController extends BaseController {
             @ModelAttribute("rows") Integer cantidad,
             @ModelAttribute("sidx") String ordenarPor,
             @ModelAttribute("sord") String sentidoOrdenamiento,
-            @ModelAttribute("fk") String fkEmpresa,
+            @ModelAttribute("id") Long id,
             @ModelAttribute("all") boolean todos) {
 
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         Sucursales model = new Sucursales();
-        model.setEmpresa(new Empresas(Long.parseLong(fkEmpresa)));
+        model.setEmpresa(new Empresas(id));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {

@@ -70,10 +70,10 @@ public class Sucursales extends Base {
     private String observacion;
     
     @Column(name = "LATITUD")
-    private String latitud;
+    private Double latitud;
     
     @Column(name = "LONGITUD")
-    private String longitud;
+    private Double longitud;
     
     @NotNull(message = "Ingrese Empresa")
     @ManyToOne
@@ -81,7 +81,7 @@ public class Sucursales extends Base {
     private Empresas empresa;
     
     @Transient
-    private List<DepartamentosSucursal> areas;
+    private List<DepartamentosSucursal> departamentos;
 
     public Sucursales() {
 
@@ -248,36 +248,38 @@ public class Sucursales extends Base {
     /**
      * @return the latitud
      */
-    public String getLatitud() {
+    public Double getLatitud() {
         return latitud;
     }
 
     /**
      * @param latitud the latitud to set
      */
-    public void setLatitud(String latitud) {
+    public void setLatitud(Double latitud) {
         this.latitud = latitud;
     }
 
     /**
      * @return the longitud
      */
-    public String getLongitud() {
+    public Double getLongitud() {
         return longitud;
     }
 
     /**
      * @param longitud the longitud to set
      */
-    public void setLongitud(String longitud) {
+    public void setLongitud(Double longitud) {
         this.longitud = longitud;
     }
 
-    public List<DepartamentosSucursal> getAreas() {
-        return areas;
+    public List<DepartamentosSucursal> getDepartamentos() {
+        return departamentos;
     }
 
-    public void setAreas(List<DepartamentosSucursal> areas) {
-        this.areas = areas;
-    }     
+    public void setDepartamentos(List<DepartamentosSucursal> departamentos) {
+        this.departamentos = departamentos;
+    }
+    
+    
 }

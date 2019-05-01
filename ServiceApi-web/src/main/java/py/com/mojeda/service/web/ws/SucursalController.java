@@ -216,7 +216,7 @@ public class SucursalController extends BaseController {
             
             sucursal = sucursalManager.get(sucursal);
             
-            for(DepartamentosSucursal rpm : model.getAreas()){
+            for(DepartamentosSucursal rpm : model.getDepartamentos()){
                 rpm.setSucursal(sucursal);
                 departamentosSucursalManager.save(rpm);
             }
@@ -292,7 +292,7 @@ public class SucursalController extends BaseController {
             
             sucursalManager.update(model);
             
-            for(DepartamentosSucursal rpm : model.getAreas()){
+            for(DepartamentosSucursal rpm : model.getDepartamentos()){
                 rpm.setSucursal(new Sucursales(id));
                 if(rpm.getId() != null){
                     departamentosSucursalManager.update(rpm);
