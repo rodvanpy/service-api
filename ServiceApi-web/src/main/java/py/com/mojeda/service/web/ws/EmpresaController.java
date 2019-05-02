@@ -469,6 +469,8 @@ public class EmpresaController extends BaseController {
             
             Empresas dato = empresaManager.get(id);
             
+            model.setNombre(model.getNombre().toUpperCase());
+            model.setNombreFantasia(model.getNombreFantasia().toUpperCase());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());

@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,7 @@ public class DepartamentosSucursalController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         DepartamentosSucursal model = new DepartamentosSucursal();
+        model.setActivo("S");
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarDepartamentosSucursalManager();
@@ -174,10 +176,31 @@ public class DepartamentosSucursalController extends BaseController {
 				.collect(Collectors.joining(",")));
                 return response;
             }
+
+            model.setNombreArea(model.getNombreArea().toUpperCase());
+            model.setAlias(model.getAlias().toUpperCase());
             
             DepartamentosSucursal sucursal = new DepartamentosSucursal();
             sucursal.setSucursal(model.getSucursal());
+            sucursal.setNombreArea(model.getNombreArea());
             
+            Map<String,Object> sucursalMaps = departamentosSucursalManager.getLike(sucursal,"nombre".split(","));
+            if(sucursalMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un departamenta con el mismo nombre.");                         
+                return response;
+            }
+            
+            sucursal = new DepartamentosSucursal();
+            sucursal.setSucursal(model.getSucursal());
+            sucursal.setAlias(model.getAlias());
+            
+            sucursalMaps = departamentosSucursalManager.getLike(sucursal,"nombre".split(","));
+            if(sucursalMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un departamenta con el mismo alias.");                         
+                return response;
+            }
             
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
@@ -191,7 +214,7 @@ public class DepartamentosSucursalController extends BaseController {
             //sucursal.setCodigoSucursal(model.getCodigoSucursal());
             
             response.setStatus(200);
-            response.setMessage("La sucursal ha sido guardada");           
+            response.setMessage("El departamento se guardo con exito");           
             response.setModel(departamentosSucursalManager.get(sucursal));
             
         } catch (Exception e) {
@@ -235,7 +258,21 @@ public class DepartamentosSucursalController extends BaseController {
                 return response;
             }
             
+            model.setNombreArea(model.getNombreArea().toUpperCase());
+            model.setAlias(model.getAlias().toUpperCase());
+            
             DepartamentosSucursal dato = departamentosSucursalManager.get(id);
+            
+            DepartamentosSucursal sucursal = new DepartamentosSucursal();
+            sucursal.setNombreArea(model.getNombreArea());
+            
+            Map<String,Object> sucursalMaps = departamentosSucursalManager.getLike(sucursal,"id,nombre".split(","));
+            if(sucursalMaps != null
+                    && sucursalMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0){
+                response.setStatus(205);
+                response.setMessage("Ya existe un departamento con el mismo nombre.");                          
+                return response;
+            }
             
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
@@ -255,6 +292,41 @@ public class DepartamentosSucursalController extends BaseController {
 
         return response;
     }
+    
+    /**
+     * Mapping para el metodo DELETE de la vista visualizar.(eliminar Departamentos Sucursal)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO deleteObject(
+            @ModelAttribute("id") Long id) {        
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarDepartamentosSucursalManager();
+                        
+            DepartamentosSucursal model = departamentosSucursalManager.get(id);
+            model.setActivo("N");
+            model.setIdUsuarioEliminacion(userDetail.getId());
+            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+            
+            departamentosSucursalManager.update(model);
+            
+            response.setModel(model);
+            response.setStatus(200);
+            response.setMessage("Registro eliminado con exito.");
+        } catch (Exception e) {
+            logger.error("Error: ",e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
     
     
     

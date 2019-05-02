@@ -37,11 +37,11 @@ import py.com.mojeda.service.web.spring.config.User;
 @Controller
 @RequestMapping(value = "/sucursales")
 public class SucursalController extends BaseController {
-    
+
     String atributos = "id,nombre,codigoSucursal,descripcion,direccion,telefono,fax,telefonoMovil,email,"
             + "observacion,activo,longitud,latitud";
     String atributos_departamento = "id,alias,nombreArea,descripcionArea,activo";
-    
+
     @GetMapping
     public @ResponseBody
     ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
@@ -81,7 +81,6 @@ public class SucursalController extends BaseController {
 //
 //            }
             // ejemplo.setActivo("S");
-
             pagina = pagina != null ? pagina : 1;
             Long total = 0L;
 
@@ -99,11 +98,11 @@ public class SucursalController extends BaseController {
             listMapGrupos = sucursalManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
+
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
+
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
             retorno.setRecords(total);
@@ -112,7 +111,7 @@ public class SucursalController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            
+
         } catch (Exception e) {
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
@@ -120,7 +119,7 @@ public class SucursalController extends BaseController {
 
         return retorno;
     }
-    
+
     @GetMapping("/{id}/departamentos")
     public @ResponseBody
     ResponseListDTO listarDepartamentos(@ModelAttribute("id") Long id,
@@ -138,7 +137,7 @@ public class SucursalController extends BaseController {
         DepartamentosSucursal model = new DepartamentosSucursal();
         model.setSucursal(new Sucursales(id));
         model.setActivo("S");
-        
+
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarDepartamentosSucursalManager();
@@ -163,7 +162,6 @@ public class SucursalController extends BaseController {
 //
 //            }
             // ejemplo.setActivo("S");
-
             pagina = pagina != null ? pagina : 1;
             Long total = 0L;
 
@@ -181,11 +179,11 @@ public class SucursalController extends BaseController {
             listMapGrupos = departamentosSucursalManager.listAtributos(model, atributos_departamento.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
+
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
+
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
             retorno.setRecords(total);
@@ -194,7 +192,7 @@ public class SucursalController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            
+
         } catch (Exception e) {
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
@@ -202,7 +200,7 @@ public class SucursalController extends BaseController {
 
         return retorno;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Empresa)
      *
@@ -212,19 +210,38 @@ public class SucursalController extends BaseController {
     @GetMapping("/{id}")
     public @ResponseBody
     ResponseDTO getObject(
-            @ModelAttribute("id") Long id) {        
+            @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarSucursalManager();
-                        
+            inicializarDepartamentosSucursalManager();
+
             Sucursales model = sucursalManager.get(id);
-               
+
+            DepartamentosSucursal ejDepSuc = new DepartamentosSucursal();
+            ejDepSuc.setSucursal(model);
+
+            List<Map<String, Object>> listDep = departamentosSucursalManager.listAtributos(ejDepSuc, "id,alias,nombreArea,descripcionArea,activo".split(","));
+
+            List<DepartamentosSucursal> departamentos = new ArrayList();
+            for (Map<String, Object> rpm : listDep) {
+                ejDepSuc = new DepartamentosSucursal();
+                ejDepSuc.setId(Long.parseLong(rpm.get("id").toString()));
+                ejDepSuc.setAlias(rpm.get("alias") == null ? "" : rpm.get("alias").toString());
+                ejDepSuc.setNombreArea(rpm.get("nombreArea") == null ? "" : rpm.get("nombreArea").toString());
+                ejDepSuc.setDescripcionArea(rpm.get("descripcionArea") == null ? "" : rpm.get("descripcionArea").toString());
+                ejDepSuc.setActivo(rpm.get("activo") == null ? "" : rpm.get("activo").toString());
+                departamentos.add(ejDepSuc);
+            }
+
+            model.setDepartamentos(departamentos);
+
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -246,80 +263,87 @@ public class SucursalController extends BaseController {
     ResponseDTO create(
             @RequestBody @Valid Sucursales model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarSucursalManager();
             inicializarDepartamentosSucursalManager();
-            
-            if(errors.hasErrors()){
-                
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
-            
+
             model.setNombre(model.getNombre().toUpperCase());
-            
+
             Sucursales sucursal = new Sucursales();
             sucursal.setNombre(model.getNombre());
             sucursal.setEmpresa(model.getEmpresa());
-            
-            Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"nombre".split(","));
-            if(sucursalMaps != null){
+
+            Map<String, Object> sucursalMaps = sucursalManager.getLike(sucursal, "nombre".split(","));
+            if (sucursalMaps != null) {
                 response.setStatus(205);
-                response.setMessage("Ya existe una sucursal con el mismo nombre.");                         
+                response.setMessage("Ya existe una sucursal con el mismo nombre.");
                 return response;
             }
-            
+
             String[] codigo = model.getNombre().split(" ");
             String codigoNombre = "";
-            for(int i = 0; i < codigo.length ; i++){
+            for (int i = 0; i < codigo.length; i++) {
                 codigoNombre = codigoNombre + codigo[i].substring(0, 1);
-            }            
+            }
             sucursal = new Sucursales();
-            sucursal.setEmpresa(model.getEmpresa());            
+            sucursal.setEmpresa(model.getEmpresa());
             //Numero Sucursal
             Integer numeroSucursal = sucursalManager.total(sucursal) + 1;
             //Cantidad Sucursales
             Integer cantidadSucursal = sucursalManager.total(new Sucursales()) + 1;
-            
-            model.setCodigoSucursal(codigoNombre+"-"+numeroSucursal+"-"+cantidadSucursal);
+
+            model.setCodigoSucursal(codigoNombre + "-" + numeroSucursal + "-" + cantidadSucursal);
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
-            
+
             sucursalManager.save(model);
-            
+
             sucursal = new Sucursales();
             sucursal.setCodigoSucursal(model.getCodigoSucursal());
-            
+
             sucursal = sucursalManager.get(sucursal);
-            
-            for(DepartamentosSucursal rpm : model.getDepartamentos()){
+
+            for (DepartamentosSucursal rpm : model.getDepartamentos()) {
+                rpm.setActivo("S");
+                rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                rpm.setIdUsuarioCreacion(userDetail.getId());
+                rpm.setIdUsuarioModificacion(userDetail.getId());
                 rpm.setSucursal(sucursal);
+                rpm.setNombreArea(rpm.getNombreArea().toUpperCase());
+                rpm.setAlias(rpm.getAlias().toUpperCase());
                 departamentosSucursalManager.save(rpm);
             }
-            
+
             response.setStatus(200);
-            response.setMessage("La sucursal ha sido guardada");           
+            response.setMessage("La sucursal ha sido guardada");
             response.setModel(sucursalManager.get(sucursal));
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo PUT de la vista actualizar.(actualizar Empresa)
      *
@@ -336,66 +360,71 @@ public class SucursalController extends BaseController {
             @ModelAttribute("id") Long id,
             @RequestBody @Valid Sucursales model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarSucursalManager();
             inicializarDepartamentosSucursalManager();
-            
-            if(errors.hasErrors()){
-                
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
-            
+
             model.setNombre(model.getNombre().toUpperCase());
-            
+
             Sucursales dato = sucursalManager.get(id);
-            
+
             Sucursales sucursal = new Sucursales();
             sucursal.setNombre(model.getNombre());
             sucursal.setEmpresa(model.getEmpresa());
-            
-            Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"id,nombre".split(","));
-            if(sucursalMaps != null
-                    && sucursalMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0){
+
+            Map<String, Object> sucursalMaps = sucursalManager.getLike(sucursal, "id,nombre".split(","));
+            if (sucursalMaps != null
+                    && sucursalMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
                 response.setStatus(205);
-                response.setMessage("Ya existe una sucursal con el mismo nombre.");                          
+                response.setMessage("Ya existe una sucursal con el mismo nombre.");
                 return response;
             }
-            
+
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());
             model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
-            
+
             sucursalManager.update(model);
-            
-            for(DepartamentosSucursal rpm : model.getDepartamentos() == null ? new ArrayList<DepartamentosSucursal>() : model.getDepartamentos()){
+
+            for (DepartamentosSucursal rpm : model.getDepartamentos() == null ? new ArrayList<DepartamentosSucursal>() : model.getDepartamentos()) {
+                rpm.setActivo("S");
+                rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                rpm.setIdUsuarioModificacion(userDetail.getId());
                 rpm.setSucursal(new Sucursales(id));
-                if(rpm.getId() != null){
+                rpm.setNombreArea(rpm.getNombreArea().toUpperCase());
+                rpm.setAlias(rpm.getAlias().toUpperCase());
+                if (rpm.getId() != null) {
                     departamentosSucursalManager.update(rpm);
-                }else{
+                } else {
                     departamentosSucursalManager.save(rpm);
-                }                
-            }            
+                }
+            }
             response.setStatus(200);
             response.setMessage("La sucursal ha sido guardada");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Empresa)
      *
@@ -405,31 +434,29 @@ public class SucursalController extends BaseController {
     @DeleteMapping("/{id}")
     public @ResponseBody
     ResponseDTO deleteObject(
-            @ModelAttribute("id") Long id) {        
+            @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarSucursalManager();
-                        
+
             Sucursales model = sucursalManager.get(id);
             model.setActivo("N");
             model.setIdUsuarioEliminacion(userDetail.getId());
             model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
-            
+
             sucursalManager.update(model);
-            
+
             response.setModel(model);
             response.setStatus(200);
             response.setMessage("Registro eliminado con exito.");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
-    
-    
+
 }
