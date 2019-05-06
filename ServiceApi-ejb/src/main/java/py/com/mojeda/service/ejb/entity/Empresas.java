@@ -19,6 +19,8 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.web.multipart.MultipartFile;
+import py.com.mojeda.service.ejb.utils.Avatar;
 
 /**
  *
@@ -77,6 +79,8 @@ public class Empresas extends Base {
     
     @Column(name = "LONGITUD")
     private Double longitud;
+    @Transient
+    private  Avatar avatar;
 
     public Empresas() {
 
@@ -256,8 +260,12 @@ public class Empresas extends Base {
         this.longitud = longitud;
     }
 
-    
-    
-    
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }  
 
 }
