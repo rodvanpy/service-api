@@ -31,6 +31,8 @@ import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
+import py.com.mojeda.service.web.utils.FilterDTO;
+import py.com.mojeda.service.web.utils.ReglaDTO;
 import static py.com.mojeda.service.web.ws.BaseController.logger;
 
 /**
@@ -67,22 +69,22 @@ public class EmpresaController extends BaseController {
             String camposFiltros = null;
             String valorFiltro = null;
 
-//            if (filtrar) {
-//                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
-//                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
-//                    for (ReglaDTO regla : filtro.getRules()) {
-//                        if (camposFiltros == null) {
-//                            camposFiltros = regla.getField();
-//                            valorFiltro = regla.getData();
-//                        } else {
-//                            camposFiltros += "," + regla.getField();
-//                        }
-//                    }
-//                } else {
-//                    //ejemplo = generarEjemplo(filtro, ejemplo);
-//                }
-//
-//            }
+            if (filtrar) {
+                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
+                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
+                    for (ReglaDTO regla : filtro.getRules()) {
+                        if (camposFiltros == null) {
+                            camposFiltros = regla.getField();
+                            valorFiltro = regla.getData();
+                        } else {
+                            camposFiltros += "," + regla.getField();
+                        }
+                    }
+                } else {
+                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                }
+
+            }
             // ejemplo.setActivo("S");
 
             pagina = pagina != null ? pagina : 1;
@@ -197,6 +199,7 @@ public class EmpresaController extends BaseController {
             
             for(Map<String, Object> rpm : listMapGrupos){
                 DepartamentosSucursal ejDepSucursal = new DepartamentosSucursal();
+                ejDepSucursal.setActivo("S");
                 ejDepSucursal.setSucursal(new Sucursales(Long.parseLong(rpm.get("id").toString())));
                 List<Map<String, Object>> listMapDepart = departamentosSucursalManager.listAtributos(ejDepSucursal, "id,alias,nombreArea,descripcionArea,activo".split(","));
                 if(listMapDepart != null){
@@ -301,7 +304,16 @@ public class EmpresaController extends BaseController {
             logger.info("getNombre: " + sucursal.getNombre());
             
             for(DepartamentosSucursal rpm : model.getDepartamentos() == null ? new ArrayList<DepartamentosSucursal>() : model.getDepartamentos()){
+                
+                rpm.setNombreArea(rpm.getNombreArea().toUpperCase());
+                rpm.setAlias(rpm.getAlias().toUpperCase());
+                rpm.setActivo("S");
+                rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                rpm.setIdUsuarioCreacion(userDetail.getId());
+                rpm.setIdUsuarioModificacion(userDetail.getId());
                 rpm.setSucursal(sucursal);
+                
                 departamentosSucursalManager.save(rpm);
             }
             

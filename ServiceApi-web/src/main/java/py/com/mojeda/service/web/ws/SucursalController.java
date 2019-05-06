@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
+import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -217,25 +218,21 @@ public class SucursalController extends BaseController {
             inicializarSucursalManager();
             inicializarDepartamentosSucursalManager();
 
-            Sucursales model = sucursalManager.get(id);
+            Map<String,Object> model = sucursalManager.getAtributos(new Sucursales(id),
+                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo,empresa.id".split(","));
 
             DepartamentosSucursal ejDepSuc = new DepartamentosSucursal();
-            ejDepSuc.setSucursal(model);
-
+            ejDepSuc.setSucursal(new Sucursales(id));
+            ejDepSuc.setActivo("S");
+            
             List<Map<String, Object>> listDep = departamentosSucursalManager.listAtributos(ejDepSuc, "id,alias,nombreArea,descripcionArea,activo".split(","));
-
-            List<DepartamentosSucursal> departamentos = new ArrayList();
-            for (Map<String, Object> rpm : listDep) {
-                ejDepSuc = new DepartamentosSucursal();
-                ejDepSuc.setId(Long.parseLong(rpm.get("id").toString()));
-                ejDepSuc.setAlias(rpm.get("alias") == null ? "" : rpm.get("alias").toString());
-                ejDepSuc.setNombreArea(rpm.get("nombreArea") == null ? "" : rpm.get("nombreArea").toString());
-                ejDepSuc.setDescripcionArea(rpm.get("descripcionArea") == null ? "" : rpm.get("descripcionArea").toString());
-                ejDepSuc.setActivo(rpm.get("activo") == null ? "" : rpm.get("activo").toString());
-                departamentos.add(ejDepSuc);
-            }
-
-            model.setDepartamentos(departamentos);
+            
+            Empresas empresa = new Empresas();
+            empresa.setId(Long.parseLong(model.get("id").toString()));
+            
+            model.remove("empresa.id");
+            model.put("empresa",empresa);
+            model.put("departamentos",listDep);
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -383,7 +380,7 @@ public class SucursalController extends BaseController {
 
             Sucursales sucursal = new Sucursales();
             sucursal.setNombre(model.getNombre());
-            sucursal.setEmpresa(model.getEmpresa());
+            sucursal.setEmpresa(dato.getEmpresa());
 
             Map<String, Object> sucursalMaps = sucursalManager.getLike(sucursal, "id,nombre".split(","));
             if (sucursalMaps != null
@@ -392,7 +389,8 @@ public class SucursalController extends BaseController {
                 response.setMessage("Ya existe una sucursal con el mismo nombre.");
                 return response;
             }
-
+            
+            model.setEmpresa(dato.getEmpresa());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());
