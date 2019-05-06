@@ -21,10 +21,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.Rol;
+import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
+import py.com.mojeda.service.web.utils.FilterDTO;
+import py.com.mojeda.service.web.utils.ReglaDTO;
 
 /**
  *
@@ -34,8 +39,7 @@ import py.com.mojeda.service.web.spring.config.User;
 @RequestMapping(value = "/usuarios")
 public class UsuarioController extends BaseController {
     
-    String atributos = "id,alias,persona.primerNombre,persona.segundoNombre,persona.primerApellido,persona.segundoApellido,"
-            + "persona.documento,persona.ruc";
+    String atributos = "id,alias,superUsuario,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,activo";
     
     @GetMapping
     public @ResponseBody
@@ -55,26 +59,28 @@ public class UsuarioController extends BaseController {
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarUsuarioManager();
+            inicializarPersonaManager();
+            
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
 
-//            if (filtrar) {
-//                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
-//                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
-//                    for (ReglaDTO regla : filtro.getRules()) {
-//                        if (camposFiltros == null) {
-//                            camposFiltros = regla.getField();
-//                            valorFiltro = regla.getData();
-//                        } else {
-//                            camposFiltros += "," + regla.getField();
-//                        }
-//                    }
-//                } else {
-//                    //ejemplo = generarEjemplo(filtro, ejemplo);
-//                }
-//
-//            }
+            if (filtrar) {
+                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
+                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
+                    for (ReglaDTO regla : filtro.getRules()) {
+                        if (camposFiltros == null) {
+                            camposFiltros = regla.getField();
+                            valorFiltro = regla.getData();
+                        } else {
+                            camposFiltros += "," + regla.getField();
+                        }
+                    }
+                } else {
+                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                }
+
+            }
             // ejemplo.setActivo("S");
 
             pagina = pagina != null ? pagina : 1;
@@ -95,7 +101,14 @@ public class UsuarioController extends BaseController {
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
-            
+            for(Map<String, Object> rpm: listMapGrupos){
+                Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(rpm.get("persona.id").toString())),
+                        "primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email".split(","));
+                rpm.put("persona", persona);
+                rpm.remove("persona.id");
+                rpm.remove("rol.id");
+                rpm.remove("sucursal.id");
+            }
             
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
@@ -134,9 +147,30 @@ public class UsuarioController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarUsuarioManager();
-                        
-            Usuarios model = usuarioManager.get(id);
-               
+            inicializarPersonaManager();
+            inicializarRolManager();
+            inicializarSucursalManager();
+            inicializarEmpresaManager();
+            
+            Map<String, Object> model = usuarioManager.getAtributos(new Usuarios(id),atributos.split(","));
+            
+            Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
+                        "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));               
+            model.put("persona", persona);
+            model.remove("persona.id");
+            Map<String, Object> rol = rolManager.getAtributos(new Rol(Long.parseLong(model.get("rol.id").toString())),
+                        "id,nombre,activo".split(",")); 
+            model.put("rol", rol);
+            model.remove("rol.id");
+            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
+                        "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
+            model.put("sucursal", sucursal);
+            model.remove("sucursal.id");
+            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("sucursal.empresa.id").toString())),
+                        "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
+            model.put("empresa", sucursal);
+            model.remove("sucursal.empresa.id");
+            
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
