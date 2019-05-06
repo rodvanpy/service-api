@@ -50,7 +50,8 @@ public class UsuarioController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        Usuarios ejUsuario = new Usuarios();
+        Usuarios model = new Usuarios();
+        model.setActivo("S");
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarUsuarioManager();
@@ -80,7 +81,7 @@ public class UsuarioController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(usuarioManager.list(ejUsuario).size() + "");
+                total = Long.parseLong(usuarioManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -90,7 +91,7 @@ public class UsuarioController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = usuarioManager.listAtributos(ejUsuario, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = usuarioManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
