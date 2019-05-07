@@ -25,6 +25,7 @@ import py.com.mojeda.service.ejb.manager.TipoVinculoManager;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 import py.com.mojeda.service.ejb.manager.DepartamentosSucursalManager;
+import py.com.mojeda.service.ejb.manager.ImagenManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 
 /**
@@ -32,6 +33,8 @@ import py.com.mojeda.service.ejb.manager.PersonaManager;
  * @author miguel.ojeda
  */
 public class BaseController {
+    
+    protected static final String CONTENT_IMAGE = "C:\\imagen\\";
     
     private Context context;
     
@@ -68,10 +71,30 @@ public class BaseController {
     protected TipoEgresosManager tipoEgresosManager;
     
     protected TipoPagosManager tipoPagosManager;
+    
+    protected ImagenManager imagenManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
     
+    
+    protected void inicializarImagenManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (imagenManager == null) {
+            try {
+
+                imagenManager = (ImagenManager) context.lookup("java:app/ServiceApi-ejb/ImagenManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarPersonaManager() throws Exception {
         if (context == null) {

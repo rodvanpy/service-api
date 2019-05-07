@@ -27,7 +27,7 @@ import py.com.mojeda.service.ejb.utils.Avatar;
  * @author daniel
  */
 @Entity
-@Table(name = "EMPRESAS", uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = { "ruc" }) )
+@Table(name = "EMPRESAS", uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = {"ruc"}))
 public class Empresas extends Base {
 
     private static final long serialVersionUID = 79861856088L;
@@ -38,18 +38,18 @@ public class Empresas extends Base {
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
-    
+
     @NotEmpty(message = "Ingrese Nombre")
     @Column(name = "NOMBRE")
     private String nombre;
-    
+
     //@NotEmpty(message = "Ingrese Nombre Fantasia")
     @Column(name = "NOMBRE_FANTASIA")
     private String nombreFantasia;
 
     @Column(name = "DESCRIPCION")
     private String descripcion;
-    
+
     @NotEmpty(message = "Ingrese Ruc")
     @Column(name = "RUC")
     private String ruc;
@@ -57,30 +57,30 @@ public class Empresas extends Base {
     @NotEmpty(message = "Ingrese Direccion")
     @Column(name = "DIRECCION")
     private String direccion;
-    
+
     @Column(name = "TELEFONO")
     private String telefono;
-    
+
     @Column(name = "FAX")
     private String fax;
 
     @Column(name = "telefono_movil")
     private String telefonoMovil;
-    
+
     @NotEmpty(message = "Ingrese Email")
     @Column(name = "EMAIL")
     private String email;
-    
+
     @Column(name = "OBSERVACION")
     private String observacion;
-    
+
     @Column(name = "LATITUD")
     private Double latitud;
-    
+
     @Column(name = "LONGITUD")
     private Double longitud;
     @Transient
-    private  Avatar avatar;
+    private Avatar avatar;   
 
     public Empresas() {
 
@@ -266,6 +266,10 @@ public class Empresas extends Base {
 
     public void setAvatar(Avatar avatar) {
         this.avatar = avatar;
-    }  
+    }
+    
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
 
 }

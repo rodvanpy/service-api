@@ -190,5 +190,9 @@ public class Usuarios extends Base{
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
     }
+    
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
            
 }

@@ -145,5 +145,7 @@ public class Referencias extends Base {
         this.persona = persona;
     }
     
-    
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
 }

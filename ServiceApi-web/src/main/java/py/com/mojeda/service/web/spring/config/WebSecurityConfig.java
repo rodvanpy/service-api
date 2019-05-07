@@ -54,6 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/empresas").hasAuthority("ROLE_ENTERPRISE.ADD")
                 // Allow anonymous access to "/login" (only POST requests)
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/image/**").permitAll()
                 .antMatchers("/updateauth/token").permitAll()
                 // Any other request must be authenticated
                 .anyRequest().authenticated().and()

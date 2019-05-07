@@ -282,5 +282,9 @@ public class Sucursales extends Base {
         this.departamentos = departamentos;
     }
     
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
+    
     
 }

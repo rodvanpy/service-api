@@ -443,6 +443,8 @@ public class Personas extends Base {
         this.longitud = longitud;
     }
     
-    
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
 
 }

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Imagen;
 
 /**
@@ -34,25 +35,38 @@ import py.com.mojeda.service.ejb.entity.Imagen;
 public class ImagenController extends BaseController {
 
     @ResponseBody
-    @RequestMapping(value = "/image/{entidad}/{entidadId}", method = RequestMethod.GET)
-    public void descagarImagen(@PathVariable("entidad") String entidad, @PathVariable("entidadId") Long entidadId,
+    @RequestMapping(value = "/image/{idEmpresa}/{entidad}/{entidadId}", method = RequestMethod.GET)
+    public void descagarImagen(
+            @PathVariable("idEmpresa") Long idEmpresa,
+            @PathVariable("entidad") String entidad,
+            @PathVariable("entidadId") Long entidadId,
             HttpServletRequest request, HttpServletResponse response) {
 
         try {
 
-            //inicializarImagenManager();
+            inicializarImagenManager();
+            
             response.setHeader("Pragma", "no-cache");
             response.addHeader("Cache-Control", "no-cache");
 
             // Si es un agregar entidadId es 0
             if (entidadId != 0) { // Si es un editar
+                
                 Imagen imagen = new Imagen();
                 imagen.setNombreTabla(entidad);
                 imagen.setIdEntidad(entidadId);
-                //imagen = imagenManager.get(imagen);
+                imagen.setEmpresa(new Empresas(idEmpresa));
+                
+                imagen = imagenManager.get(imagen);
 
                 if (imagen != null) { // Si existe la imagen
-                    File file = convertirImagen(imagen.getImagen(), 640);
+                    File file;
+                    if(imagen.getArchivo() != null){
+                        file = convertirImagen(imagen.getArchivo(), 640);
+                    }else{
+                        file = new File(imagen.getPath());
+                    }
+                    
                     BufferedImage bufferedImage = ImageIO.read(file);
                     OutputStream output = response.getOutputStream();
                     ImageIO.write(bufferedImage, "jpg", output);
@@ -72,10 +86,11 @@ public class ImagenController extends BaseController {
                 Imagen imagen = new Imagen();
                 imagen.setNombreTabla(entidad);
                 imagen.setIdEntidad(0l);
-                //imagen = imagenManager.get(imagen);
+                
+                imagen = imagenManager.get(imagen);
 
                 if (imagen != null) { // Si existe la imagen temporal
-                    File file = convertirImagen(imagen.getImagen(), 640);
+                    File file = convertirImagen(imagen.getArchivo(), 640);
                     BufferedImage bufferedImage = ImageIO.read(file);
                     OutputStream output = response.getOutputStream();
                     ImageIO.write(bufferedImage, "jpg", output);

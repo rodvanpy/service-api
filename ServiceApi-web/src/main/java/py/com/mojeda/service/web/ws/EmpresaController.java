@@ -26,11 +26,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Imagen;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
+import py.com.mojeda.service.web.utils.Base64Bytes;
 import py.com.mojeda.service.web.utils.FilterDTO;
 import py.com.mojeda.service.web.utils.ReglaDTO;
 import static py.com.mojeda.service.web.ws.BaseController.logger;
@@ -155,22 +157,22 @@ public class EmpresaController extends BaseController {
             String camposFiltros = null;
             String valorFiltro = null;
 
-//            if (filtrar) {
-//                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
-//                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
-//                    for (ReglaDTO regla : filtro.getRules()) {
-//                        if (camposFiltros == null) {
-//                            camposFiltros = regla.getField();
-//                            valorFiltro = regla.getData();
-//                        } else {
-//                            camposFiltros += "," + regla.getField();
-//                        }
-//                    }
-//                } else {
-//                    //ejemplo = generarEjemplo(filtro, ejemplo);
-//                }
-//
-//            }
+            if (filtrar) {
+                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
+                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
+                    for (ReglaDTO regla : filtro.getRules()) {
+                        if (camposFiltros == null) {
+                            camposFiltros = regla.getField();
+                            valorFiltro = regla.getData();
+                        } else {
+                            camposFiltros += "," + regla.getField();
+                        }
+                    }
+                } else {
+                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                }
+
+            }
             // ejemplo.setActivo("S");
 
             pagina = pagina != null ? pagina : 1;
@@ -379,6 +381,7 @@ public class EmpresaController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarEmpresaManager();
+            inicializarImagenManager();
             
             if(errors.hasErrors()){
                 
@@ -433,6 +436,14 @@ public class EmpresaController extends BaseController {
             
             empresa = new Empresas();
             empresa.setRuc(model.getRuc());
+            
+            empresa = empresaManager.get(empresa);
+            
+            if(model.getAvatar() != null){
+                Boolean imagenBoolean = imagenManager.guardar(Base64Bytes.decode(model.getAvatar().getValue()), model.getAvatar().getFilename(),
+                        model.getAvatar().getFiletype(), empresa.getClassName(), empresa.getId(), userDetail.getId(), userDetail.getIdEmpresa());
+                
+            }
             
             response.setStatus(200);
             response.setMessage("La empresa ha sido guardada");           

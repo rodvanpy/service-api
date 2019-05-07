@@ -17,5 +17,6 @@ import py.com.mojeda.service.ejb.utils.Avatar;
 @Local
 public interface ImagenManager extends GenericDao<Imagen, Long> {
          
-    public boolean guardar(Avatar avatar);
+    public boolean guardar(byte[] archivo, String fileName, String fileType,
+            String entidad, Long idEntidad, Long idUsuario, Long idEmpresa);
 }

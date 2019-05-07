@@ -34,11 +34,14 @@ public class Imagen extends Base{
     private Long id;
 
    @Lob
-   @Column(name = "imagen")
-   private byte[] imagen;
+   @Column(name = "ARCHIVO")
+   private byte[] archivo;
 
-   @Column(name = "NOMBRE_IMAGEN")
-   private String nombreImagen;
+   @Column(name = "NOMBRE_ARCHIVO")
+   private String nombreArchivo;
+   
+   @Column(name = "TIPO_ARCHIVO")
+   private String tipoArchivo;
 
    @Column(name = "NOMBRE_TABLA")
    private String nombreTabla;
@@ -82,33 +85,21 @@ public class Imagen extends Base{
     public void setId(Long id) {
         this.id = id;
     }
+    
+    
 
     /**
-     * @return the imagen
+     * @return the tipoArchivo
      */
-    public byte[] getImagen() {
-        return imagen;
+    public String getTipoArchivo() {
+        return tipoArchivo;
     }
 
     /**
-     * @param imagen the imagen to set
+     * @param tipoArchivo the tipoArchivo to set
      */
-    public void setImagen(byte[] imagen) {
-        this.imagen = imagen;
-    }
-
-    /**
-     * @return the nombreImagen
-     */
-    public String getNombreImagen() {
-        return nombreImagen;
-    }
-
-    /**
-     * @param nombreImagen the nombreImagen to set
-     */
-    public void setNombreImagen(String nombreImagen) {
-        this.nombreImagen = nombreImagen;
+    public void setTipoArchivo(String tipoArchivo) {
+        this.tipoArchivo = tipoArchivo;
     }
 
     /**
@@ -166,7 +157,35 @@ public class Imagen extends Base{
     public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
     }
-   
-   
+
+    /**
+     * @return the nombreArchivo
+     */
+    public String getNombreArchivo() {
+        return nombreArchivo;
+    }
+
+    /**
+     * @param nombreArchivo the nombreArchivo to set
+     */
+    public void setNombreArchivo(String nombreArchivo) {
+        this.nombreArchivo = nombreArchivo;
+    }
+
+    /**
+     * @return the archivo
+     */
+    public byte[] getArchivo() {
+        return archivo;
+    }
+
+    /**
+     * @param archivo the archivo to set
+     */
+    public void setArchivo(byte[] archivo) {
+        this.archivo = archivo;
+    }
+
+    
    
 }
