@@ -26,6 +26,7 @@ import py.com.mojeda.service.ejb.manager.UsuarioManager;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 import py.com.mojeda.service.ejb.manager.DepartamentosSucursalManager;
 import py.com.mojeda.service.ejb.manager.ImagenManager;
+import py.com.mojeda.service.ejb.manager.PermisoManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 
 /**
@@ -73,10 +74,29 @@ public class BaseController {
     protected TipoPagosManager tipoPagosManager;
     
     protected ImagenManager imagenManager;
+    
+    protected PermisoManager permisoManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
     
+    protected void inicializarPermisoManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (permisoManager == null) {
+            try {
+
+                permisoManager = (PermisoManager) context.lookup("java:app/ServiceApi-ejb/PermisoManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarImagenManager() throws Exception {
         if (context == null) {

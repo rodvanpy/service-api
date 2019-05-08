@@ -29,15 +29,15 @@ public class ImagenManagerImpl extends GenericDaoImpl<Imagen, Long> implements
         return Imagen.class;
     }
     private static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    private static final String CONTENT = "C:\\imagen\\";
+    private static final String CONTENT = "/home/image/";
 
     @Override
     public boolean guardar(byte[] archivo, String fileName, String fileType,
             String entidad, Long idEntidad, Long idUsuario, Long idEmpresa) {
         try {           
             
-            Files.createDirectories(Paths.get(CONTENT + entidad + "\\" + idEntidad));
-            String path = entidad + "\\" + idEntidad + "\\" + fileName;
+            Files.createDirectories(Paths.get(CONTENT + entidad + "/" + idEntidad));
+            String path = entidad + "/" + idEntidad + "/" + fileName;
             FileOutputStream fos = new FileOutputStream(CONTENT + path);
             fos.write(archivo);
             fos.close();
