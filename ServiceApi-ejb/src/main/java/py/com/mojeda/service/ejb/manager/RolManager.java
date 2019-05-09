@@ -18,4 +18,7 @@ import py.com.mojeda.service.ejb.entity.Rol;
 @Local
 public interface RolManager extends GenericDao<Rol, Long>{   
     
+    public Rol guardar(Rol rol) throws Exception;
+    
+    public Rol editar(Rol rol) throws Exception;
 }

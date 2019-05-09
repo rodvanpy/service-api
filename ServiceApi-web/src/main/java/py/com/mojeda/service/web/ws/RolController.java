@@ -17,20 +17,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Permisos;
 import py.com.mojeda.service.ejb.entity.Rol;
+import py.com.mojeda.service.ejb.entity.RolPermiso;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
 import py.com.mojeda.service.web.utils.ReglaDTO;
+import static py.com.mojeda.service.web.ws.BaseController.logger;
 
 /**
  *
@@ -54,6 +58,7 @@ public class RolController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         Rol model = new Rol();
+        model.setActivo("S");
         model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
         List<Map<String, Object>> listMapGrupos = null;
@@ -136,9 +141,30 @@ public class RolController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarRolManager();
-
+            inicializarRolPermisoManager();
+            
             Rol model = rolManager.get(id);
+            
+            RolPermiso ejRolPermiso = new RolPermiso();
+            ejRolPermiso.setRol(new Rol(model.getId()));
+            ejRolPermiso.setEmpresa(new Empresas(model.getEmpresa().getId()));
 
+            List<Map<String, Object>> authRol = rolPermisoManager.listAtributos(ejRolPermiso, "permiso.id,permiso.nombre,permiso.grupo,permiso.descripcion".split(","), true);
+            
+            Permisos ejPermisos = null;
+            List<Permisos> authorities = new ArrayList<>();
+            for(Map<String, Object> rpm: authRol){
+                ejPermisos = new Permisos();
+                ejPermisos.setId(Long.parseLong(rpm.get("permiso.id").toString()));
+                ejPermisos.setDescripcion(rpm.get("permiso.descripcion").toString());
+                ejPermisos.setNombre(rpm.get("permiso.nombre").toString());
+                ejPermisos.setGrupo(rpm.get("permiso.grupo").toString());
+                
+                authorities.add(ejPermisos);
+            }
+            
+            model.setAuthorities(authorities);
+                    
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
@@ -263,7 +289,7 @@ public class RolController extends BaseController {
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
-            @Valid Rol model,
+            @RequestBody @Valid Rol model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -286,9 +312,11 @@ public class RolController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
+            model.setEmpresa(new Empresas(userDetail.getId()));
 
-            rolManager.save(model);
-
+            model = rolManager.guardar(model);
+            
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("OK");
         } catch (Exception e) {
@@ -313,7 +341,7 @@ public class RolController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @Valid Rol model,
+            @RequestBody @Valid Rol model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -330,16 +358,52 @@ public class RolController extends BaseController {
                         .collect(Collectors.joining(",")));
                 return response;
             }
-
+                       
+            model.setId(id);
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            rolManager.update(model);
-
+            model = rolManager.editar(model);
+            
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("OK");
         } catch (Exception e) {
             logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
+    /**
+     * Mapping para el metodo DELETE de la vista eliminar.(eliminar Rol)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO delete(
+            @ModelAttribute("id") Long id) {        
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarRolManager();
+                        
+            Rol model = rolManager.get(id);
+            model.setActivo("N");
+            model.setIdUsuarioEliminacion(userDetail.getId());
+            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+            
+            rolManager.update(model);
+            
+            response.setModel(model);
+            response.setStatus(200);
+            response.setMessage("Registro eliminado con exito.");
+        } catch (Exception e) {
+            logger.error("Error: ",e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }

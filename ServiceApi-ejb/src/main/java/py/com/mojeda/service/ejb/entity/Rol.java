@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -39,7 +41,10 @@ public class Rol extends Base {
     @ManyToOne
     @JoinColumn
     private Empresas empresa;
-
+    
+    @Transient
+    //@NotEmpty(message = "Ingrese Permisos")
+    private List<Permisos> authorities; 
     
     public Rol() {
 
@@ -93,6 +98,14 @@ public class Rol extends Base {
      */
     public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
+    }
+
+    public List<Permisos> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(List<Permisos> authorities) {
+        this.authorities = authorities;
     }
 
     

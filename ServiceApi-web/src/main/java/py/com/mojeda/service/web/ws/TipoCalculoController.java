@@ -30,6 +30,8 @@ import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
+import py.com.mojeda.service.web.utils.FilterDTO;
+import py.com.mojeda.service.web.utils.ReglaDTO;
 
 /**
  *
@@ -64,22 +66,22 @@ public class TipoCalculoController extends BaseController {
             String camposFiltros = null;
             String valorFiltro = null;
 
-//            if (filtrar) {
-//                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
-//                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
-//                    for (ReglaDTO regla : filtro.getRules()) {
-//                        if (camposFiltros == null) {
-//                            camposFiltros = regla.getField();
-//                            valorFiltro = regla.getData();
-//                        } else {
-//                            camposFiltros += "," + regla.getField();
-//                        }
-//                    }
-//                } else {
-//                    //ejemplo = generarEjemplo(filtro, ejemplo);
-//                }
-//
-//            }
+            if (filtrar) {
+                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
+                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
+                    for (ReglaDTO regla : filtro.getRules()) {
+                        if (camposFiltros == null) {
+                            camposFiltros = regla.getField();
+                            valorFiltro = regla.getData();
+                        } else {
+                            camposFiltros += "," + regla.getField();
+                        }
+                    }
+                } else {
+                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                }
+
+            }
             // ejemplo.setActivo("S");
             pagina = pagina != null ? pagina : 1;
             Long total = 0L;

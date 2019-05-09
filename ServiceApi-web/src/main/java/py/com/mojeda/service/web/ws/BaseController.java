@@ -28,6 +28,7 @@ import py.com.mojeda.service.ejb.manager.DepartamentosSucursalManager;
 import py.com.mojeda.service.ejb.manager.ImagenManager;
 import py.com.mojeda.service.ejb.manager.PermisoManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
+import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 
 /**
  *
@@ -57,6 +58,8 @@ public class BaseController {
     
     protected RolManager rolManager;
     
+    protected RolPermisoManager rolPermisoManager;
+    
     protected ModalidadesManager modalidadesManager;
             
     protected TipoCalculosManager tipoCalculosManager;
@@ -79,6 +82,24 @@ public class BaseController {
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
+    
+    protected void inicializarRolPermisoManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (rolPermisoManager == null) {
+            try {
+
+                rolPermisoManager = (RolPermisoManager) context.lookup("java:app/ServiceApi-ejb/RolPermisoManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarPermisoManager() throws Exception {
         if (context == null) {
