@@ -65,11 +65,12 @@ public class Usuarios extends Base{
     @ManyToOne
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
     private Rol rol;
+        
     
-    @NotNull(message = "Ingrese Sucursal")
-    @ManyToOne
-    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
-    private Sucursales sucursal;
+//    @NotNull(message = "Ingrese Sucursal")
+//    @ManyToOne
+//    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
+//    private Sucursales sucursal;
     
     public Usuarios() {
 
@@ -177,19 +178,19 @@ public class Usuarios extends Base{
         this.expirationTimeTokens = expirationTimeTokens;
     }
 
-    /**
-     * @return the sucursal
-     */
-    public Sucursales getSucursal() {
-        return sucursal;
-    }
-
-    /**
-     * @param sucursal the sucursal to set
-     */
-    public void setSucursal(Sucursales sucursal) {
-        this.sucursal = sucursal;
-    }
+//    /**
+//     * @return the sucursal
+//     */
+//    public Sucursales getSucursal() {
+//        return sucursal;
+//    }
+//
+//    /**
+//     * @param sucursal the sucursal to set
+//     */
+//    public void setSucursal(Sucursales sucursal) {
+//        this.sucursal = sucursal;
+//    }
     
     public String getClassName() {
         return this.getClass().getSimpleName();

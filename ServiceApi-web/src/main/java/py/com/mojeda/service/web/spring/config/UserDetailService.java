@@ -51,8 +51,8 @@ public class UserDetailService implements UserDetailsService {
             user.setId(ejObjeto.getId());
             user.setApellido(ejObjeto.getPersona().getPrimerApellido() + " " + ejObjeto.getPersona().getSegundoApellido() == null ? "" : ejObjeto.getPersona().getSegundoApellido());
             user.setNombre(ejObjeto.getPersona().getPrimerNombre() + " " + ejObjeto.getPersona().getSegundoNombre() == null ? "" : ejObjeto.getPersona().getSegundoNombre());
-            user.setIdEmpresa(ejObjeto.getSucursal().getEmpresa().getId());
-            user.setIdSusursal(ejObjeto.getSucursal().getId());
+            user.setIdEmpresa(ejObjeto.getPersona().getSucursal().getEmpresa().getId());
+            user.setIdSusursal(ejObjeto.getPersona().getSucursal().getId());
             user.setNombreRol(ejObjeto.getRol().getNombre());
             user.setUsername(ejObjeto.getAlias());
 

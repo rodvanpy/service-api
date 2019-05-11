@@ -79,6 +79,7 @@ public class Empresas extends Base {
 
     @Column(name = "LONGITUD")
     private Double longitud;
+    
     @Transient
     private Avatar avatar;   
 

@@ -32,7 +32,7 @@ import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
-import py.com.mojeda.service.web.utils.Base64Bytes;
+import py.com.mojeda.service.ejb.utils.Base64Bytes;
 import py.com.mojeda.service.web.utils.FilterDTO;
 import py.com.mojeda.service.web.utils.ReglaDTO;
 import static py.com.mojeda.service.web.ws.BaseController.logger;

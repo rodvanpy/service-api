@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +40,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @RequestMapping(value = "/usuarios")
 public class UsuarioController extends BaseController {
     
-    String atributos = "id,alias,superUsuario,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,activo";
+    String atributos = "id,alias,superUsuario,expirationTimeTokens,persona.id,rol.id,persona.sucursal.id,persona.sucursal.empresa.id,activo";
     
     @GetMapping
     public @ResponseBody
@@ -107,7 +108,7 @@ public class UsuarioController extends BaseController {
                 rpm.put("persona", persona);
                 rpm.remove("persona.id");
                 rpm.remove("rol.id");
-                rpm.remove("sucursal.id");
+                rpm.remove("persona.sucursal.id");
             }
             
             if (todos) {
@@ -156,20 +157,25 @@ public class UsuarioController extends BaseController {
             
             Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
                         "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));               
-            model.put("persona", persona);
+            
+            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
+                        "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
+            
+            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("persona.sucursal.empresa.id").toString())),
+                        "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
+            sucursal.put("empresa", empresa);     
+            
+            persona.put("sucursal", sucursal);                
+            model.put("persona", persona);  
+            
             model.remove("persona.id");
+            model.remove("persona.sucursal.id");
+            model.remove("persona.sucursal.empresa.id");
+            
             Map<String, Object> rol = rolManager.getAtributos(new Rol(Long.parseLong(model.get("rol.id").toString())),
                         "id,nombre,activo".split(",")); 
             model.put("rol", rol);
             model.remove("rol.id");
-            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
-                        "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
-            model.put("sucursal", sucursal);
-            model.remove("sucursal.id");
-            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("sucursal.empresa.id").toString())),
-                        "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
-            model.put("empresa", sucursal);
-            model.remove("sucursal.empresa.id");
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -199,8 +205,10 @@ public class UsuarioController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         Usuarios ejUsuario = new Usuarios();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
             inicializarUsuarioManager();
+            inicializarImagenManager();
             
             if(errors.hasErrors()){
                 
@@ -212,16 +220,19 @@ public class UsuarioController extends BaseController {
                 return response;
             }
             
+            
             model.setActivo("S");
+            model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            usuarioManager.save(model);
-
+            model = usuarioManager.guardar(model);
+            
+            response.setModel(model);
             response.setStatus(200);
-            response.setMessage("OK");
+            response.setMessage("Usuario creado con exito");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -248,6 +259,7 @@ public class UsuarioController extends BaseController {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
             inicializarUsuarioManager();
             
@@ -260,6 +272,7 @@ public class UsuarioController extends BaseController {
 				.collect(Collectors.joining(",")));
                 return response;
             }
+            
             
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());

@@ -1,5 +1,5 @@
 
-package  py.com.mojeda.service.web.utils;
+package  py.com.mojeda.service.ejb.utils;
 
 
 

@@ -15,9 +15,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
+import py.com.mojeda.service.ejb.utils.Avatar;
 
 /**
  *
@@ -111,6 +113,9 @@ public class Personas extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
+    
+    @Transient
+    private Avatar avatar;
 
     public Personas() {
 
@@ -447,4 +452,12 @@ public class Personas extends Base {
         return this.getClass().getSimpleName();
     }
 
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }
+       
 }

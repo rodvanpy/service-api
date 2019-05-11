@@ -63,8 +63,8 @@ public class UserSession implements AuthenticationProvider {
                     userDetails.setId(ejObjeto.getId());
                     userDetails.setApellido(ejObjeto.getPersona().getPrimerApellido() + " " + ejObjeto.getPersona().getSegundoApellido() == null ? "" : ejObjeto.getPersona().getSegundoApellido());
                     userDetails.setNombre(ejObjeto.getPersona().getPrimerNombre() + " " + ejObjeto.getPersona().getSegundoNombre() == null ? "" : ejObjeto.getPersona().getSegundoNombre());
-                    userDetails.setIdEmpresa(ejObjeto.getSucursal().getEmpresa().getId());
-                    userDetails.setIdSusursal(ejObjeto.getSucursal().getId());
+                    userDetails.setIdEmpresa(ejObjeto.getPersona().getSucursal().getEmpresa().getId());
+                    userDetails.setIdSusursal(ejObjeto.getPersona().getSucursal().getId());
                     userDetails.setNombreRol(ejObjeto.getRol().getNombre());
                     userDetails.setUsername(ejObjeto.getAlias());
 
