@@ -26,8 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
 import py.com.mojeda.service.ejb.entity.Empresas;
-import py.com.mojeda.service.ejb.entity.Imagen;
+import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.TipoDocumentos;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -379,6 +380,7 @@ public class EmpresaController extends BaseController {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        Documentos ejDocumentos = null;
         try {
             inicializarEmpresaManager();
             inicializarImagenManager();
@@ -440,6 +442,27 @@ public class EmpresaController extends BaseController {
             empresa = empresaManager.get(empresa);
             
             if(model.getAvatar() != null){
+                
+                ejDocumentos = new Documentos();
+                ejDocumentos.setActivo("S");
+                ejDocumentos.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                ejDocumentos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                ejDocumentos.setIdUsuarioCreacion(userDetail.getId());
+                ejDocumentos.setIdUsuarioModificacion(userDetail.getId());
+                ejDocumentos.setDocumento(Base64Bytes.decode(model.getAvatar().getValue()));
+                ejDocumentos.setNombreDocumento(model.getAvatar().getFilename());
+                ejDocumentos.setTipoArchivo(model.getAvatar().getFiletype());
+                ejDocumentos.setNombreTabla(empresa.getClassName());
+                ejDocumentos.setIdEntidad(empresa.getId());
+                ejDocumentos.setEmpresa(new Empresas(empresa.getId()));
+
+                TipoDocumentos ejTipoDocumento = new TipoDocumentos();
+                ejTipoDocumento.setCodigo("I-E-200");
+                ejTipoDocumento = tipoDocumentosManager.get(ejTipoDocumento);
+
+                ejDocumentos.setTipoDocumento(ejTipoDocumento);
+                ejDocumentos = documentoManager.editar(ejDocumentos);
+                
                 Boolean imagenBoolean = imagenManager.guardar(Base64Bytes.decode(model.getAvatar().getValue()), model.getAvatar().getFilename(),
                         model.getAvatar().getFiletype(), empresa.getClassName(), empresa.getId(), userDetail.getId(), userDetail.getIdEmpresa());
                 

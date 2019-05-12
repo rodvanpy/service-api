@@ -25,10 +25,12 @@ import py.com.mojeda.service.ejb.manager.TipoVinculoManager;
 import py.com.mojeda.service.ejb.manager.UsuarioManager;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 import py.com.mojeda.service.ejb.manager.DepartamentosSucursalManager;
-import py.com.mojeda.service.ejb.manager.ImagenManager;
 import py.com.mojeda.service.ejb.manager.PermisoManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
+import py.com.mojeda.service.ejb.manager.DocumentoManager;
+import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
+import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 
 /**
  *
@@ -49,6 +51,8 @@ public class BaseController {
     protected SucursalManager sucursalManager;
     
     protected DepartamentosSucursalManager departamentosSucursalManager;
+    
+    protected UsuarioDepartamentosManager usuarioDepartamentosManager;
     
     protected ReferenciaManager referenciaManager;
     
@@ -76,12 +80,50 @@ public class BaseController {
     
     protected TipoPagosManager tipoPagosManager;
     
-    protected ImagenManager imagenManager;
+    protected DocumentoManager documentoManager;
+    
+    protected TipoDocumentosManager tipoDocumentosManager;
     
     protected PermisoManager permisoManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
+    
+    protected void inicializarUsuarioDepartamentosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (usuarioDepartamentosManager == null) {
+            try {
+
+                usuarioDepartamentosManager = (UsuarioDepartamentosManager) context.lookup("java:app/ServiceApi-ejb/UsuarioDepartamentosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarTipoDocumentosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (tipoDocumentosManager == null) {
+            try {
+
+                tipoDocumentosManager = (TipoDocumentosManager) context.lookup("java:app/ServiceApi-ejb/TipoDocumentosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarRolPermisoManager() throws Exception {
         if (context == null) {
@@ -119,7 +161,7 @@ public class BaseController {
         }
     }
     
-    protected void inicializarImagenManager() throws Exception {
+    protected void inicializarDocumentoManager() throws Exception {
         if (context == null) {
             try {
                 context = new InitialContext();
@@ -127,10 +169,10 @@ public class BaseController {
                 throw new RuntimeException("No se puede inicializar el contexto", e1);
             }
         }
-        if (imagenManager == null) {
+        if (documentoManager == null) {
             try {
 
-                imagenManager = (ImagenManager) context.lookup("java:app/ServiceApi-ejb/ImagenManagerImpl");
+                documentoManager = (DocumentoManager) context.lookup("java:app/ServiceApi-ejb/DocumentoManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

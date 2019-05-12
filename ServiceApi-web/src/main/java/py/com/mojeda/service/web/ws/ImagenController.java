@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
-import py.com.mojeda.service.ejb.entity.Imagen;
+import py.com.mojeda.service.ejb.entity.Documentos;
 
 /**
  *
@@ -44,7 +44,7 @@ public class ImagenController extends BaseController {
 
         try {
 
-            inicializarImagenManager();
+            inicializarDocumentoManager();
             
             response.setHeader("Pragma", "no-cache");
             response.addHeader("Cache-Control", "no-cache");
@@ -52,17 +52,17 @@ public class ImagenController extends BaseController {
             // Si es un agregar entidadId es 0
             if (entidadId != 0) { // Si es un editar
                 
-                Imagen imagen = new Imagen();
+                Documentos imagen = new Documentos();
                 imagen.setNombreTabla(entidad);
                 imagen.setIdEntidad(entidadId);
                 imagen.setEmpresa(new Empresas(idEmpresa));
                 
-                imagen = imagenManager.get(imagen);
+                imagen = documentoManager.get(imagen);
 
                 if (imagen != null) { // Si existe la imagen
                     File file;
-                    if(imagen.getArchivo() != null){
-                        file = convertirImagen(imagen.getArchivo(), 640);
+                    if(imagen.getDocumento()!= null){
+                        file = convertirImagen(imagen.getDocumento(), 640);
                     }else{
                         file = new File(imagen.getPath());
                     }
@@ -83,14 +83,14 @@ public class ImagenController extends BaseController {
                     output.close();
                 }
             } else { // Si es un agregar
-                Imagen imagen = new Imagen();
+                Documentos imagen = new Documentos();
                 imagen.setNombreTabla(entidad);
                 imagen.setIdEntidad(0l);
                 
-                imagen = imagenManager.get(imagen);
+                imagen = documentoManager.get(imagen);
 
                 if (imagen != null) { // Si existe la imagen temporal
-                    File file = convertirImagen(imagen.getArchivo(), 640);
+                    File file = convertirImagen(imagen.getDocumento(), 640);
                     BufferedImage bufferedImage = ImageIO.read(file);
                     OutputStream output = response.getOutputStream();
                     ImageIO.write(bufferedImage, "jpg", output);

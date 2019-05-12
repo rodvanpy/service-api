@@ -6,6 +6,8 @@
 
 package py.com.mojeda.service.ejb.entity;
 
+import java.util.List;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -65,12 +68,13 @@ public class Usuarios extends Base{
     @ManyToOne
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
     private Rol rol;
-        
     
-//    @NotNull(message = "Ingrese Sucursal")
-//    @ManyToOne
-//    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
-//    private Sucursales sucursal;
+    @Transient
+    private String imagePath;
+    
+    @Transient
+    private List<Map<String,Object>> departamentos;
+        
     
     public Usuarios() {
 
@@ -178,22 +182,26 @@ public class Usuarios extends Base{
         this.expirationTimeTokens = expirationTimeTokens;
     }
 
-//    /**
-//     * @return the sucursal
-//     */
-//    public Sucursales getSucursal() {
-//        return sucursal;
-//    }
-//
-//    /**
-//     * @param sucursal the sucursal to set
-//     */
-//    public void setSucursal(Sucursales sucursal) {
-//        this.sucursal = sucursal;
-//    }
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }    
     
     public String getClassName() {
         return this.getClass().getSimpleName();
     }
+
+    public List<Map<String, Object>> getDepartamentos() {
+        return departamentos;
+    }
+
+    public void setDepartamentos(List<Map<String, Object>> departamentos) {
+        this.departamentos = departamentos;
+    }
+    
+    
            
 }

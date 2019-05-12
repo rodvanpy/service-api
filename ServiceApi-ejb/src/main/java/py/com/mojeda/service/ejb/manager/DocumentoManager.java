@@ -7,7 +7,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.Imagen;
+import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.utils.Avatar;
 
 /**
@@ -15,8 +15,9 @@ import py.com.mojeda.service.ejb.utils.Avatar;
  * @author Miguel
  */
 @Local
-public interface ImagenManager extends GenericDao<Imagen, Long> {
+public interface DocumentoManager extends GenericDao<Documentos, Long> {
          
-    public boolean guardar(byte[] archivo, String fileName, String fileType,
-            String entidad, Long idEntidad, Long idUsuario, Long idEmpresa);
+    public Documentos guardar(Documentos documento) throws Exception;
+    
+    public Documentos editar(Documentos documento) throws Exception;
 }

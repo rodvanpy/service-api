@@ -20,7 +20,7 @@ import javax.persistence.SequenceGenerator;
  * @author Miguel
  */
 @Entity
-public class Imagen extends Base{
+public class Documentos extends Base{
     /**
     * 
     */
@@ -34,14 +34,14 @@ public class Imagen extends Base{
     private Long id;
 
    @Lob
-   @Column(name = "ARCHIVO")
-   private byte[] archivo;
-
-   @Column(name = "NOMBRE_ARCHIVO")
-   private String nombreArchivo;
+   @Column(name = "DOCUMENTO")
+   private byte[] documento;
    
    @Column(name = "TIPO_ARCHIVO")
    private String tipoArchivo;
+
+   @Column(name = "NOMBRE_DOCUMENTO")
+   private String nombreDocumento;  
 
    @Column(name = "NOMBRE_TABLA")
    private String nombreTabla;
@@ -51,6 +51,10 @@ public class Imagen extends Base{
 
    @Column(name = "ID_ENTIDAD")
    private Long idEntidad;
+   
+   @ManyToOne
+   @JoinColumn(name = "ID_TIPO_DOCUMENTO")
+   private TipoDocumentos tipoDocumento;
 
    @ManyToOne
    @JoinColumn(name = "EMPRESA")
@@ -60,7 +64,7 @@ public class Imagen extends Base{
    /**
     * Constructor vacío
     */
-   public Imagen() {
+   public Documentos() {
 
    }
 
@@ -68,7 +72,7 @@ public class Imagen extends Base{
     * @param id
     *            el id de Imagen
     */
-   public Imagen(Long id) {
+   public Documentos(Long id) {
            this.setId(id);
    }
 
@@ -84,22 +88,6 @@ public class Imagen extends Base{
      */
     public void setId(Long id) {
         this.id = id;
-    }
-    
-    
-
-    /**
-     * @return the tipoArchivo
-     */
-    public String getTipoArchivo() {
-        return tipoArchivo;
-    }
-
-    /**
-     * @param tipoArchivo the tipoArchivo to set
-     */
-    public void setTipoArchivo(String tipoArchivo) {
-        this.tipoArchivo = tipoArchivo;
     }
 
     /**
@@ -159,33 +147,56 @@ public class Imagen extends Base{
     }
 
     /**
-     * @return the nombreArchivo
+     * @return the documento
      */
-    public String getNombreArchivo() {
-        return nombreArchivo;
+    public byte[] getDocumento() {
+        return documento;
     }
 
     /**
-     * @param nombreArchivo the nombreArchivo to set
+     * @param documento the documento to set
      */
-    public void setNombreArchivo(String nombreArchivo) {
-        this.nombreArchivo = nombreArchivo;
+    public void setDocumento(byte[] documento) {
+        this.documento = documento;
     }
 
     /**
-     * @return the archivo
+     * @return the nombreDocumento
      */
-    public byte[] getArchivo() {
-        return archivo;
+    public String getNombreDocumento() {
+        return nombreDocumento;
     }
 
     /**
-     * @param archivo the archivo to set
+     * @param nombreDocumento the nombreDocumento to set
      */
-    public void setArchivo(byte[] archivo) {
-        this.archivo = archivo;
+    public void setNombreDocumento(String nombreDocumento) {
+        this.nombreDocumento = nombreDocumento;
     }
 
+    /**
+     * @return the tipoDocumento
+     */
+    public TipoDocumentos getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    /**
+     * @param tipoDocumento the tipoDocumento to set
+     */
+    public void setTipoDocumento(TipoDocumentos tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
+    public String getTipoArchivo() {
+        return tipoArchivo;
+    }
+
+    public void setTipoArchivo(String tipoArchivo) {
+        this.tipoArchivo = tipoArchivo;
+    }
+
+    
     
    
 }

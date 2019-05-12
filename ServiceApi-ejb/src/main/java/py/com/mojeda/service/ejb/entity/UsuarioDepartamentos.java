@@ -21,8 +21,8 @@ import javax.persistence.Transient;
  * @author Miguel
  */
 @Entity
-@Table(name = "USUARIO_DEPARTAMENTO")
-public class UsuarioDepartamento{
+@Table(name = "USUARIO_DEPARTAMENTOS")
+public class UsuarioDepartamentos{
     
     private static final long serialVersionUID = 7986185608L;
     

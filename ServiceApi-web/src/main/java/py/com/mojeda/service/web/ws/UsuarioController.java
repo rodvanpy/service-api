@@ -25,6 +25,7 @@ import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -152,6 +153,7 @@ public class UsuarioController extends BaseController {
             inicializarRolManager();
             inicializarSucursalManager();
             inicializarEmpresaManager();
+            inicializarUsuarioDepartamentosManager();
             
             Map<String, Object> model = usuarioManager.getAtributos(new Usuarios(id),atributos.split(","));
             
@@ -176,6 +178,24 @@ public class UsuarioController extends BaseController {
                         "id,nombre,activo".split(",")); 
             model.put("rol", rol);
             model.remove("rol.id");
+            
+            UsuarioDepartamentos ejUsuarioDepartamentos = new UsuarioDepartamentos();
+            ejUsuarioDepartamentos.setUsuario(new Usuarios(id));
+            
+            List<Map<String, Object>> departamentos = usuarioDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","),true);
+                        
+            for(Map<String, Object> rpm : departamentos){
+                rpm.put("id", rpm.get("departamento.id").toString());
+                rpm.put("alias", rpm.get("departamento.alias").toString());
+                rpm.put("nombreArea", rpm.get("departamento.nombreArea").toString());
+                rpm.put("descripcionArea", rpm.get("departamento.descripcionArea").toString());
+                
+                rpm.remove("departamento.id");
+                rpm.remove("departamento.alias");
+                rpm.remove("departamento.nombreArea");
+                rpm.remove("departamento.descripcionArea");
+            }
+            model.put("departamentos", departamentos);
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -208,7 +228,6 @@ public class UsuarioController extends BaseController {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
             inicializarUsuarioManager();
-            inicializarImagenManager();
             
             if(errors.hasErrors()){
                 
@@ -219,7 +238,37 @@ public class UsuarioController extends BaseController {
 				.collect(Collectors.joining(",")));
                 return response;
             }
+            //Buscar usuario por empresa
+            Sucursales ejSucursales = new Sucursales();
+            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
+            Personas ejPersona = new Personas();
+            ejPersona.setSucursal(ejSucursales);
+            
+            Usuarios ejUsuarios = new Usuarios();
+            ejUsuarios.setAlias(model.getAlias());
+            ejUsuarios.setPersona(ejPersona);
+            
+            Map<String,Object> usuarioMaps = usuarioManager.getLike(ejUsuarios,"alias".split(","));
+            
+            if(usuarioMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un usuario con el mismo alias.");                          
+                return response;
+            }
+
+            ejPersona.setDocumento(model.getPersona().getDocumento());
+            
+            ejUsuarios = new Usuarios();
+            ejUsuarios.setPersona(ejPersona);
+            
+            usuarioMaps = usuarioManager.getLike(ejUsuarios,"alias".split(","));
+            
+            if(usuarioMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un usuario con el mismo documento.");                          
+                return response;
+            }
             
             model.setActivo("S");
             model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
