@@ -67,10 +67,7 @@ public class Usuarios extends Base{
     @NotNull(message = "Ingrese Rol")
     @ManyToOne
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
-    private Rol rol;
-    
-    @Transient
-    private String imagePath;
+    private Rol rol;    
     
     @Transient
     private List<Map<String,Object>> departamentos;
@@ -180,15 +177,7 @@ public class Usuarios extends Base{
 
     public void setExpirationTimeTokens(Long expirationTimeTokens) {
         this.expirationTimeTokens = expirationTimeTokens;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }    
+    }  
     
     public String getClassName() {
         return this.getClass().getSimpleName();

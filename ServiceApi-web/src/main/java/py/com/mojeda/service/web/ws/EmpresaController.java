@@ -45,11 +45,11 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @Controller
 @RequestMapping(value = "/empresas")
 public class EmpresaController extends BaseController {
-    
+
     String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo";
     String atributos_sucursales = "id,nombre,codigoSucursal,descripcion,direccion,telefono"
             + ",fax,telefonoMovil,email,observacion,longitud,latitud,activo";
-    
+
     @GetMapping
     public @ResponseBody
     ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
@@ -107,11 +107,11 @@ public class EmpresaController extends BaseController {
             listMapGrupos = empresaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
+
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
+
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
             retorno.setRecords(total);
@@ -120,18 +120,16 @@ public class EmpresaController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
     }
-    
-   
-    
+
     @GetMapping("/{id}/sucursales")
     public @ResponseBody
     ResponseListDTO listarSucursalesEmpresa(@ModelAttribute("_search") boolean filtrar,
@@ -149,7 +147,7 @@ public class EmpresaController extends BaseController {
         Sucursales model = new Sucursales();
         model.setActivo("S");
         model.setEmpresa(new Empresas(id));
-        
+
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarSucursalManager();
@@ -193,20 +191,20 @@ public class EmpresaController extends BaseController {
             listMapGrupos = sucursalManager.listAtributos(model, atributos_sucursales.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
+
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
+
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
-            
-            for(Map<String, Object> rpm : listMapGrupos){
+
+            for (Map<String, Object> rpm : listMapGrupos) {
                 DepartamentosSucursal ejDepSucursal = new DepartamentosSucursal();
                 ejDepSucursal.setActivo("S");
                 ejDepSucursal.setSucursal(new Sucursales(Long.parseLong(rpm.get("id").toString())));
                 List<Map<String, Object>> listMapDepart = departamentosSucursalManager.listAtributos(ejDepSucursal, "id,alias,nombreArea,descripcionArea,activo".split(","));
-                if(listMapDepart != null){
-                   rpm.put("departamentos", listMapDepart);
+                if (listMapDepart != null) {
+                    rpm.put("departamentos", listMapDepart);
                 }
             }
 
@@ -216,16 +214,16 @@ public class EmpresaController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
     }
-    
+
     /**
      * Mapping para el metodo POST de la vista crear.(crear Empresa)
      *
@@ -233,7 +231,6 @@ public class EmpresaController extends BaseController {
      * @param errors
      * @return
      */
-
     @PostMapping("/{id}/sucursales")
     //@CrossOrigin(origins = "http://localhost:4599")
     @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -242,7 +239,7 @@ public class EmpresaController extends BaseController {
             @ModelAttribute("id") Long id,
             @RequestBody @Valid Sucursales model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
 
@@ -250,64 +247,64 @@ public class EmpresaController extends BaseController {
         try {
             inicializarSucursalManager();
             inicializarDepartamentosSucursalManager();
-            
-            if(errors.hasErrors()){
-                
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
-            
+
             model.setNombre(model.getNombre().toUpperCase());
-            
+
             Sucursales sucursal = new Sucursales();
             sucursal.setNombre(model.getNombre());
             sucursal.setEmpresa(model.getEmpresa());
-            
-            Map<String,Object> sucursalMaps = sucursalManager.getLike(sucursal,"nombre".split(","));
-            if(sucursalMaps != null){
+
+            Map<String, Object> sucursalMaps = sucursalManager.getLike(sucursal, "nombre".split(","));
+            if (sucursalMaps != null) {
                 response.setStatus(200);
-                response.setMessage("Ya existe una sucursal con el mismo nombre.");           
-                response.setModel(sucursalManager.get(sucursal));                
+                response.setMessage("Ya existe una sucursal con el mismo nombre.");
+                response.setModel(sucursalManager.get(sucursal));
                 return response;
             }
-            
+
             String[] codigo = model.getNombre().split(" ");
             String codigoNombre = "";
-            for(int i = 0; i < codigo.length ; i++){
+            for (int i = 0; i < codigo.length; i++) {
                 codigoNombre = codigoNombre + codigo[i].substring(0, 1);
-            }            
+            }
             sucursal = new Sucursales();
-            sucursal.setEmpresa(model.getEmpresa());            
+            sucursal.setEmpresa(model.getEmpresa());
             //Numero Sucursal
             Integer numeroSucursal = sucursalManager.total(sucursal) + 1;
             //Cantidad Sucursales
             Integer cantidadSucursal = sucursalManager.total(new Sucursales()) + 1;
-            
-            model.setCodigoSucursal(codigoNombre+"-"+numeroSucursal+"-"+cantidadSucursal);
+
+            model.setCodigoSucursal(codigoNombre + "-" + numeroSucursal + "-" + cantidadSucursal);
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
-            
+
             sucursalManager.save(model);
-            
+
             sucursal = new Sucursales();
             sucursal.setNombre(model.getNombre());
             sucursal.setCodigoSucursal(model.getCodigoSucursal());
-            
+
             sucursal = sucursalManager.get(sucursal);
-            
+
             logger.info("getId: " + sucursal.getId());
             logger.info("getCodigoSucursal: " + sucursal.getCodigoSucursal());
             logger.info("getNombre: " + sucursal.getNombre());
-            
-            for(DepartamentosSucursal rpm : model.getDepartamentos() == null ? new ArrayList<DepartamentosSucursal>() : model.getDepartamentos()){
-                
+
+            for (DepartamentosSucursal rpm : model.getDepartamentos() == null ? new ArrayList<DepartamentosSucursal>() : model.getDepartamentos()) {
+
                 rpm.setNombreArea(rpm.getNombreArea().toUpperCase());
                 rpm.setAlias(rpm.getAlias().toUpperCase());
                 rpm.setActivo("S");
@@ -316,24 +313,23 @@ public class EmpresaController extends BaseController {
                 rpm.setIdUsuarioCreacion(userDetail.getId());
                 rpm.setIdUsuarioModificacion(userDetail.getId());
                 rpm.setSucursal(sucursal);
-                
+
                 departamentosSucursalManager.save(rpm);
             }
-            
+
             response.setStatus(200);
-            response.setMessage("La sucursal ha sido guardada");           
+            response.setMessage("La sucursal ha sido guardada");
             response.setModel(sucursalManager.get(sucursal));
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Empresa)
      *
@@ -343,19 +339,19 @@ public class EmpresaController extends BaseController {
     @GetMapping("/{id}")
     public @ResponseBody
     ResponseDTO getObject(
-            @ModelAttribute("id") Long id) {        
+            @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarEmpresaManager();
-                        
+            
             Empresas model = empresaManager.get(id);
-               
+
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -377,110 +373,79 @@ public class EmpresaController extends BaseController {
     ResponseDTO create(
             @RequestBody @Valid Empresas model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         Documentos ejDocumentos = null;
         try {
             inicializarEmpresaManager();
-            inicializarImagenManager();
-            
-            if(errors.hasErrors()){
-                
+            inicializarDocumentoManager();
+            inicializarTipoDocumentosManager();
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
-            
+
             model.setNombre(model.getNombre().toUpperCase());
             model.setNombreFantasia(model.getNombreFantasia().toUpperCase());
-            
+
             Empresas empresa = new Empresas();
             empresa.setNombre(model.getNombre());
-            
-            Map<String,Object> sucursalMaps = empresaManager.getLike(empresa,"nombre".split(","));
-            if(sucursalMaps != null){
+
+            Map<String, Object> sucursalMaps = empresaManager.getLike(empresa, "nombre".split(","));
+            if (sucursalMaps != null) {
                 response.setStatus(205);
-                response.setMessage("Ya existe una empresa con el mismo nombre.");                          
+                response.setMessage("Ya existe una empresa con el mismo nombre.");
                 return response;
             }
-                
+
             empresa = new Empresas();
             empresa.setNombreFantasia(model.getNombreFantasia());
-            
-            sucursalMaps = empresaManager.getLike(empresa,"nombre".split(","));
-            if(sucursalMaps != null){
+
+            sucursalMaps = empresaManager.getLike(empresa, "nombre".split(","));
+            if (sucursalMaps != null) {
                 response.setStatus(205);
-                response.setMessage("Ya existe una empresa con el mismo nombre de fantasia.");                          
+                response.setMessage("Ya existe una empresa con el mismo nombre de fantasia.");
                 return response;
             }
-            
+
             empresa = new Empresas();
             empresa.setRuc(model.getRuc());
-            
-            sucursalMaps = empresaManager.getLike(empresa,"nombre".split(","));
-            if(sucursalMaps != null){
+
+            sucursalMaps = empresaManager.getLike(empresa, "nombre".split(","));
+            if (sucursalMaps != null) {
                 response.setStatus(205);
-                response.setMessage("Ya existe una empresa con el mismo ruc.");                          
+                response.setMessage("Ya existe una empresa con el mismo ruc.");
                 return response;
             }
-            
+
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
-            
-            empresaManager.save(model);
-            
-            empresa = new Empresas();
-            empresa.setRuc(model.getRuc());
-            
-            empresa = empresaManager.get(empresa);
-            
-            if(model.getAvatar() != null){
-                
-                ejDocumentos = new Documentos();
-                ejDocumentos.setActivo("S");
-                ejDocumentos.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                ejDocumentos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                ejDocumentos.setIdUsuarioCreacion(userDetail.getId());
-                ejDocumentos.setIdUsuarioModificacion(userDetail.getId());
-                ejDocumentos.setDocumento(Base64Bytes.decode(model.getAvatar().getValue()));
-                ejDocumentos.setNombreDocumento(model.getAvatar().getFilename());
-                ejDocumentos.setTipoArchivo(model.getAvatar().getFiletype());
-                ejDocumentos.setNombreTabla(empresa.getClassName());
-                ejDocumentos.setIdEntidad(empresa.getId());
-                ejDocumentos.setEmpresa(new Empresas(empresa.getId()));
 
-                TipoDocumentos ejTipoDocumento = new TipoDocumentos();
-                ejTipoDocumento.setCodigo("I-E-200");
-                ejTipoDocumento = tipoDocumentosManager.get(ejTipoDocumento);
+            model = empresaManager.guardar(model);
 
-                ejDocumentos.setTipoDocumento(ejTipoDocumento);
-                ejDocumentos = documentoManager.editar(ejDocumentos);
-                
-                Boolean imagenBoolean = imagenManager.guardar(Base64Bytes.decode(model.getAvatar().getValue()), model.getAvatar().getFilename(),
-                        model.getAvatar().getFiletype(), empresa.getClassName(), empresa.getId(), userDetail.getId(), userDetail.getIdEmpresa());
-                
-            }
-            
+            response.setMessage("La empresa ha sido guardada");
+            response.setModel(model);
             response.setStatus(200);
-            response.setMessage("La empresa ha sido guardada");           
-            response.setModel(empresaManager.get(empresa));
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo PUT de la vista actualizar.(actualizar Empresa)
      *
@@ -497,24 +462,60 @@ public class EmpresaController extends BaseController {
             @ModelAttribute("id") Long id,
             @RequestBody @Valid Empresas model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        Documentos ejDocumentos = null;
         try {
             inicializarEmpresaManager();
-            
-            if(errors.hasErrors()){
-                
+            inicializarTipoDocumentosManager();
+            inicializarDocumentoManager();
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
-            
+
             Empresas dato = empresaManager.get(id);
-            
+
+            Empresas ejEmpresas = new Empresas();
+            ejEmpresas.setNombre(model.getNombre());
+
+            Map<String, Object> empresaMaps = empresaManager.getLike(ejEmpresas, "id,nombre".split(","));
+            if (empresaMaps != null
+                    && empresaMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe una empresa con el mismo nombre.");
+                return response;
+            }
+
+            ejEmpresas = new Empresas();
+            ejEmpresas.setNombreFantasia(model.getNombreFantasia());
+
+            empresaMaps = empresaManager.getLike(ejEmpresas, "id,nombre".split(","));
+            if (empresaMaps != null
+                    && empresaMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe una empresa con el mismo nombre de fantasia.");
+                return response;
+            }
+
+            ejEmpresas = new Empresas();
+            ejEmpresas.setRuc(model.getRuc());
+
+            empresaMaps = empresaManager.getLike(ejEmpresas, "id,nombre".split(","));
+            if (empresaMaps != null
+                    && empresaMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe una empresa con el mismo ruc.");
+                return response;
+            }
+
             model.setNombre(model.getNombre().toUpperCase());
             model.setNombreFantasia(model.getNombreFantasia().toUpperCase());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -522,20 +523,21 @@ public class EmpresaController extends BaseController {
             model.setFechaCreacion(dato.getFechaCreacion());
             model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
-            
-            empresaManager.update(model);
-            
+
+            model = empresaManager.editar(model);
+
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("La empresa ha sido guardada");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Empresa)
      *
@@ -545,29 +547,29 @@ public class EmpresaController extends BaseController {
     @DeleteMapping("/{id}")
     public @ResponseBody
     ResponseDTO deleteObject(
-            @ModelAttribute("id") Long id) {        
+            @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarEmpresaManager();
-                        
+
             Empresas model = empresaManager.get(id);
             model.setActivo("N");
             model.setIdUsuarioEliminacion(userDetail.getId());
             model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
-            
+
             empresaManager.update(model);
-            
+
             response.setModel(model);
             response.setStatus(200);
             response.setMessage("Registro eliminado con exito.");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
 }

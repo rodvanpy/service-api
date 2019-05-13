@@ -16,6 +16,10 @@ import py.com.mojeda.service.ejb.entity.Empresas;
  * @author Miguel
  */
 @Local
-public interface EmpresaManager extends GenericDao<Empresas, Long>{   
+public interface EmpresaManager extends GenericDao<Empresas, Long>{ 
+    
+    public Empresas guardar(Empresas usuario) throws Exception;
+    
+    public Empresas editar(Empresas usuario) throws Exception;
     
 }

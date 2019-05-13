@@ -21,10 +21,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.TipoDocumentos;
 import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
@@ -158,7 +160,7 @@ public class UsuarioController extends BaseController {
             Map<String, Object> model = usuarioManager.getAtributos(new Usuarios(id),atributos.split(","));
             
             Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
-                        "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));               
+                        "id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));               
             
             Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
                         "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
@@ -322,11 +324,36 @@ public class UsuarioController extends BaseController {
                 return response;
             }
             
+            Usuarios ejUsuarios = new Usuarios();
+            ejUsuarios.setAlias(model.getAlias());
+            
+            Map<String, Object> usuarioMaps = usuarioManager.getLike(ejUsuarios, "id".split(","));
+            if (usuarioMaps != null
+                    && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe un usuario con el mismo alias.");
+                return response;
+            }
+            
+            Personas ejPersona = new Personas();
+            ejPersona.setDocumento(model.getPersona().getDocumento());
+            
+            ejUsuarios = new Usuarios();
+            ejUsuarios.setPersona(ejPersona);
+            
+            usuarioMaps = usuarioManager.getLike(ejUsuarios, "id".split(","));
+            if (usuarioMaps != null
+                    && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe un usuario con el mismo documento.");
+                return response;
+            }           
+            
             
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            usuarioManager.update(model);
+            usuarioManager.editar(model);
             
             response.setStatus(200);
             response.setMessage("OK");

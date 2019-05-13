@@ -30,5 +30,7 @@ public class Constants {
 	
 	/** The Constant EXIT. */
 	public static final String EXIT = "Exit";
+        
+        public static final String CONTENT_PATH = "/image/";
 
 }

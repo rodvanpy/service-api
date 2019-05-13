@@ -114,6 +114,9 @@ public class Personas extends Base {
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
     
+    @Column(name = "IMAGE_PATH")
+    private String imagePath;
+    
     @Transient
     private Avatar avatar;
 
@@ -459,5 +462,15 @@ public class Personas extends Base {
     public void setAvatar(Avatar avatar) {
         this.avatar = avatar;
     }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+    
+    
        
 }

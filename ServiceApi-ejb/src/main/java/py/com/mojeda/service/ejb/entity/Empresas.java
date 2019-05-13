@@ -80,6 +80,9 @@ public class Empresas extends Base {
     @Column(name = "LONGITUD")
     private Double longitud;
     
+    @Column(name = "IMAGE_PATH")
+    private String imagePath;
+    
     @Transient
     private Avatar avatar;   
 
@@ -273,4 +276,13 @@ public class Empresas extends Base {
         return this.getClass().getSimpleName();
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+       
+    
 }

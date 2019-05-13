@@ -5,6 +5,9 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -20,6 +23,7 @@ import py.com.mojeda.service.ejb.manager.UsuarioManager;
 import py.com.mojeda.service.ejb.utils.Base64Bytes;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
+import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
 /**
  *
@@ -73,6 +77,17 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
 
+                if (usuario.getPersona().getAvatar() != null) {
+
+                    Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
+                    String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
+                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
+                    fos.close();
+
+                    ejPersona.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
+                }
+
                 personaManager.update(ejPersona);
 
             } else {
@@ -82,38 +97,27 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 usuario.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 usuario.getPersona().setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
                 usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                usuario.getPersona().setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
+                usuario.getPersona().setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));                
 
                 personaManager.save(usuario.getPersona());
 
                 ejPersona = personaManager.get(usuario.getPersona());
+                
+                if (usuario.getPersona().getAvatar() != null) {
+
+                    Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
+                    String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
+                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
+                    fos.close();
+
+                    ejPersona.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
+                }
+                
+                personaManager.update(ejPersona);
 
             }
 
-            if (usuario.getPersona().getAvatar() != null) {
-
-                ejDocumentos = new Documentos();
-                ejDocumentos.setActivo("S");
-                ejDocumentos.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                ejDocumentos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                ejDocumentos.setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
-                ejDocumentos.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                ejDocumentos.setDocumento(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                ejDocumentos.setNombreDocumento(usuario.getPersona().getAvatar().getFilename());
-                ejDocumentos.setTipoArchivo(usuario.getPersona().getAvatar().getFiletype());
-                ejDocumentos.setNombreTabla(usuario.getPersona().getClassName());
-                ejDocumentos.setIdEntidad(usuario.getPersona().getId());
-                ejDocumentos.setEmpresa(new Empresas(usuario.getPersona().getSucursal().getEmpresa().getId()));
-
-                TipoDocumentos ejTipoDocumento = new TipoDocumentos();
-                ejTipoDocumento.setCodigo("I-U-200");
-                ejTipoDocumento = tipoDocumentosManager.get(ejTipoDocumento);
-
-                ejDocumentos.setTipoDocumento(ejTipoDocumento);
-                ejDocumentos = documentoManager.guardar(ejDocumentos);
-            }
-            
-            usuario.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
             usuario.setAlias(usuario.getAlias().toUpperCase());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
@@ -155,6 +159,17 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
 
+                if (usuario.getPersona().getAvatar() != null) {
+
+                    Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
+                    String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
+                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
+                    fos.close();
+
+                    ejPersona.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
+                }
+
                 personaManager.update(ejPersona);
 
             } else {
@@ -166,36 +181,23 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                 usuario.getPersona().setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
 
+                if (usuario.getPersona().getAvatar() != null) {
+
+                    Files.createDirectories(Paths.get(CONTENT_PATH + usuario.getPersona().getClassName() + "/" + usuario.getPersona().getId()));
+                    String path = usuario.getPersona().getClassName() + "/" + usuario.getPersona().getId() + "/" + usuario.getPersona().getAvatar().getFilename();
+                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
+                    fos.close();
+
+                    usuario.getPersona().setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
+                }
+
                 personaManager.save(usuario.getPersona());
 
                 ejPersona = personaManager.get(usuario.getPersona());
 
             }
 
-            if (usuario.getPersona().getAvatar() != null) {
-
-                ejDocumentos = new Documentos();
-                ejDocumentos.setActivo("S");
-                ejDocumentos.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                ejDocumentos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                ejDocumentos.setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
-                ejDocumentos.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                ejDocumentos.setDocumento(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                ejDocumentos.setNombreDocumento(usuario.getPersona().getAvatar().getFilename());
-                ejDocumentos.setTipoArchivo(usuario.getPersona().getAvatar().getFiletype());
-                ejDocumentos.setNombreTabla(usuario.getPersona().getClassName());
-                ejDocumentos.setIdEntidad(usuario.getPersona().getId());
-                ejDocumentos.setEmpresa(new Empresas(usuario.getPersona().getSucursal().getEmpresa().getId()));
-
-                TipoDocumentos ejTipoDocumento = new TipoDocumentos();
-                ejTipoDocumento.setCodigo("I-U-200");
-                ejTipoDocumento = tipoDocumentosManager.get(ejTipoDocumento);
-
-                ejDocumentos.setTipoDocumento(ejTipoDocumento);
-                ejDocumentos = documentoManager.editar(ejDocumentos);
-            }
-            
-            usuario.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
             usuario.setAlias(usuario.getAlias().toUpperCase());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));

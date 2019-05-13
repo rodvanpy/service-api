@@ -11,11 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
-import py.com.mojeda.service.ejb.utils.Avatar;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
+import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
 /**
  *
@@ -30,19 +29,19 @@ public class DocumentoManagerImpl extends GenericDaoImpl<Documentos, Long> imple
         return Documentos.class;
     }
     private static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    private static final String CONTENT = "/home/image/";
 
     @Override
     public Documentos guardar(Documentos documento) throws Exception {
         Documentos retorno = null;
         if (documento != null) {
-            Files.createDirectories(Paths.get(CONTENT + documento.getNombreTabla() + "/" + documento.getIdEntidad()+ "/" + documento.getTipoDocumento().getCodigo() ));
-            String path = documento.getNombreTabla() + "/" + documento.getIdEntidad()+ "/" + documento.getTipoDocumento().getCodigo()  + "/" + documento.getNombreDocumento();
-            FileOutputStream fos = new FileOutputStream(CONTENT + path);
+            Files.createDirectories(Paths.get(CONTENT_PATH + documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
+            String path = documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();
+            FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
             fos.write(documento.getDocumento());
             fos.close();
 
             documento.setDocumento(null);
+            documento.setPath(CONTENT_PATH + path);
 
             this.save(documento);
 
@@ -56,27 +55,18 @@ public class DocumentoManagerImpl extends GenericDaoImpl<Documentos, Long> imple
     public Documentos editar(Documentos documento) throws Exception {
         Documentos retorno = null;
         if (documento != null) {
-            
+
             byte[] archivo = documento.getDocumento();
-            
-            //Se desactiva el documento anterior
-            documento.setActivo("N");
-            documento.setDocumento(null);
-            this.update(documento);
-            
-            //Nuevo Documento
-            documento.setId(null);
-            documento.setActivo("S");
-            
-            Files.createDirectories(Paths.get(CONTENT + documento.getNombreTabla() + "/" + documento.getIdEntidad()+ "/" + documento.getTipoDocumento().getCodigo() ));
-            String path = documento.getNombreTabla() + "/" + documento.getIdEntidad()+ "/" + documento.getTipoDocumento().getCodigo()  + "/" + documento.getNombreDocumento();
-            FileOutputStream fos = new FileOutputStream(CONTENT + path);
-            fos.write(documento.getDocumento());
+
+            Files.createDirectories(Paths.get(CONTENT_PATH + documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
+            String path = documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();
+            FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+            fos.write(archivo);
             fos.close();
 
-            documento.setDocumento(null);
+            documento.setPath(CONTENT_PATH + path);
 
-            this.save(documento);
+            this.update(documento);
 
             retorno = this.get(documento);
         }

@@ -55,6 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Allow anonymous access to "/login" (only POST requests)
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/image/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/DisplayImage**").permitAll()
                 .antMatchers("/updateauth/token").permitAll()
                 // Any other request must be authenticated
                 .anyRequest().authenticated().and()
