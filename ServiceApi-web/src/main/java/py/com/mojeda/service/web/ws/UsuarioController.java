@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Documentos;
@@ -43,7 +44,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @RequestMapping(value = "/usuarios")
 public class UsuarioController extends BaseController {
     
-    String atributos = "id,alias,superUsuario,expirationTimeTokens,persona.id,rol.id,persona.sucursal.id,persona.sucursal.empresa.id,activo";
+    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,persona.id,rol.id,persona.sucursal.id,persona.sucursal.empresa.id,activo";
     
     @GetMapping
     public @ResponseBody
@@ -187,7 +188,7 @@ public class UsuarioController extends BaseController {
             List<Map<String, Object>> departamentos = usuarioDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","),true);
                         
             for(Map<String, Object> rpm : departamentos){
-                rpm.put("id", rpm.get("departamento.id").toString());
+                rpm.put("id", Long.parseLong(rpm.get("departamento.id").toString()));
                 rpm.put("alias", rpm.get("departamento.alias").toString());
                 rpm.put("nombreArea", rpm.get("departamento.nombreArea").toString());
                 rpm.put("descripcionArea", rpm.get("departamento.descripcionArea").toString());
@@ -221,7 +222,7 @@ public class UsuarioController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @Valid Usuarios model,
+            @RequestBody @Valid Usuarios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -305,7 +306,7 @@ public class UsuarioController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @Valid Usuarios model,
+            @RequestBody @Valid Usuarios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());

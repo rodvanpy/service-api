@@ -28,6 +28,8 @@ import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
+import py.com.mojeda.service.web.utils.FilterDTO;
+import py.com.mojeda.service.web.utils.ReglaDTO;
 
 /**
  *
@@ -37,11 +39,12 @@ import py.com.mojeda.service.web.spring.config.User;
 @RequestMapping(value = "/departamentos_sucursal")
 public class DepartamentosSucursalController extends BaseController {
     
-    String atributos = "id,alias,nombre,descripcion,activo";
+    String atributos = "id,alias,nombreArea,descripcionArea,activo";
     
-    @GetMapping
+    @GetMapping("/{id}/sucursal")
     public @ResponseBody
-    ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
+    ResponseListDTO listar(@ModelAttribute("id") Long id,
+            @ModelAttribute("_search") boolean filtrar,
             @ModelAttribute("filters") String filtros,
             @ModelAttribute("page") Integer pagina,
             @ModelAttribute("rows") Integer cantidad,
@@ -54,6 +57,8 @@ public class DepartamentosSucursalController extends BaseController {
 
         DepartamentosSucursal model = new DepartamentosSucursal();
         model.setActivo("S");
+        model.setSucursal(new Sucursales(id));
+        
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarDepartamentosSucursalManager();
@@ -61,22 +66,22 @@ public class DepartamentosSucursalController extends BaseController {
             String camposFiltros = null;
             String valorFiltro = null;
 
-//            if (filtrar) {
-//                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
-//                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
-//                    for (ReglaDTO regla : filtro.getRules()) {
-//                        if (camposFiltros == null) {
-//                            camposFiltros = regla.getField();
-//                            valorFiltro = regla.getData();
-//                        } else {
-//                            camposFiltros += "," + regla.getField();
-//                        }
-//                    }
-//                } else {
-//                    //ejemplo = generarEjemplo(filtro, ejemplo);
-//                }
-//
-//            }
+            if (filtrar) {
+                FilterDTO filtro = gson.fromJson(filtros, FilterDTO.class);
+                if (filtro.getGroupOp().compareToIgnoreCase("OR") == 0) {
+                    for (ReglaDTO regla : filtro.getRules()) {
+                        if (camposFiltros == null) {
+                            camposFiltros = regla.getField();
+                            valorFiltro = regla.getData();
+                        } else {
+                            camposFiltros += "," + regla.getField();
+                        }
+                    }
+                } else {
+                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                }
+
+            }
             // ejemplo.setActivo("S");
 
             pagina = pagina != null ? pagina : 1;
@@ -111,6 +116,7 @@ public class DepartamentosSucursalController extends BaseController {
             retorno.setMessage("OK");
             
         } catch (Exception e) {
+            logger.error("Error: ",e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }

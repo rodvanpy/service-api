@@ -283,7 +283,8 @@ public class SucursalController extends BaseController {
 
             Sucursales sucursal = new Sucursales();
             sucursal.setNombre(model.getNombre());
-            sucursal.setEmpresa(model.getEmpresa());
+            sucursal.setActivo("S");
+            sucursal.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
             Map<String, Object> sucursalMaps = sucursalManager.getLike(sucursal, "nombre".split(","));
             if (sucursalMaps != null) {
@@ -298,12 +299,13 @@ public class SucursalController extends BaseController {
                 codigoNombre = codigoNombre + codigo[i].substring(0, 1);
             }
             sucursal = new Sucursales();
-            sucursal.setEmpresa(model.getEmpresa());
+            sucursal.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             //Numero Sucursal
             Integer numeroSucursal = sucursalManager.total(sucursal) + 1;
             //Cantidad Sucursales
             Integer cantidadSucursal = sucursalManager.total(new Sucursales()) + 1;
-
+            
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setCodigoSucursal(codigoNombre + "-" + numeroSucursal + "-" + cantidadSucursal);
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
@@ -381,6 +383,7 @@ public class SucursalController extends BaseController {
             Sucursales dato = sucursalManager.get(id);
 
             Sucursales sucursal = new Sucursales();
+            sucursal.setActivo("S");
             sucursal.setNombre(model.getNombre());
             sucursal.setEmpresa(dato.getEmpresa());
 
