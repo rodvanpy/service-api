@@ -105,10 +105,10 @@ public class Personas extends Base {
     private String observacion;
     
     @Column(name = "LATITUD")
-    private String latitud;
-    
+    private Double latitud;
+
     @Column(name = "LONGITUD")
-    private String longitud;
+    private Double longitud;
 
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
@@ -423,33 +423,7 @@ public class Personas extends Base {
         this.sucursal = sucursal;
     }
 
-    /**
-     * @return the latitud
-     */
-    public String getLatitud() {
-        return latitud;
-    }
-
-    /**
-     * @param latitud the latitud to set
-     */
-    public void setLatitud(String latitud) {
-        this.latitud = latitud;
-    }
-
-    /**
-     * @return the longitud
-     */
-    public String getLongitud() {
-        return longitud;
-    }
-
-    /**
-     * @param longitud the longitud to set
-     */
-    public void setLongitud(String longitud) {
-        this.longitud = longitud;
-    }
+    
     
     public String getClassName() {
         return this.getClass().getSimpleName();
@@ -469,6 +443,34 @@ public class Personas extends Base {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    /**
+     * @return the latitud
+     */
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    /**
+     * @param latitud the latitud to set
+     */
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    /**
+     * @return the longitud
+     */
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    /**
+     * @param longitud the longitud to set
+     */
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
     }
     
     

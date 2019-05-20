@@ -20,11 +20,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "NACIONALIDAD")
-public class Nacionalidad extends Base{
+@Table(name = "NACIONALIDADES")
+public class Nacionalidades extends Base{
 
     private static final long serialVersionUID = 1574657L;
-    private static final String SECUENCIA = "seq_nacionalidad_id";
+    private static final String SECUENCIA = "seq_nacionalidades_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
@@ -43,10 +43,10 @@ public class Nacionalidad extends Base{
     private String codigo;
    
     
-    public Nacionalidad() {
+    public Nacionalidades() {
     }
 
-    public Nacionalidad(Long id) {
+    public Nacionalidades(Long id) {
             this.setId(id);
     }
 
