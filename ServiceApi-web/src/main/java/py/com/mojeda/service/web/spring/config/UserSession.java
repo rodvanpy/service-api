@@ -67,7 +67,8 @@ public class UserSession implements AuthenticationProvider {
                     userDetails.setIdSusursal(ejObjeto.getPersona().getSucursal().getId());
                     userDetails.setNombreRol(ejObjeto.getRol().getNombre());
                     userDetails.setUsername(ejObjeto.getAlias());
-
+                    userDetails.setImagePath(ejObjeto.getPersona().getImagePath());
+                    
                     RolPermiso ejRolPermiso = new RolPermiso();
                     ejRolPermiso.setRol(ejObjeto.getRol());
 

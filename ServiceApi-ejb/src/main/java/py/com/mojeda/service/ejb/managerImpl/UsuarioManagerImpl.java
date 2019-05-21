@@ -51,7 +51,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/TipoDocumentosManagerImpl")
     private TipoDocumentosManager tipoDocumentosManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/UsuarioDepartamentosManagerImpl")
     private UsuarioDepartamentosManager usuarioDepartamentosManager;
 
@@ -87,7 +87,8 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                 ejPersona.setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
 
-                if (usuario.getPersona().getAvatar() != null) {
+                if (usuario.getPersona().getAvatar() != null
+                        && usuario.getPersona().getAvatar().getValue() != null) {
 
                     Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
                     String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
@@ -95,7 +96,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                     fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
                     fos.close();
 
-                    ejPersona.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
+                    ejPersona.setImagePath(CONTENT_PATH + path);
                 }
 
                 personaManager.update(ejPersona);
@@ -107,12 +108,12 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 usuario.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 usuario.getPersona().setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
                 usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                usuario.getPersona().setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));                
+                usuario.getPersona().setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
 
                 personaManager.save(usuario.getPersona());
 
                 ejPersona = personaManager.get(usuario.getPersona());
-                
+
                 if (usuario.getPersona().getAvatar() != null) {
 
                     Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
@@ -121,8 +122,8 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                     fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
                     fos.close();
 
-                    ejPersona.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
-                    
+                    ejPersona.setImagePath(CONTENT_PATH + path);
+
                     personaManager.update(ejPersona);
                 }
             }
@@ -135,11 +136,11 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
             object = this.get(usuario);
             UsuarioDepartamentos usuarioDepartamentos;
-            for(Map<String,Object> rpm: usuario.getDepartamentos()){
+            for (Map<String, Object> rpm : usuario.getDepartamentos()) {
                 usuarioDepartamentos = new UsuarioDepartamentos();
                 usuarioDepartamentos.setUsuario(usuario);
                 usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(Long.parseLong(rpm.get("id").toString())));
-                
+
                 usuarioDepartamentosManager.save(usuarioDepartamentos);
             }
         }
@@ -178,7 +179,8 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                 ejPersona.setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
 
-                if (usuario.getPersona().getAvatar() != null) {
+                if (usuario.getPersona().getAvatar() != null
+                        && usuario.getPersona().getAvatar().getValue() != null) {
 
                     Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
                     String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
@@ -186,7 +188,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                     fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
                     fos.close();
 
-                    ejPersona.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
+                    ejPersona.setImagePath(CONTENT_PATH+path);
                 }
 
                 personaManager.update(ejPersona);
@@ -203,8 +205,9 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 personaManager.save(usuario.getPersona());
 
                 ejPersona = personaManager.get(usuario.getPersona());
-                
-                if (usuario.getPersona().getAvatar() != null) {
+
+                if (usuario.getPersona().getAvatar() != null
+                        && usuario.getPersona().getAvatar().getValue() != null) {
 
                     Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
                     String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
@@ -212,8 +215,8 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                     fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
                     fos.close();
 
-                    ejPersona.setImagePath(ejDocumentos == null ? null : ejDocumentos.getPath());
-                    
+                    ejPersona.setImagePath(CONTENT_PATH+path);
+
                     personaManager.update(ejPersona);
                 }
 
@@ -223,25 +226,25 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
-            this.update(usuario);
+            this.update(usuario);           
 
-            object = this.get(usuario);
-            
             UsuarioDepartamentos usuarioDepartamentos = new UsuarioDepartamentos();
             usuarioDepartamentos.setUsuario(usuario);
-            
+
             List<UsuarioDepartamentos> list = usuarioDepartamentosManager.list(usuarioDepartamentos);
-            for(UsuarioDepartamentos rpc : list){
+            for (UsuarioDepartamentos rpc : list) {
                 usuarioDepartamentosManager.delete(rpc.getId());
             }
-            
-            for(Map<String,Object> rpm: usuario.getDepartamentos()){
+
+            for (Map<String, Object> rpm : usuario.getDepartamentos()) {
                 usuarioDepartamentos = new UsuarioDepartamentos();
                 usuarioDepartamentos.setUsuario(usuario);
                 usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(Long.parseLong(rpm.get("id").toString())));
-                
+
                 usuarioDepartamentosManager.save(usuarioDepartamentos);
             }
+            
+            object = this.get(usuario);
         }
         return object;
     }

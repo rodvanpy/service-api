@@ -55,6 +55,7 @@ public class UserDetailService implements UserDetailsService {
             user.setIdSusursal(ejObjeto.getPersona().getSucursal().getId());
             user.setNombreRol(ejObjeto.getRol().getNombre());
             user.setUsername(ejObjeto.getAlias());
+            user.setImagePath(ejObjeto.getPersona().getImagePath());
 
             RolPermiso ejRolPermiso = new RolPermiso();
             ejRolPermiso.setRol(ejObjeto.getRol());

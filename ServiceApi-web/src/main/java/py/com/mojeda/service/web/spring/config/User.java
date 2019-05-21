@@ -24,7 +24,7 @@ public class User implements UserDetails {
     private String apellido;
     private String email;
     private String rol;
-    private String idMovil;
+    private String imagePath;
     private Long idEmpresa;
     private Long idSusursal;
     private Collection<GrantedAuthority> authorities;
@@ -94,13 +94,13 @@ public class User implements UserDetails {
         this.rol = rol;
     }
 
-    public String getIdMovil() {
-        return idMovil;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setIdMovil(String idMovil) {
-        this.idMovil = idMovil;
-    }
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }   
 
     public Long getIdEmpresa() {
         return idEmpresa;

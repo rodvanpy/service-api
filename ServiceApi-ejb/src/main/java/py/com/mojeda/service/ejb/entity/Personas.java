@@ -109,13 +109,14 @@ public class Personas extends Base {
 
     @Column(name = "LONGITUD")
     private Double longitud;
-
+    
+    @Column(name = "IMAGE_PATH")
+    private String imagePath;
+    
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
     
-    @Column(name = "IMAGE_PATH")
-    private String imagePath;
     
     @Transient
     private Avatar avatar;

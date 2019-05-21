@@ -36,7 +36,8 @@ public class EmpresaManagerImpl extends GenericDaoImpl<Empresas, Long>
 
             object = this.get(empresa);
 
-            if (empresa.getAvatar() != null) {
+            if (empresa.getAvatar() != null
+                    && empresa.getAvatar().getValue() != null) {
                 Files.createDirectories(Paths.get(CONTENT_PATH + object.getClassName() + "/" + object.getId()));
                 String path = object.getClassName() + "/" + object.getId() + "/" + empresa.getAvatar().getFilename();
                 FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
@@ -55,7 +56,8 @@ public class EmpresaManagerImpl extends GenericDaoImpl<Empresas, Long>
     public Empresas editar(Empresas empresa) throws Exception {
         Empresas object = null;
         if (empresa != null) {
-            if (empresa.getAvatar() != null) {
+            if (empresa.getAvatar() != null
+                    && empresa.getAvatar().getValue() != null) {
                 Files.createDirectories(Paths.get(CONTENT_PATH + empresa.getClassName() + "/" + empresa.getId()));
                 String path = empresa.getClassName() + "/" + empresa.getId() + "/" + empresa.getAvatar().getFilename();
                 FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
