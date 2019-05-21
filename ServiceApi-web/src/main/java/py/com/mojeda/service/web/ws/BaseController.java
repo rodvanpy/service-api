@@ -8,6 +8,9 @@ package py.com.mojeda.service.web.ws;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import py.com.mojeda.service.ejb.manager.BarriosManager;
+import py.com.mojeda.service.ejb.manager.CiudadesManager;
+import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.ModalidadesManager;
 import py.com.mojeda.service.ejb.manager.ReferenciaManager;
@@ -29,6 +32,8 @@ import py.com.mojeda.service.ejb.manager.PermisoManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
+import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
+import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 
@@ -85,9 +90,104 @@ public class BaseController {
     protected TipoDocumentosManager tipoDocumentosManager;
     
     protected PermisoManager permisoManager;
+    
+    protected NacionalidadesManager nacionalidadesManager;
+    
+    protected PaisesManager paisesManager;
+    
+    protected DepartamentosPaisManager departamentosPaisManager;
+    
+    protected CiudadesManager ciudadesManager;
+    
+    protected BarriosManager barriosManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
+    protected void inicializarBarriosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (barriosManager == null) {
+            try {
+                barriosManager = (BarriosManager) context.lookup("java:app/ServiceApi-ejb/BarriosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarCiudadesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (ciudadesManager == null) {
+            try {
+                ciudadesManager = (CiudadesManager) context.lookup("java:app/ServiceApi-ejb/CiudadesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarDepartamentosPaisManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (departamentosPaisManager == null) {
+            try {
+                departamentosPaisManager = (DepartamentosPaisManager) context.lookup("java:app/ServiceApi-ejb/DepartamentosPaisManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarPaisesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (paisesManager == null) {
+            try {
+                paisesManager = (PaisesManager) context.lookup("java:app/ServiceApi-ejb/PaisesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarNacionalidadesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (nacionalidadesManager == null) {
+            try {
+
+                nacionalidadesManager = (NacionalidadesManager) context.lookup("java:app/ServiceApi-ejb/NacionalidadesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarUsuarioDepartamentosManager() throws Exception {
         if (context == null) {

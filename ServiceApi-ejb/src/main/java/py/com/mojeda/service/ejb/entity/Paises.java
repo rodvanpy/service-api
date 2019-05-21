@@ -36,8 +36,7 @@ public class Paises extends Base{
     @Basic(optional = false)
     @Column(name = "NOMBRE")
     private String nombre;
-    
-   
+      
     
     public Paises() {
     }
