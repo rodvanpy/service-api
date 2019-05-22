@@ -117,7 +117,30 @@ public class Personas extends Base {
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
     
+    @NotNull(message = "Ingrese Nacionalidad")
+    @ManyToOne
+    @JoinColumn(name = "ID_NACIONALIDAD", referencedColumnName = "id")
+    private Nacionalidades nacionalidad;
     
+    @NotNull(message = "Ingrese Pais")
+    @ManyToOne
+    @JoinColumn(name = "ID_PAIS", referencedColumnName = "id")
+    private Paises pais;
+    
+    @NotNull(message = "Ingrese Departamento")
+    @ManyToOne
+    @JoinColumn(name = "ID_DEPARTAMENTO_PAIS", referencedColumnName = "id")
+    private DepartamentosPais departamento;
+    
+    @NotNull(message = "Ingrese Ciudad")
+    @ManyToOne
+    @JoinColumn(name = "ID_CIUDAD", referencedColumnName = "id")
+    private Ciudades ciudad;
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_BARRIO", referencedColumnName = "id")
+    private Barrios barrio;
+        
     @Transient
     private Avatar avatar;
 
@@ -472,6 +495,76 @@ public class Personas extends Base {
      */
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
+    }
+
+    /**
+     * @return the nacionalidad
+     */
+    public Nacionalidades getNacionalidad() {
+        return nacionalidad;
+    }
+
+    /**
+     * @param nacionalidad the nacionalidad to set
+     */
+    public void setNacionalidad(Nacionalidades nacionalidad) {
+        this.nacionalidad = nacionalidad;
+    }
+
+    /**
+     * @return the pais
+     */
+    public Paises getPais() {
+        return pais;
+    }
+
+    /**
+     * @param pais the pais to set
+     */
+    public void setPais(Paises pais) {
+        this.pais = pais;
+    }
+
+    /**
+     * @return the departamento
+     */
+    public DepartamentosPais getDepartamento() {
+        return departamento;
+    }
+
+    /**
+     * @param departamento the departamento to set
+     */
+    public void setDepartamento(DepartamentosPais departamento) {
+        this.departamento = departamento;
+    }
+
+    /**
+     * @return the ciudad
+     */
+    public Ciudades getCiudad() {
+        return ciudad;
+    }
+
+    /**
+     * @param ciudad the ciudad to set
+     */
+    public void setCiudad(Ciudades ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    /**
+     * @return the barrio
+     */
+    public Barrios getBarrio() {
+        return barrio;
+    }
+
+    /**
+     * @param barrio the barrio to set
+     */
+    public void setBarrio(Barrios barrio) {
+        this.barrio = barrio;
     }
     
     

@@ -43,7 +43,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @RequestMapping(value = "/nacionalidades")
 public class NacionalidadController extends BaseController {
 
-    String atributos = "id,nombre,activo";
+    String atributos = "id,nombre,codigo,activo";
 
     @GetMapping
     public @ResponseBody

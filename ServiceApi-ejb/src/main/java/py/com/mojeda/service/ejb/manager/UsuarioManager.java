@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 
@@ -21,5 +22,7 @@ public interface UsuarioManager extends GenericDao<Usuarios, Long>{
     public Usuarios guardar(Usuarios usuario) throws Exception;
     
     public Usuarios editar(Usuarios usuario) throws Exception;
+    
+    public Map<String, Object> getUsuario(Long id) throws Exception;
     
 }

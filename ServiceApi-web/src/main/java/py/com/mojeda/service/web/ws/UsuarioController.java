@@ -152,53 +152,8 @@ public class UsuarioController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarUsuarioManager();
-            inicializarPersonaManager();
-            inicializarRolManager();
-            inicializarSucursalManager();
-            inicializarEmpresaManager();
-            inicializarUsuarioDepartamentosManager();
             
-            Map<String, Object> model = usuarioManager.getAtributos(new Usuarios(id),atributos.split(","));
-            
-            Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
-                        "id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));               
-            
-            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
-                        "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
-            
-            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("persona.sucursal.empresa.id").toString())),
-                        "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(",")); 
-            sucursal.put("empresa", empresa);     
-            
-            persona.put("sucursal", sucursal);                
-            model.put("persona", persona);  
-            
-            model.remove("persona.id");
-            model.remove("persona.sucursal.id");
-            model.remove("persona.sucursal.empresa.id");
-            
-            Map<String, Object> rol = rolManager.getAtributos(new Rol(Long.parseLong(model.get("rol.id").toString())),
-                        "id,nombre,activo".split(",")); 
-            model.put("rol", rol);
-            model.remove("rol.id");
-            
-            UsuarioDepartamentos ejUsuarioDepartamentos = new UsuarioDepartamentos();
-            ejUsuarioDepartamentos.setUsuario(new Usuarios(id));
-            
-            List<Map<String, Object>> departamentos = usuarioDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","),true);
-                        
-            for(Map<String, Object> rpm : departamentos){
-                rpm.put("id", Long.parseLong(rpm.get("departamento.id").toString()));
-                rpm.put("alias", rpm.get("departamento.alias").toString());
-                rpm.put("nombreArea", rpm.get("departamento.nombreArea").toString());
-                rpm.put("descripcionArea", rpm.get("departamento.descripcionArea").toString());
-                
-                rpm.remove("departamento.id");
-                rpm.remove("departamento.alias");
-                rpm.remove("departamento.nombreArea");
-                rpm.remove("departamento.descripcionArea");
-            }
-            model.put("departamentos", departamentos);
+            Map<String, Object> model = usuarioManager.getUsuario(id);            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -357,7 +312,7 @@ public class UsuarioController extends BaseController {
             usuarioManager.editar(model);
             
             response.setStatus(200);
-            response.setMessage("OK");
+            response.setMessage("Usuario modificado con exito");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
