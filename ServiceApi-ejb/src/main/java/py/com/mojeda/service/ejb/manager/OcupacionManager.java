@@ -8,7 +8,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.Ocupaciones;
+import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 
 
 /**
@@ -16,6 +16,6 @@ import py.com.mojeda.service.ejb.entity.Ocupaciones;
  * @author Miguel
  */
 @Local
-public interface OcupacionManager extends GenericDao<Ocupaciones, Long>{   
+public interface OcupacionManager extends GenericDao<TipoOcupaciones, Long>{   
     
 }

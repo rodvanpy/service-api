@@ -42,6 +42,10 @@ public class OcupacionPersona extends Base {
     @Column(name = "CARGO")
     private String cargo;
     
+    @NotEmpty(message = "Ingrese Tipo Trabajo")
+    @Column(name = "TIPO_TRABAJO")
+    private String tipoTrabajo;
+    
     @NotEmpty(message = "Ingrese Direccion")
     @Column(name = "DIRECCION")
     private String direccion;
@@ -73,12 +77,9 @@ public class OcupacionPersona extends Base {
 
     @ManyToOne
     @NotNull(message = "Ingrese Ocupacion")
-    @JoinColumn(name = "ID_OCUPACION", referencedColumnName = "id")
-    private Ocupaciones ocupacion;
+    @JoinColumn(name = "ID_TIPO_OCUPACION", referencedColumnName = "id")
+    private TipoOcupaciones tipoOcupacion;
 
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
 
     public OcupacionPersona() {
 
@@ -229,31 +230,33 @@ public class OcupacionPersona extends Base {
     }
 
     /**
-     * @return the ocupacion
+     * @return the tipoTrabajo
      */
-    public Ocupaciones getOcupacion() {
-        return ocupacion;
+    public String getTipoTrabajo() {
+        return tipoTrabajo;
     }
 
     /**
-     * @param ocupacion the ocupacion to set
+     * @param tipoTrabajo the tipoTrabajo to set
      */
-    public void setOcupacion(Ocupaciones ocupacion) {
-        this.ocupacion = ocupacion;
+    public void setTipoTrabajo(String tipoTrabajo) {
+        this.tipoTrabajo = tipoTrabajo;
     }
 
     /**
-     * @return the empresa
+     * @return the tipoOcupacion
      */
-    public Empresas getEmpresa() {
-        return empresa;
+    public TipoOcupaciones getTipoOcupacion() {
+        return tipoOcupacion;
     }
 
     /**
-     * @param empresa the empresa to set
+     * @param tipoOcupacion the tipoOcupacion to set
      */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
+    public void setTipoOcupacion(TipoOcupaciones tipoOcupacion) {
+        this.tipoOcupacion = tipoOcupacion;
     }
+
+    
 
 }

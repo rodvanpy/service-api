@@ -16,11 +16,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  */
 @Entity
-@Table(name = "OCUPACIONES")
-public class Ocupaciones extends Base {
+@Table(name = "TIPO_OCUPACIONES")
+public class TipoOcupaciones extends Base {
 
     private static final long serialVersionUID = 1546546546L;
-    private static final String SECUENCIA = "seq_ocupacion_id";
+    private static final String SECUENCIA = "seq_tipo_ocupacion_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
@@ -39,10 +39,10 @@ public class Ocupaciones extends Base {
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
 
-    public Ocupaciones() {
+    public TipoOcupaciones() {
     }
 
-    public Ocupaciones(Long id) {
+    public TipoOcupaciones(Long id) {
             this.setId(id);
     }
     

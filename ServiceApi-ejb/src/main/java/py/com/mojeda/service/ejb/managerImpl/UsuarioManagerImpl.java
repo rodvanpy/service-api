@@ -88,7 +88,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/CiudadesManagerImpl")
     private CiudadesManager ciudadesManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/BarriosManagerImpl")
     private BarriosManager barriosManager;
 
@@ -128,21 +128,6 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
                 ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
                 ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getCiudad().getId()) : null);
-                
-
-                if (usuario.getPersona().getAvatar() != null
-                        && usuario.getPersona().getAvatar().getValue() != null) {
-
-                    Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
-                    String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
-                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
-                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                    fos.close();
-
-                    ejPersona.setImagePath(CONTENT_PATH + path);
-                }
-
-                personaManager.update(ejPersona);
 
             } else {
 
@@ -157,18 +142,6 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
                 ejPersona = personaManager.get(usuario.getPersona());
 
-                if (usuario.getPersona().getAvatar() != null) {
-
-                    Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
-                    String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
-                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
-                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                    fos.close();
-
-                    ejPersona.setImagePath(CONTENT_PATH + path);
-
-                    personaManager.update(ejPersona);
-                }
             }
 
             usuario.setAlias(usuario.getAlias().toUpperCase());
@@ -176,8 +149,24 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.save(usuario);
-
+            
             object = this.get(usuario);
+
+            if (usuario.getPersona().getAvatar() != null
+                    && usuario.getPersona().getAvatar().getValue() != null) {
+
+                Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
+                String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
+                FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+                fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
+                fos.close();
+
+                ejPersona.setImagePath(CONTENT_PATH + path);
+            }
+            
+            ejPersona.setIdUsuario(object.getId());
+            personaManager.update(ejPersona);
+            
             UsuarioDepartamentos usuarioDepartamentos;
             for (Map<String, Object> rpm : usuario.getDepartamentos()) {
                 usuarioDepartamentos = new UsuarioDepartamentos();
@@ -226,20 +215,6 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
                 ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
                 ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getCiudad().getId()) : null);
-                
-                if (usuario.getPersona().getAvatar() != null
-                        && usuario.getPersona().getAvatar().getValue() != null) {
-
-                    Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
-                    String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
-                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
-                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                    fos.close();
-
-                    ejPersona.setImagePath(CONTENT_PATH + path);
-                }
-
-                personaManager.update(ejPersona);
 
             } else {
 
@@ -254,20 +229,18 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
                 ejPersona = personaManager.get(usuario.getPersona());
 
-                if (usuario.getPersona().getAvatar() != null
-                        && usuario.getPersona().getAvatar().getValue() != null) {
+            }
 
-                    Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
-                    String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
-                    FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
-                    fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                    fos.close();
+            if (usuario.getPersona().getAvatar() != null
+                    && usuario.getPersona().getAvatar().getValue() != null) {
 
-                    ejPersona.setImagePath(CONTENT_PATH + path);
+                Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
+                String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
+                FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+                fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
+                fos.close();
 
-                    personaManager.update(ejPersona);
-                }
-
+                ejPersona.setImagePath(CONTENT_PATH + path);
             }
 
             usuario.setAlias(usuario.getAlias().toUpperCase());
@@ -275,6 +248,9 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.update(usuario);
+
+            ejPersona.setIdUsuario(usuario.getId());
+            personaManager.update(ejPersona);
 
             UsuarioDepartamentos usuarioDepartamentos = new UsuarioDepartamentos();
             usuarioDepartamentos.setUsuario(usuario);
@@ -304,27 +280,27 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
         Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
                 "id,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));
-        
+
         Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
         persona.put("nacionalidad", nacionalidad);
         persona.remove("nacionalidad.id");
-        
+
         Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(persona.get("pais.id") == null ? "0" : persona.get("pais.id").toString())), "id,nombre,activo".split(","));
         persona.put("pais", pais);
         persona.remove("pais.id");
-        
+
         Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(persona.get("departamento.id") == null ? "0" : persona.get("departamento.id").toString())), "id,nombre,activo".split(","));
         persona.put("departamento", departamento);
         persona.remove("departamento.id");
-        
+
         Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(persona.get("ciudad.id") == null ? "0" : persona.get("ciudad.id").toString())), "id,nombre,activo".split(","));
         persona.put("ciudad", ciudad);
         persona.remove("ciudad.id");
-        
+
         Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(persona.get("barrio.id") == null ? "0" : persona.get("barrio.id").toString())), "id,nombre,activo".split(","));
         persona.put("barrio", barrio);
         persona.remove("barrio.id");
-        
+
         Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
                 "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
 

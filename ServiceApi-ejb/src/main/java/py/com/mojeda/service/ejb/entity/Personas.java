@@ -113,6 +113,9 @@ public class Personas extends Base {
     @Column(name = "IMAGE_PATH")
     private String imagePath;
     
+    @Column(name = "ID_USUARIO")
+    private Long idUsuario;
+    
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
@@ -566,7 +569,14 @@ public class Personas extends Base {
     public void setBarrio(Barrios barrio) {
         this.barrio = barrio;
     }
-    
-    
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+        
        
 }
