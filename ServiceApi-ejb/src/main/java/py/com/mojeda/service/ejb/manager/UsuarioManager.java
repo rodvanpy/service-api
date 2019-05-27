@@ -23,6 +23,6 @@ public interface UsuarioManager extends GenericDao<Usuarios, Long>{
     
     public Usuarios editar(Usuarios usuario) throws Exception;
     
-    public Map<String, Object> getUsuario(Long id) throws Exception;
+    public Map<String, Object> getUsuario(Usuarios usuario) throws Exception;
     
 }

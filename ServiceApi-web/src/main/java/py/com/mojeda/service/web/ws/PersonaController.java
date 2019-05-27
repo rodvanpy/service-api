@@ -145,11 +145,50 @@ public class PersonaController extends BaseController {
         try {
             inicializarPersonaManager();
             
-            Map<String, Object> model = personaManager.getPersona(id);            
+            Map<String, Object> model = personaManager.getPersona(new Personas(id));            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
-            response.setMessage(model == null ? "Registro no encontrado" : "OK");
+            response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
+        } catch (Exception e) {
+            logger.error("Error: ",e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
+    /**
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Persona)
+     *
+     * @param documento de la entidad
+     * @return
+     */
+    @GetMapping("/documento/{documento}")
+    public @ResponseBody
+    ResponseDTO getObjectCi(
+            @ModelAttribute("documento") String documento) {        
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarPersonaManager();
+            
+            Empresas ejEmpresas = new Empresas();
+            ejEmpresas.setId(userDetail.getIdEmpresa());
+            
+            Sucursales ejSucursales = new Sucursales();
+            ejSucursales.setEmpresa(ejEmpresas);
+            
+            Personas ejPersonas = new Personas();
+            ejPersonas.setDocumento(documento);
+            ejPersonas.setSucursal(ejSucursales);
+            
+            Map<String, Object> modelMaps = personaManager.getPersona(ejPersonas);            
+            
+            response.setModel(modelMaps);
+            response.setStatus(modelMaps == null ? 404 : 200);
+            response.setMessage(modelMaps == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);

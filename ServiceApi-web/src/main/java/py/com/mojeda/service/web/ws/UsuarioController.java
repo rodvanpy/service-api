@@ -65,6 +65,7 @@ public class UsuarioController extends BaseController {
         try {
             inicializarUsuarioManager();
             inicializarPersonaManager();
+            inicializarSucursalManager();
             
             Gson gson = new Gson();
             String camposFiltros = null;
@@ -109,6 +110,11 @@ public class UsuarioController extends BaseController {
             for(Map<String, Object> rpm: listMapGrupos){
                 Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(rpm.get("persona.id").toString())),
                         "primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email".split(","));
+                
+                Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("persona.sucursal.id").toString())),
+                "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
+                
+                persona.put("sucursal", sucursal);
                 rpm.put("persona", persona);
                 rpm.remove("persona.id");
                 rpm.remove("rol.id");
@@ -153,11 +159,11 @@ public class UsuarioController extends BaseController {
         try {
             inicializarUsuarioManager();
             
-            Map<String, Object> model = usuarioManager.getUsuario(id);            
+            Map<String, Object> model = usuarioManager.getUsuario(new Usuarios(id));            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
-            response.setMessage(model == null ? "Registro no encontrado" : "OK");
+            response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -166,6 +172,7 @@ public class UsuarioController extends BaseController {
 
         return response;
     }
+       
 
     /**
      * Mapping para el metodo POST de la vista crear.(crear Usuario)

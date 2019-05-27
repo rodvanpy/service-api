@@ -149,7 +149,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.save(usuario);
-            
+
             object = this.get(usuario);
 
             if (usuario.getPersona().getAvatar() != null
@@ -163,10 +163,10 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
                 ejPersona.setImagePath(CONTENT_PATH + path);
             }
-            
+
             ejPersona.setIdUsuario(object.getId());
             personaManager.update(ejPersona);
-            
+
             UsuarioDepartamentos usuarioDepartamentos;
             for (Map<String, Object> rpm : usuario.getDepartamentos()) {
                 usuarioDepartamentos = new UsuarioDepartamentos();
@@ -274,69 +274,70 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
     }
 
     @Override
-    public Map<String, Object> getUsuario(Long id) throws Exception {
+    public Map<String, Object> getUsuario(Usuarios usuario) throws Exception {
 
-        Map<String, Object> model = this.getAtributos(new Usuarios(id), "id,alias,claveAcceso,superUsuario,expirationTimeTokens,persona.id,rol.id,persona.sucursal.id,persona.sucursal.empresa.id,activo".split(","));
+        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,superUsuario,expirationTimeTokens,persona.id,rol.id,persona.sucursal.id,persona.sucursal.empresa.id,activo".split(","));
+        if (model != null) {
+            Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
+                    "id,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));
 
-        Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
-                "id,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));
+            Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
+            persona.put("nacionalidad", nacionalidad);
+            persona.remove("nacionalidad.id");
 
-        Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
-        persona.put("nacionalidad", nacionalidad);
-        persona.remove("nacionalidad.id");
+            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(persona.get("pais.id") == null ? "0" : persona.get("pais.id").toString())), "id,nombre,activo".split(","));
+            persona.put("pais", pais);
+            persona.remove("pais.id");
 
-        Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(persona.get("pais.id") == null ? "0" : persona.get("pais.id").toString())), "id,nombre,activo".split(","));
-        persona.put("pais", pais);
-        persona.remove("pais.id");
+            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(persona.get("departamento.id") == null ? "0" : persona.get("departamento.id").toString())), "id,nombre,activo".split(","));
+            persona.put("departamento", departamento);
+            persona.remove("departamento.id");
 
-        Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(persona.get("departamento.id") == null ? "0" : persona.get("departamento.id").toString())), "id,nombre,activo".split(","));
-        persona.put("departamento", departamento);
-        persona.remove("departamento.id");
+            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(persona.get("ciudad.id") == null ? "0" : persona.get("ciudad.id").toString())), "id,nombre,activo".split(","));
+            persona.put("ciudad", ciudad);
+            persona.remove("ciudad.id");
 
-        Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(persona.get("ciudad.id") == null ? "0" : persona.get("ciudad.id").toString())), "id,nombre,activo".split(","));
-        persona.put("ciudad", ciudad);
-        persona.remove("ciudad.id");
+            Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(persona.get("barrio.id") == null ? "0" : persona.get("barrio.id").toString())), "id,nombre,activo".split(","));
+            persona.put("barrio", barrio);
+            persona.remove("barrio.id");
 
-        Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(persona.get("barrio.id") == null ? "0" : persona.get("barrio.id").toString())), "id,nombre,activo".split(","));
-        persona.put("barrio", barrio);
-        persona.remove("barrio.id");
+            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
+                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
 
-        Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
-                "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
+            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("persona.sucursal.empresa.id").toString())),
+                    "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
+            sucursal.put("empresa", empresa);
 
-        Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("persona.sucursal.empresa.id").toString())),
-                "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-        sucursal.put("empresa", empresa);
+            persona.put("sucursal", sucursal);
+            model.put("persona", persona);
 
-        persona.put("sucursal", sucursal);
-        model.put("persona", persona);
+            model.remove("persona.id");
+            model.remove("persona.sucursal.id");
+            model.remove("persona.sucursal.empresa.id");
 
-        model.remove("persona.id");
-        model.remove("persona.sucursal.id");
-        model.remove("persona.sucursal.empresa.id");
+            Map<String, Object> rol = rolManager.getAtributos(new Rol(Long.parseLong(model.get("rol.id").toString())),
+                    "id,nombre,activo".split(","));
+            model.put("rol", rol);
+            model.remove("rol.id");
 
-        Map<String, Object> rol = rolManager.getAtributos(new Rol(Long.parseLong(model.get("rol.id").toString())),
-                "id,nombre,activo".split(","));
-        model.put("rol", rol);
-        model.remove("rol.id");
+            UsuarioDepartamentos ejUsuarioDepartamentos = new UsuarioDepartamentos();
+            ejUsuarioDepartamentos.setUsuario(new Usuarios(Long.parseLong(model.get("id").toString())));
 
-        UsuarioDepartamentos ejUsuarioDepartamentos = new UsuarioDepartamentos();
-        ejUsuarioDepartamentos.setUsuario(new Usuarios(id));
+            List<Map<String, Object>> departamentos = usuarioDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","), true);
 
-        List<Map<String, Object>> departamentos = usuarioDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","), true);
+            for (Map<String, Object> rpm : departamentos) {
+                rpm.put("id", Long.parseLong(rpm.get("departamento.id").toString()));
+                rpm.put("alias", rpm.get("departamento.alias").toString());
+                rpm.put("nombreArea", rpm.get("departamento.nombreArea").toString());
+                rpm.put("descripcionArea", rpm.get("departamento.descripcionArea").toString());
 
-        for (Map<String, Object> rpm : departamentos) {
-            rpm.put("id", Long.parseLong(rpm.get("departamento.id").toString()));
-            rpm.put("alias", rpm.get("departamento.alias").toString());
-            rpm.put("nombreArea", rpm.get("departamento.nombreArea").toString());
-            rpm.put("descripcionArea", rpm.get("departamento.descripcionArea").toString());
-
-            rpm.remove("departamento.id");
-            rpm.remove("departamento.alias");
-            rpm.remove("departamento.nombreArea");
-            rpm.remove("departamento.descripcionArea");
+                rpm.remove("departamento.id");
+                rpm.remove("departamento.alias");
+                rpm.remove("departamento.nombreArea");
+                rpm.remove("departamento.descripcionArea");
+            }
+            model.put("departamentos", departamentos);
         }
-        model.put("departamentos", departamentos);
 
         return model;
     }

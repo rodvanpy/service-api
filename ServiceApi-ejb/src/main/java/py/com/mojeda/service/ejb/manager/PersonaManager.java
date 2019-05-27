@@ -19,10 +19,10 @@ import py.com.mojeda.service.ejb.entity.Personas;
 @Local
 public interface PersonaManager extends GenericDao<Personas, Long>{
     
-    public Personas guardar(Personas usuario) throws Exception;
+    public Personas guardar(Personas persona) throws Exception;
     
-    public Personas editar(Personas usuario) throws Exception;
+    public Personas editar(Personas persona) throws Exception;
     
-    public Map<String, Object> getPersona(Long id) throws Exception;
+    public Map<String, Object> getPersona(Personas persona) throws Exception;
     
 }
