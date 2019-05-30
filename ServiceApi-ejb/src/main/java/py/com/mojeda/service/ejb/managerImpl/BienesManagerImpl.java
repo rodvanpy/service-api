@@ -6,8 +6,8 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
-import py.com.mojeda.service.ejb.entity.TipoEgresos;
-import py.com.mojeda.service.ejb.manager.TipoEgresosManager;
+import py.com.mojeda.service.ejb.entity.Bienes;
+import py.com.mojeda.service.ejb.manager.BienesManager;
 
 
 /**
@@ -15,11 +15,11 @@ import py.com.mojeda.service.ejb.manager.TipoEgresosManager;
  * @author Miguel
  */
 @Stateless
-public class TipoEgresosManagerImpl extends GenericDaoImpl<TipoEgresos, Long>
-        implements TipoEgresosManager {
+public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
+        implements BienesManager {
 
     @Override
-    protected Class<TipoEgresos> getEntityBeanType() {
-        return TipoEgresos.class;
+    protected Class<Bienes> getEntityBeanType() {
+        return Bienes.class;
     }
 }

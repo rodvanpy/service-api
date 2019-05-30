@@ -39,11 +39,11 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @RequestMapping(value = "/ciudades")
 public class CiudadesController extends BaseController {
 
-    String atributos = "id,nombre,activo";
+    String atributos = "id,nombre,departamentoPais.id,departamentoPais.nombre,activo";
 
-    @GetMapping("/{id}/departamento")
+    @GetMapping
     public @ResponseBody
-    ResponseListDTO listar(@ModelAttribute("id") Long id,
+    ResponseListDTO listar(@ModelAttribute("fkModel") Long id,
             @ModelAttribute("_search") boolean filtrar,
             @ModelAttribute("filters") String filtros,
             @ModelAttribute("page") Integer pagina,
@@ -56,7 +56,7 @@ public class CiudadesController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         
         Ciudades model = new Ciudades();
-        model.setDepartamentoPais(new DepartamentosPais(id));
+        model.setDepartamentoPais(new DepartamentosPais(id == null ? 0 : id));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {

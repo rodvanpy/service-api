@@ -8,7 +8,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.TipoIngresos;
+import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
 
 
 /**
@@ -16,6 +16,6 @@ import py.com.mojeda.service.ejb.entity.TipoIngresos;
  * @author Miguel
  */
 @Local
-public interface TipoIngresosManager extends GenericDao<TipoIngresos, Long>{   
+public interface TipoIngresosEgresosManager extends GenericDao<TipoIngresosEgresos, Long>{   
     
 }

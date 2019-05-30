@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
-import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoEgresos;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -37,7 +35,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/tipos-egresos")
+@RequestMapping(value = "/tipos-ingresos-egresos")
 public class TipoEgresoController extends BaseController {
     
     String atributos = "id,nombre,codigo,activo";
@@ -55,12 +53,12 @@ public class TipoEgresoController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        TipoEgresos model = new TipoEgresos();
+        TipoIngresosEgresos model = new TipoIngresosEgresos();
         model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarTipoEgresosManager();
+            inicializarTipoIngresosEgresosManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -137,9 +135,9 @@ public class TipoEgresoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoEgresosManager();
+            inicializarTipoIngresosEgresosManager();
                         
-            TipoEgresos model = tipoEgresosManager.get(id);
+            TipoIngresosEgresos model = tipoEgresosManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -165,13 +163,13 @@ public class TipoEgresoController extends BaseController {
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid TipoEgresos model,
+            @RequestBody @Valid TipoIngresosEgresos model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoEgresosManager();
+            inicializarTipoIngresosEgresosManager();
             
             if(errors.hasErrors()){
                 
@@ -183,7 +181,7 @@ public class TipoEgresoController extends BaseController {
                 return response;
             }
             
-            TipoEgresos dato = new TipoEgresos();
+            TipoIngresosEgresos dato = new TipoIngresosEgresos();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
             //Numero Sucursal
@@ -200,11 +198,11 @@ public class TipoEgresoController extends BaseController {
             
             tipoEgresosManager.save(model);
             
-            TipoEgresos empresa = new TipoEgresos();
+            TipoIngresosEgresos empresa = new TipoIngresosEgresos();
             empresa.setCodigo(model.getCodigo());
             
             response.setStatus(200);
-            response.setMessage("El Tipo Egreso ha sido guardado");           
+            response.setMessage("El Registro ha sido guardado");           
             response.setModel(tipoEgresosManager.get(empresa));
             
         } catch (Exception e) {
@@ -230,13 +228,13 @@ public class TipoEgresoController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid TipoEgresos model,
+            @RequestBody @Valid TipoIngresosEgresos model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoEgresosManager();
+            inicializarTipoIngresosEgresosManager();
             
             if(errors.hasErrors()){
                 
@@ -248,7 +246,7 @@ public class TipoEgresoController extends BaseController {
                 return response;
             }
             
-            TipoEgresos dato = tipoEgresosManager.get(id);
+            TipoIngresosEgresos dato = tipoEgresosManager.get(id);
 
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -260,7 +258,7 @@ public class TipoEgresoController extends BaseController {
             tipoEgresosManager.update(model);
             
             response.setStatus(200);
-            response.setMessage("El Tipo Egreso ha sido guardado");
+            response.setMessage("El Registro ha sido guardado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);

@@ -19,9 +19,7 @@ import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.TipoCalculosManager;
 import py.com.mojeda.service.ejb.manager.TipoDesembolsosManager;
 import py.com.mojeda.service.ejb.manager.TipoDestinosManager;
-import py.com.mojeda.service.ejb.manager.TipoEgresosManager;
 import py.com.mojeda.service.ejb.manager.TipoGarantiasManager;
-import py.com.mojeda.service.ejb.manager.TipoIngresosManager;
 import py.com.mojeda.service.ejb.manager.TipoPagosManager;
 import py.com.mojeda.service.ejb.manager.TipoReferenciaManager;
 import py.com.mojeda.service.ejb.manager.TipoVinculoManager;
@@ -36,6 +34,7 @@ import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
+import py.com.mojeda.service.ejb.manager.TipoIngresosEgresosManager;
 
 /**
  *
@@ -76,12 +75,10 @@ public class BaseController {
     protected TipoDesembolsosManager tipoDesembolsosManager;
             
     protected TipoDestinosManager tipoDestinosManager;
-    
-    protected TipoIngresosManager tipoIngresosManager;
             
     protected TipoGarantiasManager tipoGarantiasManager;
             
-    protected TipoEgresosManager tipoEgresosManager;
+    protected TipoIngresosEgresosManager tipoEgresosManager;
     
     protected TipoPagosManager tipoPagosManager;
     
@@ -315,7 +312,7 @@ public class BaseController {
         }
     }
     
-    protected void inicializarTipoEgresosManager() throws Exception {
+    protected void inicializarTipoIngresosEgresosManager() throws Exception {
         if (context == null) {
             try {
                 context = new InitialContext();
@@ -326,7 +323,7 @@ public class BaseController {
         if (tipoEgresosManager == null) {
             try {
 
-                tipoEgresosManager = (TipoEgresosManager) context.lookup("java:app/ServiceApi-ejb/TipoEgresosManagerImpl");
+                tipoEgresosManager = (TipoIngresosEgresosManager) context.lookup("java:app/ServiceApi-ejb/TipoEgresosManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }
@@ -436,24 +433,6 @@ public class BaseController {
             try {
 
                 tipoDestinosManager = (TipoDestinosManager) context.lookup("java:app/ServiceApi-ejb/TipoDestinosManagerImpl");
-            } catch (NamingException ne) {
-                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
-            }
-        }
-    }
-    
-    protected void inicializarTipoIngresosManager() throws Exception {
-        if (context == null) {
-            try {
-                context = new InitialContext();
-            } catch (NamingException e1) {
-                throw new RuntimeException("No se puede inicializar el contexto", e1);
-            }
-        }
-        if (tipoIngresosManager == null) {
-            try {
-
-                tipoIngresosManager = (TipoIngresosManager) context.lookup("java:app/ServiceApi-ejb/TipoIngresosManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

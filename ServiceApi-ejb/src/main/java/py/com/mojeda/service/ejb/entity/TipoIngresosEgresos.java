@@ -22,11 +22,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "TIPO_EGRESOS")
-public class TipoEgresos extends Base{
+@Table(name = "TIPO_INGRESOS_EGRESOS")
+public class TipoIngresosEgresos extends Base{
 
     private static final long serialVersionUID = 1574657L;
-    private static final String SECUENCIA = "seq_tipo_egreso_id";
+    private static final String SECUENCIA = "seq_tipo_ingreso_egreso_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
@@ -44,14 +44,17 @@ public class TipoEgresos extends Base{
     @Column(name = "CODIGO")
     private String codigo;
     
+    @Column(name = "TIPO")
+    private String tipo;
+    
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
     
-    public TipoEgresos() {
+    public TipoIngresosEgresos() {
     }
 
-    public TipoEgresos(Long id) {
+    public TipoIngresosEgresos(Long id) {
             this.setId(id);
     }
 
