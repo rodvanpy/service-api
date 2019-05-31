@@ -41,6 +41,10 @@ public class Clientes extends Base{
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_SUCURSAL_ALTA", referencedColumnName = "id")
+    private Sucursales sucursal;
         
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
@@ -91,6 +95,21 @@ public class Clientes extends Base{
     public String getClassName() {
         return this.getClass().getSimpleName();
     }
+
+    /**
+     * @return the sucursal
+     */
+    public Sucursales getSucursal() {
+        return sucursal;
+    }
+
+    /**
+     * @param sucursal the sucursal to set
+     */
+    public void setSucursal(Sucursales sucursal) {
+        this.sucursal = sucursal;
+    }
+    
     
            
 }

@@ -22,13 +22,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Personas;
-import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoDocumentos;
-import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -45,7 +41,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 public class PersonaController extends BaseController {
     
     String atributos = "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo"
-            + ",numeroHijos,numeroDependientes,estadoCivil,email,idUsuario,activo";
+            + ",numeroHijos,numeroDependientes,estadoCivil,email,activo";
     
     @GetMapping
     public @ResponseBody
@@ -174,15 +170,9 @@ public class PersonaController extends BaseController {
         try {
             inicializarPersonaManager();
             
-            Empresas ejEmpresas = new Empresas();
-            ejEmpresas.setId(userDetail.getIdEmpresa());
-            
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(ejEmpresas);
-            
             Personas ejPersonas = new Personas();
             ejPersonas.setDocumento(documento);
-            ejPersonas.setSucursal(ejSucursales);
+            ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
             Map<String, Object> modelMaps = personaManager.getPersona(ejPersonas);            
             
@@ -227,12 +217,9 @@ public class PersonaController extends BaseController {
 				.collect(Collectors.joining(",")));
                 return response;
             }
-            //Buscar usuario por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
+
             Personas ejPersona = new Personas();
-            ejPersona.setSucursal(ejSucursales);            
+            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));        
             ejPersona.setDocumento(model.getDocumento());
             
             Map<String, Object> personaMaps = personaManager.getLike(ejPersona,"id".split(","));
@@ -243,6 +230,7 @@ public class PersonaController extends BaseController {
                 return response;
             }
             
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -294,12 +282,8 @@ public class PersonaController extends BaseController {
                 return response;
             }     
             
-            //Buscar usuario por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
             Personas ejPersona = new Personas();
-            ejPersona.setSucursal(ejSucursales);            
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));            
             ejPersona.setDocumento(model.getDocumento());
             
             Map<String, Object> personaMaps = personaManager.getLike(ejPersona, "id".split(","));
@@ -310,7 +294,7 @@ public class PersonaController extends BaseController {
                 return response;
             }           
             
-            
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             

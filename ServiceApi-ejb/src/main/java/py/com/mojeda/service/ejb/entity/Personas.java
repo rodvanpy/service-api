@@ -111,14 +111,7 @@ public class Personas extends Base {
     private Double longitud;
     
     @Column(name = "IMAGE_PATH")
-    private String imagePath;
-    
-    @Column(name = "ID_USUARIO")
-    private Long idUsuario;
-    
-    @ManyToOne
-    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
-    private Sucursales sucursal;
+    private String imagePath;   
     
     @NotNull(message = "Ingrese Nacionalidad")
     @ManyToOne
@@ -143,6 +136,14 @@ public class Personas extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_BARRIO", referencedColumnName = "id")
     private Barrios barrio;
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_PROFESION", referencedColumnName = "id")
+    private Profesiones profesion;
+    
+    @ManyToOne
+    @JoinColumn
+    private Empresas empresa;
         
     @Transient
     private Avatar avatar;
@@ -435,21 +436,6 @@ public class Personas extends Base {
     public void setSeparacionBienes(Boolean separacionBienes) {
         this.separacionBienes = separacionBienes;
     }
-
-    /**
-     * @return the sucursal
-     */
-    public Sucursales getSucursal() {
-        return sucursal;
-    }
-
-    /**
-     * @param sucursal the sucursal to set
-     */
-    public void setSucursal(Sucursales sucursal) {
-        this.sucursal = sucursal;
-    }
-
     
     
     public String getClassName() {
@@ -570,13 +556,28 @@ public class Personas extends Base {
         this.barrio = barrio;
     }
 
-    public Long getIdUsuario() {
-        return idUsuario;
+    public Profesiones getProfesion() {
+        return profesion;
     }
 
-    public void setIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setProfesion(Profesiones profesion) {
+        this.profesion = profesion;
     }
-        
+
+    /**
+     * @return the empresa
+     */
+    public Empresas getEmpresa() {
+        return empresa;
+    }
+
+    /**
+     * @param empresa the empresa to set
+     */
+    public void setEmpresa(Empresas empresa) {
+        this.empresa = empresa;
+    }
+    
+    
        
 }

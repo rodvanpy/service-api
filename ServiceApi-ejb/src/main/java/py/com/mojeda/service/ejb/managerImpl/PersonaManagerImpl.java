@@ -15,6 +15,7 @@ import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Nacionalidades;
 import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.Profesiones;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
@@ -23,6 +24,7 @@ import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
+import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
@@ -60,6 +62,9 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/BarriosManagerImpl")
     private BarriosManager barriosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
+    private ProfesionesManager profesionesManager;
 
     @Override
     public Personas guardar(Personas usuario) throws Exception {
@@ -76,11 +81,16 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
         String atributos = "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,"
                 + "fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,"
-                + "email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,"
-                + "observacion,latitud,longitud,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,sucursal.id,imagePath";
+                + "email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,activo,"
+                + "observacion,latitud,longitud,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,sucursal.id,profesion.id,imagePath";
 
         Map<String, Object> persona = this.getAtributos(personas, atributos.split(","));
         if (persona != null) {
+            
+            Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString())), "id,nombre,activo".split(","));
+            persona.put("profesion", profesion);
+            persona.remove("profesion.id");
+            
             Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
             persona.put("nacionalidad", nacionalidad);
             persona.remove("nacionalidad.id");

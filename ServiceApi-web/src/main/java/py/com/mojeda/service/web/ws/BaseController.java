@@ -33,6 +33,7 @@ import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
+import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.TipoIngresosEgresosManager;
@@ -100,9 +101,28 @@ public class BaseController {
     protected CiudadesManager ciudadesManager;
     
     protected BarriosManager barriosManager;
+    
+    protected ProfesionesManager profesionesManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
+    
+    protected void inicializarProfesionesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (profesionesManager == null) {
+            try {
+                profesionesManager = (ProfesionesManager) context.lookup("java:app/ServiceApi-ejb/ProfesionesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarClientesManager() throws Exception {
         if (context == null) {

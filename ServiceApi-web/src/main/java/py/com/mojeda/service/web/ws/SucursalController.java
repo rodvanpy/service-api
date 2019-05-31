@@ -24,8 +24,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import py.com.mojeda.service.ejb.entity.Barrios;
+import py.com.mojeda.service.ejb.entity.Ciudades;
+import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -219,9 +223,13 @@ public class SucursalController extends BaseController {
         try {
             inicializarSucursalManager();
             inicializarDepartamentosSucursalManager();
-
+            inicializarPaisesManager();
+            inicializarDepartamentosPaisManager();
+            inicializarCiudadesManager();
+            inicializarBarriosManager();
+            
             Map<String,Object> model = sucursalManager.getAtributos(new Sucursales(id),
-                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo,empresa.id".split(","));
+                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo,empresa.id,pais.id,ciudad.id,departamento.id,barrio.id".split(","));
 
             DepartamentosSucursal ejDepSuc = new DepartamentosSucursal();
             ejDepSuc.setSucursal(new Sucursales(id));
@@ -235,6 +243,22 @@ public class SucursalController extends BaseController {
             model.remove("empresa.id");
             model.put("empresa",empresa);
             model.put("departamentos",listDep);
+            
+            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(model.get("pais.id") == null ? "0" : model.get("pais.id").toString())), "id,nombre,activo".split(","));
+            model.put("pais", pais);
+            model.remove("pais.id");
+
+            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(model.get("departamento.id") == null ? "0" : model.get("departamento.id").toString())), "id,nombre,activo".split(","));
+            model.put("departamento", departamento);
+            model.remove("departamento.id");
+
+            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(model.get("ciudad.id") == null ? "0" : model.get("ciudad.id").toString())), "id,nombre,activo".split(","));
+            model.put("ciudad", ciudad);
+            model.remove("ciudad.id");
+
+            Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(model.get("barrio.id") == null ? "0" : model.get("barrio.id").toString())), "id,nombre,activo".split(","));
+            model.put("barrio", barrio);
+            model.remove("barrio.id");
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

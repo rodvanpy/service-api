@@ -30,7 +30,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "FUNCIONARIOS", uniqueConstraints = @UniqueConstraint(name = "usuario_alias_uq", columnNames = { "alias" }) )
+@Table(name = "FUNCIONARIOS", uniqueConstraints = @UniqueConstraint(name = "funcionario_persona_uq", columnNames = { "ID_PERSONA" }) )
 public class Funcionarios extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;

@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package py.com.mojeda.service.ejb.entity;
 
 import java.util.List;
@@ -22,7 +21,6 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -30,18 +28,18 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "USUARIOS", uniqueConstraints = @UniqueConstraint(name = "usuario_alias_uq", columnNames = { "alias" }) )
-public class Usuarios extends Base{
-    
+@Table(name = "USUARIOS", uniqueConstraints = @UniqueConstraint(name = "usuario_alias_uq", columnNames = {"alias"}))
+public class Usuarios extends Base {
+
     private static final long serialVersionUID = 8538760347986185608L;
     private static final String SECUENCIA = "seq_usuario_id";
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
-    
+
     //@NotNull(message = "Ingrese Alias")
     @NotEmpty(message = "Ingrese Alias")
     @Column(name = "ALIAS")
@@ -51,40 +49,43 @@ public class Usuarios extends Base{
     @NotEmpty(message = "Ingrese Clave Acceso")
     @Column(name = "CLAVE_ACCESO")
     private String claveAcceso;
-    
+
     @Column(name = "SUPER_USUARIO")
-    private Boolean superUsuario; 
-    
+    private Boolean superUsuario;
+
     @NotNull(message = "Ingrese Tiempo de Expiracion del Tokens")
     @Column(name = "EXPIRATION_TIME_TOKENS")
     private Long expirationTimeTokens;
-        
+
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @Valid
     private Personas persona;
+
+    @ManyToOne
+    @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
+    private Sucursales sucursal;
     
+
     @NotNull(message = "Ingrese Rol")
     @ManyToOne
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
-    private Rol rol;    
-    
+    private Rol rol;
+
     @Transient
-    private List<Map<String,Object>> departamentos;
-        
-    
+    private List<Map<String, Object>> departamentos;
+
     public Usuarios() {
 
     }
 
     /**
-     * @param id
-     *            el id de Usuario
+     * @param id el id de Usuario
      */
     public Usuarios(Long id) {
-            this.setId(id);
+        this.setId(id);
     }
-    
+
     /**
      * @return the id
      */
@@ -155,8 +156,6 @@ public class Usuarios extends Base{
         this.rol = rol;
     }
 
-    
-
     /**
      * @return the persona
      */
@@ -177,8 +176,8 @@ public class Usuarios extends Base{
 
     public void setExpirationTimeTokens(Long expirationTimeTokens) {
         this.expirationTimeTokens = expirationTimeTokens;
-    }  
-    
+    }
+
     public String getClassName() {
         return this.getClass().getSimpleName();
     }
@@ -190,7 +189,15 @@ public class Usuarios extends Base{
     public void setDepartamentos(List<Map<String, Object>> departamentos) {
         this.departamentos = departamentos;
     }
+
+    public Sucursales getSucursal() {
+        return sucursal;
+    }
+
+    public void setSucursal(Sucursales sucursal) {
+        this.sucursal = sucursal;
+    }
     
     
-           
+
 }

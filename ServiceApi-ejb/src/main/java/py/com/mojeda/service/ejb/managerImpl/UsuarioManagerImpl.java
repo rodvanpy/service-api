@@ -22,6 +22,7 @@ import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Nacionalidades;
 import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.Profesiones;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoDocumentos;
@@ -37,6 +38,7 @@ import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
+import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
@@ -91,6 +93,9 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/BarriosManagerImpl")
     private BarriosManager barriosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
+    private ProfesionesManager profesionesManager;
 
     @Override
     public Usuarios guardar(Usuarios usuario) throws Exception {
@@ -111,8 +116,11 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setPrimerApellido(usuario.getPersona().getPrimerApellido());
                 ejPersona.setSegundoApellido(usuario.getPersona().getSegundoApellido());
                 ejPersona.setEmail(usuario.getPersona().getEmail());
+                ejPersona.setSexo(usuario.getPersona().getSexo());
                 ejPersona.setEstadoCivil(usuario.getPersona().getEstadoCivil());
                 ejPersona.setNumeroHijos(usuario.getPersona().getNumeroHijos());
+                ejPersona.setNumeroDependientes(usuario.getPersona().getNumeroDependientes());
+                ejPersona.setSeparacionBienes(usuario.getPersona().getSeparacionBienes());
                 ejPersona.setTelefonoParticular(usuario.getPersona().getTelefonoParticular());
                 ejPersona.setTelefonoSecundario(usuario.getPersona().getTelefonoSecundario());
                 ejPersona.setTipoPersona(usuario.getPersona().getTipoPersona());
@@ -122,12 +130,12 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setObservacion(usuario.getPersona().getObservacion());
                 ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                ejPersona.setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
                 ejPersona.setNacionalidad(new Nacionalidades(usuario.getPersona().getNacionalidad().getId()));
                 ejPersona.setPais(new Paises(usuario.getPersona().getPais().getId()));
                 ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
                 ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
                 ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getBarrio().getId()) : null);
+                ejPersona.setProfesion((usuario.getPersona().getProfesion() != null && usuario.getPersona().getProfesion().getId() != null) ? new Profesiones(usuario.getPersona().getProfesion().getId()) : null);
 
             } else {
 
@@ -136,14 +144,14 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 usuario.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 usuario.getPersona().setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
                 usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                usuario.getPersona().setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
 
                 personaManager.save(usuario.getPersona());
 
                 ejPersona = personaManager.get(usuario.getPersona());
 
             }
-
+            
+            usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
             usuario.setAlias(usuario.getAlias().toUpperCase());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
@@ -164,7 +172,6 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setImagePath(CONTENT_PATH + path);
             }
 
-            ejPersona.setIdUsuario(object.getId());
             personaManager.update(ejPersona);
 
             UsuarioDepartamentos usuarioDepartamentos;
@@ -198,23 +205,26 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setPrimerApellido(usuario.getPersona().getPrimerApellido());
                 ejPersona.setSegundoApellido(usuario.getPersona().getSegundoApellido());
                 ejPersona.setEmail(usuario.getPersona().getEmail());
+                ejPersona.setSexo(usuario.getPersona().getSexo());
                 ejPersona.setEstadoCivil(usuario.getPersona().getEstadoCivil());
                 ejPersona.setNumeroHijos(usuario.getPersona().getNumeroHijos());
+                ejPersona.setNumeroDependientes(usuario.getPersona().getNumeroDependientes());
+                ejPersona.setSeparacionBienes(usuario.getPersona().getSeparacionBienes());
                 ejPersona.setTelefonoParticular(usuario.getPersona().getTelefonoParticular());
                 ejPersona.setTelefonoSecundario(usuario.getPersona().getTelefonoSecundario());
                 ejPersona.setTipoPersona(usuario.getPersona().getTipoPersona());
                 ejPersona.setDireccionParticular(usuario.getPersona().getDireccionParticular());
+                ejPersona.setFechaNacimiento(usuario.getPersona().getFechaNacimiento());
                 ejPersona.setDireccionDetallada(usuario.getPersona().getDireccionDetallada());
                 ejPersona.setObservacion(usuario.getPersona().getObservacion());
-                ejPersona.setFechaNacimiento(usuario.getPersona().getFechaNacimiento());
                 ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                ejPersona.setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
                 ejPersona.setNacionalidad(new Nacionalidades(usuario.getPersona().getNacionalidad().getId()));
                 ejPersona.setPais(new Paises(usuario.getPersona().getPais().getId()));
                 ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
                 ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
                 ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getBarrio().getId()) : null);
+                ejPersona.setProfesion((usuario.getPersona().getProfesion() != null && usuario.getPersona().getProfesion().getId() != null) ? new Profesiones(usuario.getPersona().getProfesion().getId()) : null);
 
             } else {
 
@@ -223,7 +233,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 usuario.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 usuario.getPersona().setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
                 usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                usuario.getPersona().setSucursal(new Sucursales(usuario.getPersona().getSucursal().getId()));
+                
 
                 personaManager.save(usuario.getPersona());
 
@@ -242,14 +252,14 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
                 ejPersona.setImagePath(CONTENT_PATH + path);
             }
-
+            
+            usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
             usuario.setAlias(usuario.getAlias().toUpperCase());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.update(usuario);
 
-            ejPersona.setIdUsuario(usuario.getId());
             personaManager.update(ejPersona);
 
             UsuarioDepartamentos usuarioDepartamentos = new UsuarioDepartamentos();
@@ -276,11 +286,15 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
     @Override
     public Map<String, Object> getUsuario(Usuarios usuario) throws Exception {
 
-        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,superUsuario,expirationTimeTokens,persona.id,rol.id,persona.sucursal.id,persona.sucursal.empresa.id,activo".split(","));
+        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,activo".split(","));
         if (model != null) {
             Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
-                    "id,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));
-
+                    "id,nacionalidad.id,profesion.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud,activo".split(","));
+            
+            Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString())), "id,nombre,activo".split(","));
+            persona.put("profesion", profesion);
+            persona.remove("profesion.id");
+            
             Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
             persona.put("nacionalidad", nacionalidad);
             persona.remove("nacionalidad.id");
@@ -301,19 +315,19 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             persona.put("barrio", barrio);
             persona.remove("barrio.id");
 
-            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
+            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
                     "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
 
-            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("persona.sucursal.empresa.id").toString())),
+            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("sucursal.empresa.id").toString())),
                     "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
             sucursal.put("empresa", empresa);
 
-            persona.put("sucursal", sucursal);
+            model.put("sucursal", sucursal);
             model.put("persona", persona);
 
             model.remove("persona.id");
-            model.remove("persona.sucursal.id");
-            model.remove("persona.sucursal.empresa.id");
+            model.remove("sucursal.id");
+            model.remove("sucursal.empresa.id");
 
             Map<String, Object> rol = rolManager.getAtributos(new Rol(Long.parseLong(model.get("rol.id").toString())),
                     "id,nombre,activo".split(","));

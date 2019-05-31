@@ -124,7 +124,6 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 ejPersona.setObservacion(cliente.getPersona().getObservacion());
                 ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejPersona.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                ejPersona.setSucursal(new Sucursales(cliente.getPersona().getSucursal().getId()));
                 ejPersona.setNacionalidad(new Nacionalidades(cliente.getPersona().getNacionalidad().getId()));
                 ejPersona.setPais(new Paises(cliente.getPersona().getPais().getId()));
                 ejPersona.setDepartamento(new DepartamentosPais(cliente.getPersona().getDepartamento().getId()));
@@ -138,7 +137,6 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 cliente.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 cliente.getPersona().setIdUsuarioCreacion(cliente.getIdUsuarioCreacion());
                 cliente.getPersona().setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                cliente.getPersona().setSucursal(new Sucursales(cliente.getPersona().getSucursal().getId()));
 
                 personaManager.save(cliente.getPersona());
 
@@ -199,7 +197,6 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 ejPersona.setFechaNacimiento(cliente.getPersona().getFechaNacimiento());
                 ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejPersona.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                ejPersona.setSucursal(new Sucursales(cliente.getPersona().getSucursal().getId()));
                 ejPersona.setNacionalidad(new Nacionalidades(cliente.getPersona().getNacionalidad().getId()));
                 ejPersona.setPais(new Paises(cliente.getPersona().getPais().getId()));
                 ejPersona.setDepartamento(new DepartamentosPais(cliente.getPersona().getDepartamento().getId()));
@@ -213,7 +210,6 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 cliente.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 cliente.getPersona().setIdUsuarioCreacion(cliente.getIdUsuarioCreacion());
                 cliente.getPersona().setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                cliente.getPersona().setSucursal(new Sucursales(cliente.getPersona().getSucursal().getId()));
 
                 personaManager.save(cliente.getPersona());
 
@@ -245,7 +241,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     @Override
     public Map<String, Object> getCliente(Clientes cliente) throws Exception {
 
-        Map<String, Object> model = this.getAtributos(cliente, "id,persona.id,persona.sucursal.id,persona.sucursal.empresa.id,activo".split(","));
+        Map<String, Object> model = this.getAtributos(cliente, "id,persona.id,sucursal.id,sucursal.empresa.id,activo".split(","));
         if (model != null) {
             Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
                     "id,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud".split(","));
@@ -273,12 +269,12 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
                     "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
 
-            persona.put("sucursal", sucursal);
+            model.put("sucursal", sucursal);
             model.put("persona", persona);
 
             model.remove("persona.id");
-            model.remove("persona.sucursal.id");
-            model.remove("persona.sucursal.empresa.id");
+            model.remove("sucursal.id");
+            model.remove("sucursal.empresa.id");
 
         }
 
