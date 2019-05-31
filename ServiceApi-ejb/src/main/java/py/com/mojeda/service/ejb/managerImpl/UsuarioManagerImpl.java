@@ -127,7 +127,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setPais(new Paises(usuario.getPersona().getPais().getId()));
                 ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
                 ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
-                ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getCiudad().getId()) : null);
+                ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getBarrio().getId()) : null);
 
             } else {
 
@@ -214,7 +214,7 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 ejPersona.setPais(new Paises(usuario.getPersona().getPais().getId()));
                 ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
                 ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
-                ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getCiudad().getId()) : null);
+                ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getBarrio().getId()) : null);
 
             } else {
 

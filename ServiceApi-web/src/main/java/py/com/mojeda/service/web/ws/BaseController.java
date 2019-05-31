@@ -10,6 +10,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
+import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.ModalidadesManager;
@@ -47,6 +48,8 @@ public class BaseController {
     private Context context;
     
     protected UsuarioManager usuarioManager;
+    
+    protected ClientesManager clientesManager;
     
     protected PersonaManager personaManager;
     
@@ -99,6 +102,24 @@ public class BaseController {
     protected BarriosManager barriosManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
+    
+    
+    protected void inicializarClientesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (clientesManager == null) {
+            try {
+                clientesManager = (ClientesManager) context.lookup("java:app/ServiceApi-ejb/ClientesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarBarriosManager() throws Exception {
         if (context == null) {
