@@ -24,9 +24,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import py.com.mojeda.service.ejb.entity.Barrios;
+import py.com.mojeda.service.ejb.entity.Ciudades;
+import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Documentos;
+import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoDocumentos;
 import py.com.mojeda.service.ejb.entity.Usuarios;
@@ -48,7 +52,7 @@ public class EmpresaController extends BaseController {
 
     String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo";
     String atributos_sucursales = "id,nombre,codigoSucursal,descripcion,direccion,telefono"
-            + ",fax,telefonoMovil,email,observacion,longitud,latitud,activo";
+            + ",fax,telefonoMovil,email,observacion,longitud,latitud,activo,pais.id,ciudad.id,departamento.id,barrio.id";
 
     @GetMapping
     public @ResponseBody
@@ -151,6 +155,10 @@ public class EmpresaController extends BaseController {
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarSucursalManager();
+            inicializarCiudadesManager();
+            inicializarDepartamentosPaisManager();
+            inicializarBarriosManager();
+            inicializarPaisesManager();
             inicializarDepartamentosSucursalManager();
             Gson gson = new Gson();
             String camposFiltros = null;
@@ -206,6 +214,21 @@ public class EmpresaController extends BaseController {
                 if (listMapDepart != null) {
                     rpm.put("departamentos", listMapDepart);
                 }
+                Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(rpm.get("pais.id") == null ? "0" : rpm.get("pais.id").toString())), "id,nombre,activo".split(","));
+                rpm.put("pais", pais);
+                rpm.remove("pais.id");
+
+                Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(rpm.get("departamento.id") == null ? "0" : rpm.get("departamento.id").toString())), "id,nombre,activo".split(","));
+                rpm.put("departamento", departamento);
+                rpm.remove("departamento.id");
+
+                Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(rpm.get("ciudad.id") == null ? "0" : rpm.get("ciudad.id").toString())), "id,nombre,activo".split(","));
+                rpm.put("ciudad", ciudad);
+                rpm.remove("ciudad.id");
+
+                Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(rpm.get("barrio.id") == null ? "0" : rpm.get("barrio.id").toString())), "id,nombre,activo".split(","));
+                rpm.put("barrio", barrio);
+                rpm.remove("barrio.id");
             }
 
             retorno.setRecords(total);
@@ -344,7 +367,7 @@ public class EmpresaController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarEmpresaManager();
-            
+
             Empresas model = empresaManager.get(id);
 
             response.setModel(model);
