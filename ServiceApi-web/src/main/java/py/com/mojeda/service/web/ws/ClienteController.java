@@ -226,9 +226,9 @@ public class ClienteController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            model = clientesManager.guardar(model);
+            Map<String,Object> modelMap = clientesManager.guardar(model);
             
-            response.setModel(model);
+            response.setModel(modelMap);
             response.setStatus(200);
             response.setMessage("Registro creado con exito");
         } catch (Exception e) {

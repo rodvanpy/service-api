@@ -20,6 +20,8 @@ public interface OcupacionPersonaManager extends GenericDao<OcupacionPersona, Lo
     
     public Map<String, Object> guardarOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
     
+    public Map<String, Object> editarOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
+    
     public Map<String, Object> getOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
     
 }

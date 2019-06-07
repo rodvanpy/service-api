@@ -27,7 +27,7 @@ public interface PersonaManager extends GenericDao<Personas, Long>{
     
     public Personas editar(Personas persona) throws Exception;
     
-    public Map<String, Object> guardarBienes(Bienes bien) throws Exception;
+    
     
     public Map<String, Object> guardarReferencias(Referencias referencia) throws Exception;
     

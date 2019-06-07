@@ -84,7 +84,7 @@
             <type>jar</type>
         </dependency>
         
-        <dependency>
+<!--        <dependency>
             <groupId>com.java</groupId>
             <artifactId>axis</artifactId>
             <version>1.0.1</version>
@@ -103,13 +103,13 @@
             <artifactId>wsdl4j</artifactId>
             <version>1.5.1</version>
             <type>jar</type>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.2</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>com.java</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>1.0.2</version>
@@ -121,7 +121,7 @@
             <artifactId>ojdbc7</artifactId>
             <version>12.1.0.1</version>
             <type>jar</type>
-        </dependency>
+        </dependency>-->
         
         <dependency>
             <groupId>org.hibernate</groupId>

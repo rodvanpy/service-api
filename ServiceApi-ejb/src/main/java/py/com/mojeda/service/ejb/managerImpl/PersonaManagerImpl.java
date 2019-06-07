@@ -19,25 +19,20 @@ import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.IngresosEgresos;
 import py.com.mojeda.service.ejb.entity.Nacionalidades;
-import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Profesiones;
 import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
-import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
-import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
-import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 import py.com.mojeda.service.ejb.utils.Base64Bytes;
 import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
@@ -83,7 +78,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     public Personas guardar(Personas persona) throws Exception {
         Personas ejPersona = new Personas();
         ejPersona.setDocumento(persona.getDocumento());
-
+        ejPersona.setEmpresa(persona.getEmpresa());
+        
         ejPersona = this.get(ejPersona);
 
         if (ejPersona != null) {
@@ -147,7 +143,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     public Personas editar(Personas persona) throws Exception {
         Personas ejPersona = new Personas();
         ejPersona.setDocumento(persona.getDocumento());
-
+        ejPersona.setEmpresa(persona.getEmpresa());
+        
         ejPersona = this.get(ejPersona);
 
         if (ejPersona != null) {
@@ -187,6 +184,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
             ejPersona = new Personas();
             ejPersona.setDocumento(persona.getDocumento());
+            ejPersona.setEmpresa(persona.getEmpresa());
+            
             ejPersona = this.get(ejPersona);
         }
 
@@ -213,7 +212,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
         String atributos = "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,"
                 + "fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,"
                 + "email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,activo,"
-                + "observacion,latitud,longitud,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,sucursal.id,profesion.id,imagePath";
+                + "observacion,latitud,longitud,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,profesion.id,imagePath";
 
         Map<String, Object> persona = this.getAtributos(personas, atributos.split(","));
         if (persona != null) {
@@ -242,24 +241,10 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             persona.put("barrio", barrio);
             persona.remove("barrio.id");
 
-            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(persona.get("sucursal.id").toString())),
-                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-
-            persona.put("sucursal", sucursal);
-            persona.remove("sucursal.id");
         }
         return persona;
     }
-
-    @Override
-    public Map<String, Object> guardarBienes(Bienes bien) throws Exception {
-        Map<String, Object> object = null;
-        try {
-
-        } catch (Exception e) {
-        }
-        return object;
-    }
+  
 
     @Override
     public Map<String, Object> guardarReferencias(Referencias referencia) throws Exception {

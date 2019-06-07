@@ -224,7 +224,8 @@ public class UsuarioController extends BaseController {
 
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
-
+            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
             ejUsuarios = new Usuarios();
             ejUsuarios.setPersona(ejPersona);
 
@@ -307,7 +308,8 @@ public class UsuarioController extends BaseController {
 
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
-
+            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
             ejUsuarios = new Usuarios();
             ejUsuarios.setPersona(ejPersona);
 

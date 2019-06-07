@@ -21,21 +21,20 @@ import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
 import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.IngresosEgresos;
 import py.com.mojeda.service.ejb.entity.Nacionalidades;
+import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoDocumentos;
 import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
-import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
-import py.com.mojeda.service.ejb.manager.UsuarioManager;
-import py.com.mojeda.service.ejb.utils.Base64Bytes;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
@@ -44,7 +43,6 @@ import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
-import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
 /**
  *
@@ -103,6 +101,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 && cliente.getPersona() != null) {
 
             cliente.getPersona().setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+            cliente.getPersona().setIdUsuarioCreacion(cliente.getIdUsuarioCreacion());
 
             Personas ejPersona = personaManager.guardar(cliente.getPersona());
 
@@ -111,11 +110,105 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             this.save(cliente);
             
             for (Bienes rpm : cliente.getBienesInmuebles()) {
-                usuarioDepartamentos = new UsuarioDepartamentos();
-                usuarioDepartamentos.setUsuario(usuario);
-                usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(Long.parseLong(rpm.get("id").toString())));
-
-                usuarioDepartamentosManager.save(usuarioDepartamentos);
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                }                
+            }
+            
+            for (Bienes rpm : cliente.getBienesVehiculo()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                }                
+            }
+            
+            for (IngresosEgresos rpm : cliente.getEgresos()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                }                
+            }
+            
+            for (IngresosEgresos rpm : cliente.getIngresos()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                }                
+            }
+            
+            for (OcupacionPersona rpm : cliente.getOcupaciones()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                }                
+            }
+            
+            for (Referencias rpm : cliente.getReferencias()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                }                
             }
 
             object = this.getCliente(cliente);
