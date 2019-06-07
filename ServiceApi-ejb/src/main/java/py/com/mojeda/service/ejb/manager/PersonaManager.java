@@ -9,7 +9,11 @@ package py.com.mojeda.service.ejb.manager;
 
 import java.util.Map;
 import javax.ejb.Local;
+import py.com.mojeda.service.ejb.entity.Bienes;
+import py.com.mojeda.service.ejb.entity.IngresosEgresos;
+import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.Referencias;
 
 
 /**
@@ -22,6 +26,12 @@ public interface PersonaManager extends GenericDao<Personas, Long>{
     public Personas guardar(Personas persona) throws Exception;
     
     public Personas editar(Personas persona) throws Exception;
+    
+    public Map<String, Object> guardarBienes(Bienes bien) throws Exception;
+    
+    public Map<String, Object> guardarReferencias(Referencias referencia) throws Exception;
+    
+    public Map<String, Object> guardarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception;        
     
     public Map<String, Object> getPersona(Personas persona) throws Exception;
     

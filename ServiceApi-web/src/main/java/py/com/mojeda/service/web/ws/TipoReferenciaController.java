@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 import py.com.mojeda.service.ejb.entity.TipoReferencias;
 import py.com.mojeda.service.ejb.entity.Usuarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
@@ -56,7 +57,6 @@ public class TipoReferenciaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoReferencias model = new TipoReferencias();
-        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -182,7 +182,11 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setActivo("S");
+            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioCreacion(userDetail.getId());
+            model.setIdUsuarioModificacion(userDetail.getId());
             
             tipoReferenciaManager.save(model);
             
@@ -211,7 +215,6 @@ public class TipoReferenciaController extends BaseController {
      * @return
      */
     @PutMapping("/{id}")
-    @CrossOrigin(origins = "http://localhost:4599")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
@@ -233,7 +236,14 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            TipoReferencias dato = tipoReferenciaManager.get(id);
+            
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioModificacion(userDetail.getId());
+            model.setFechaCreacion(dato.getFechaCreacion());
+            model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
+            model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
+            model.setActivo(dato.getActivo());
             
             tipoReferenciaManager.update(model);
             

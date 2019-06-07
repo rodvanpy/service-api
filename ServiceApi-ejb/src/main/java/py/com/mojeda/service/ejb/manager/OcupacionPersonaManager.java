@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 
@@ -16,5 +17,9 @@ import py.com.mojeda.service.ejb.entity.OcupacionPersona;
  */
 @Local
 public interface OcupacionPersonaManager extends GenericDao<OcupacionPersona, Long>{   
+    
+    public Map<String, Object> guardarOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
+    
+    public Map<String, Object> getOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
     
 }

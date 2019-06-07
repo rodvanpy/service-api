@@ -7,7 +7,7 @@ package py.com.mojeda.service.ejb.managerImpl;
 
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
-import py.com.mojeda.service.ejb.manager.OcupacionManager;
+import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
 
 
 /**
@@ -15,8 +15,8 @@ import py.com.mojeda.service.ejb.manager.OcupacionManager;
  * @author Miguel
  */
 @Stateless
-public class OcupacionManagerImpl extends GenericDaoImpl<TipoOcupaciones, Long>
-        implements OcupacionManager {
+public class TipoOcupacionesManagerImpl extends GenericDaoImpl<TipoOcupaciones, Long>
+        implements TipoOcupacionesManager {
 
     @Override
     protected Class<TipoOcupaciones> getEntityBeanType() {

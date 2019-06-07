@@ -16,6 +16,6 @@ import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
  * @author Miguel
  */
 @Local
-public interface OcupacionManager extends GenericDao<TipoOcupaciones, Long>{   
+public interface TipoOcupacionesManager extends GenericDao<TipoOcupaciones, Long>{   
     
 }

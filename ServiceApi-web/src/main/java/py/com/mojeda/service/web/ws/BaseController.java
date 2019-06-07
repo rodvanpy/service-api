@@ -37,6 +37,7 @@ import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.TipoIngresosEgresosManager;
+import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
 
 /**
  *
@@ -75,6 +76,8 @@ public class BaseController {
     protected ModalidadesManager modalidadesManager;
             
     protected TipoCalculosManager tipoCalculosManager;
+    
+    protected TipoOcupacionesManager tipoOcupacionesManager;
             
     protected TipoDesembolsosManager tipoDesembolsosManager;
             
@@ -106,6 +109,23 @@ public class BaseController {
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
+    
+    protected void inicializarTipoOcupacionesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (tipoOcupacionesManager == null) {
+            try {
+                tipoOcupacionesManager = (TipoOcupacionesManager) context.lookup("java:app/ServiceApi-ejb/TipoOcupacionesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarProfesionesManager() throws Exception {
         if (context == null) {
@@ -364,7 +384,7 @@ public class BaseController {
         if (tipoEgresosManager == null) {
             try {
 
-                tipoEgresosManager = (TipoIngresosEgresosManager) context.lookup("java:app/ServiceApi-ejb/TipoEgresosManagerImpl");
+                tipoEgresosManager = (TipoIngresosEgresosManager) context.lookup("java:app/ServiceApi-ejb/TipoIngresosEgresosManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

@@ -35,7 +35,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/tipos-ingresos-egresos")
+@RequestMapping(value = "/tipos-egresos")
 public class TipoEgresoController extends BaseController {
     
     String atributos = "id,nombre,codigo,activo";
@@ -54,7 +54,7 @@ public class TipoEgresoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoIngresosEgresos model = new TipoIngresosEgresos();
-        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+        model.setTipo("E");
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -182,14 +182,13 @@ public class TipoEgresoController extends BaseController {
             }
             
             TipoIngresosEgresos dato = new TipoIngresosEgresos();
-            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            dato.setTipo("E");
             
             //Numero Sucursal
             Integer numeroCodigo = tipoEgresosManager.total(dato) + 1;
             
             model.setCodigo("TE-" + numeroCodigo);
-            
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setTipo("E");
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -247,8 +246,9 @@ public class TipoEgresoController extends BaseController {
             }
             
             TipoIngresosEgresos dato = tipoEgresosManager.get(id);
-
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
+            model.setTipo("E");
+            model.setActivo(dato.getActivo());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());

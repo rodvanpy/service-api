@@ -50,6 +50,24 @@ public class Clientes extends Base{
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @Valid
     private Personas persona;
+    
+    @Transient
+    private List<Bienes> bienesInmuebles;
+    
+    @Transient
+    private List<Bienes> bienesVehiculo;
+    
+    @Transient
+    private List<Referencias> referencias;
+    
+    @Transient
+    private List<IngresosEgresos> egresos;
+    
+    @Transient
+    private List<IngresosEgresos> ingresos;
+    
+    @Transient
+    private List<OcupacionPersona> ocupaciones;
 
     
     public Clientes() {
@@ -108,6 +126,90 @@ public class Clientes extends Base{
      */
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
+    }
+
+    /**
+     * @return the bienesInmuebles
+     */
+    public List<Bienes> getBienesInmuebles() {
+        return bienesInmuebles;
+    }
+
+    /**
+     * @param bienesInmuebles the bienesInmuebles to set
+     */
+    public void setBienesInmuebles(List<Bienes> bienesInmuebles) {
+        this.bienesInmuebles = bienesInmuebles;
+    }
+
+    /**
+     * @return the bienesVehiculo
+     */
+    public List<Bienes> getBienesVehiculo() {
+        return bienesVehiculo;
+    }
+
+    /**
+     * @param bienesVehiculo the bienesVehiculo to set
+     */
+    public void setBienesVehiculo(List<Bienes> bienesVehiculo) {
+        this.bienesVehiculo = bienesVehiculo;
+    }
+
+    /**
+     * @return the referencias
+     */
+    public List<Referencias> getReferencias() {
+        return referencias;
+    }
+
+    /**
+     * @param referencias the referencias to set
+     */
+    public void setReferencias(List<Referencias> referencias) {
+        this.referencias = referencias;
+    }
+
+    /**
+     * @return the egresos
+     */
+    public List<IngresosEgresos> getEgresos() {
+        return egresos;
+    }
+
+    /**
+     * @param egresos the egresos to set
+     */
+    public void setEgresos(List<IngresosEgresos> egresos) {
+        this.egresos = egresos;
+    }
+
+    /**
+     * @return the ingresos
+     */
+    public List<IngresosEgresos> getIngresos() {
+        return ingresos;
+    }
+
+    /**
+     * @param ingresos the ingresos to set
+     */
+    public void setIngresos(List<IngresosEgresos> ingresos) {
+        this.ingresos = ingresos;
+    }
+
+    /**
+     * @return the ocupaciones
+     */
+    public List<OcupacionPersona> getOcupaciones() {
+        return ocupaciones;
+    }
+
+    /**
+     * @param ocupaciones the ocupaciones to set
+     */
+    public void setOcupaciones(List<OcupacionPersona> ocupaciones) {
+        this.ocupaciones = ocupaciones;
     }
     
     

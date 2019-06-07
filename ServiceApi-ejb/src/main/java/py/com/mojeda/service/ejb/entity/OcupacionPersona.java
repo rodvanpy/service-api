@@ -42,6 +42,10 @@ public class OcupacionPersona extends Base {
     @Column(name = "CARGO")
     private String cargo;
     
+    @NotEmpty(message = "Ingrese Empresa")
+    @Column(name = "EMPRESA")
+    private String empresa;
+    
     @NotEmpty(message = "Ingrese Tipo Trabajo")
     @Column(name = "TIPO_TRABAJO")
     private String tipoTrabajo;
@@ -255,6 +259,20 @@ public class OcupacionPersona extends Base {
      */
     public void setTipoOcupacion(TipoOcupaciones tipoOcupacion) {
         this.tipoOcupacion = tipoOcupacion;
+    }
+
+    /**
+     * @return the empresa
+     */
+    public String getEmpresa() {
+        return empresa;
+    }
+
+    /**
+     * @param empresa the empresa to set
+     */
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
     }
 
     

@@ -13,19 +13,25 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.Barrios;
+import py.com.mojeda.service.ejb.entity.Bienes;
 import py.com.mojeda.service.ejb.entity.Ciudades;
 import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.IngresosEgresos;
 import py.com.mojeda.service.ejb.entity.Nacionalidades;
+import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Profesiones;
+import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
+import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
@@ -71,6 +77,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
     private ProfesionesManager profesionesManager;
+
 
     @Override
     public Personas guardar(Personas persona) throws Exception {
@@ -243,4 +250,36 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
         }
         return persona;
     }
+
+    @Override
+    public Map<String, Object> guardarBienes(Bienes bien) throws Exception {
+        Map<String, Object> object = null;
+        try {
+
+        } catch (Exception e) {
+        }
+        return object;
+    }
+
+    @Override
+    public Map<String, Object> guardarReferencias(Referencias referencia) throws Exception {
+        Map<String, Object> object = null;
+        try {
+
+        } catch (Exception e) {
+        }
+        return object;
+    }
+
+    @Override
+    public Map<String, Object> guardarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
+        Map<String, Object> object = null;
+        try {
+
+        } catch (Exception e) {
+        }
+        return object;
+    }
+
+    
 }

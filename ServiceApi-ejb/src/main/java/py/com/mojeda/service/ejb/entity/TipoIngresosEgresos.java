@@ -11,8 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -47,9 +45,6 @@ public class TipoIngresosEgresos extends Base{
     @Column(name = "TIPO")
     private String tipo;
     
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
     
     public TipoIngresosEgresos() {
     }
@@ -87,20 +82,6 @@ public class TipoIngresosEgresos extends Base{
     }
 
     /**
-     * @return the empresa
-     */
-    public Empresas getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
-    }
-
-    /**
      * @return the codigo
      */
     public String getCodigo() {
@@ -114,7 +95,13 @@ public class TipoIngresosEgresos extends Base{
         this.codigo = codigo;
     }
 
-    
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }    
     
     
 }

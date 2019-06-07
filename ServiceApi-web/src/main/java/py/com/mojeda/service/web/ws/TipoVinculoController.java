@@ -57,7 +57,6 @@ public class TipoVinculoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoVinculos model = new TipoVinculos();
-        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -183,7 +182,11 @@ public class TipoVinculoController extends BaseController {
                 return response;
             }
             
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setActivo("S");
+            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioCreacion(userDetail.getId());
+            model.setIdUsuarioModificacion(userDetail.getId());
             
             tipoVinculoManager.save(model);
             
@@ -234,7 +237,14 @@ public class TipoVinculoController extends BaseController {
                 return response;
             }
             
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            TipoVinculos dato = tipoVinculoManager.get(id);
+            
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioModificacion(userDetail.getId());
+            model.setFechaCreacion(dato.getFechaCreacion());
+            model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
+            model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
+            model.setActivo(dato.getActivo());
             
             tipoVinculoManager.update(model);
             

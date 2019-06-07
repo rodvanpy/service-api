@@ -5,10 +5,15 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.sql.Timestamp;
+import java.util.Map;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.OcupacionPersona;
+import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
-
+import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
 
 /**
  *
@@ -21,5 +26,70 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
     @Override
     protected Class<OcupacionPersona> getEntityBeanType() {
         return OcupacionPersona.class;
+    }
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/TipoOcupacionesManagerImpl")
+    private TipoOcupacionesManager tipoOcupacionesManager;
+
+    @Override
+    public Map<String, Object> guardarOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
+        Map<String, Object> object = null;
+        try {
+            OcupacionPersona ejOcupacionPersona = new OcupacionPersona();
+            ejOcupacionPersona.setPersona(new Personas(ocupacionPersona.getPersona().getId()));
+            ejOcupacionPersona.setTipoOcupacion(new TipoOcupaciones(ocupacionPersona.getTipoOcupacion().getId()));
+            ejOcupacionPersona.setActivo("S");
+            ejOcupacionPersona.setEmpresa(ocupacionPersona.getEmpresa());
+
+            ejOcupacionPersona = this.get(ejOcupacionPersona);
+
+            if (ejOcupacionPersona != null) {
+                ejOcupacionPersona.setCargo(ocupacionPersona.getCargo());
+                ejOcupacionPersona.setDireccion(ocupacionPersona.getDireccion());
+                ejOcupacionPersona.setEmpresa(ocupacionPersona.getEmpresa());
+                ejOcupacionPersona.setFechaIngreso(ocupacionPersona.getFechaIngreso());
+                ejOcupacionPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                ejOcupacionPersona.setFechaSalida(ocupacionPersona.getFechaSalida());
+                ejOcupacionPersona.setIdUsuarioModificacion(ocupacionPersona.getIdUsuarioModificacion());
+                ejOcupacionPersona.setIngresosMensuales(ocupacionPersona.getIngresosMensuales());
+                ejOcupacionPersona.setInterno(ocupacionPersona.getInterno());
+                ejOcupacionPersona.setTelefonoPrincipal(ocupacionPersona.getTelefonoPrincipal());
+                ejOcupacionPersona.setTelefonoSecundario(ocupacionPersona.getTelefonoSecundario());
+                ejOcupacionPersona.setTipoTrabajo(ocupacionPersona.getTipoTrabajo());
+
+                this.update(ejOcupacionPersona);
+            } else {
+                ejOcupacionPersona = new OcupacionPersona();
+                ejOcupacionPersona = ocupacionPersona;
+
+                ocupacionPersona.setActivo("S");
+                ocupacionPersona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                ocupacionPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+
+                this.save(ocupacionPersona);
+            }
+
+            object = this.getOcupacion(ejOcupacionPersona);
+
+        } catch (Exception e) {
+            
+        }
+        return object;
+    }
+
+    @Override
+    public Map<String, Object> getOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
+        String atributos = "id,cargo,empresa,tipoTrabajo,direccion,telefonoPrincipal,"
+                + "telefonoSecundario,fechaIngreso,fechaSalida,interno,ingresosMensuales,tipoOcupacion.id";
+        
+        Map<String, Object> ocupacion = this.getAtributos(ocupacionPersona, atributos.split(","));
+        
+        if(ocupacion != null){
+            Map<String, Object> tipoOcupaciones =  tipoOcupacionesManager.getAtributos(new TipoOcupaciones(Long.parseLong(ocupacion.get("tipoOcupacion.id").toString())),
+                    "id,nombre,descripcion,activo".split(","));
+            ocupacion.put("tipoOcupacion", tipoOcupaciones);
+            ocupacion.remove("tipoOcupacion.id");
+        }
+        return ocupacion;
     }
 }

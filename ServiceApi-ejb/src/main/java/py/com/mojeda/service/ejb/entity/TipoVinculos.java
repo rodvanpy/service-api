@@ -37,9 +37,6 @@ public class TipoVinculos extends Base{
     @Column(name = "NOMBRE")
     private String nombre;
     
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
     
     public TipoVinculos() {
     }
@@ -75,22 +72,5 @@ public class TipoVinculos extends Base{
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
-    /**
-     * @return the empresa
-     */
-    public Empresas getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
-    }
-
-    
-    
-    
+   
 }

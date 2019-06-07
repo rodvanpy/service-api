@@ -28,16 +28,12 @@ public class TipoOcupaciones extends Base {
     @Column(name = "id")
     private Long id; 
     
-    @NotEmpty(message = "Ingrese Ocupacion")
-    @Column(name = "OCUPACION", nullable = false, length = 128)
-    private String ocupacion;
+    @NotEmpty(message = "Ingrese Nombre")
+    @Column(name = "NOMBRE", nullable = false, length = 128)
+    private String nombre;
     
     @Column(name = "DESCRIPCION")
     private String descripcion;
-    
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
 
     public TipoOcupaciones() {
     }
@@ -60,19 +56,15 @@ public class TipoOcupaciones extends Base {
         this.id = id;
     }
 
-    /**
-     * @return the ocupacion
-     */
-    public String getOcupacion() {
-        return ocupacion;
+    public String getNombre() {
+        return nombre;
     }
 
-    /**
-     * @param ocupacion the ocupacion to set
-     */
-    public void setOcupacion(String ocupacion) {
-        this.ocupacion = ocupacion;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
+
+    
 
     /**
      * @return the descripcion
@@ -86,20 +78,6 @@ public class TipoOcupaciones extends Base {
      */
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    /**
-     * @return the empresa
-     */
-    public Empresas getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
     }
 
     

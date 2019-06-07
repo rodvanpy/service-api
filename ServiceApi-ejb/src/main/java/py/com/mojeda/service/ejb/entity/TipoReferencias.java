@@ -38,10 +38,7 @@ public class TipoReferencias extends Base{
     @Basic(optional = false)
     @Column(name = "NOMBRE")
     private String nombre;
-    
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
+ 
     
     public TipoReferencias() {
     }
@@ -78,21 +75,5 @@ public class TipoReferencias extends Base{
         this.nombre = nombre;
     }
 
-    /**
-     * @return the empresa
-     */
-    public Empresas getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
-    }
-
-    
-    
     
 }
