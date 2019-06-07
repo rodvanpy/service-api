@@ -244,9 +244,9 @@ public class UsuarioController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            model = usuarioManager.guardar(model);
+            Map<String, Object> usuarioMap = usuarioManager.guardar(model);
 
-            response.setModel(model);
+            response.setModel(usuarioMap);
             response.setStatus(200);
             response.setMessage("Usuario creado con exito");
         } catch (Exception e) {
@@ -323,8 +323,9 @@ public class UsuarioController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            usuarioManager.editar(model);
-
+            Map<String, Object> usuarioMap = usuarioManager.editar(model);
+            
+            response.setModel(usuarioMap);
             response.setStatus(200);
             response.setMessage("Usuario modificado con exito");
         } catch (Exception e) {

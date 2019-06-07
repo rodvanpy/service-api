@@ -19,9 +19,9 @@ import py.com.mojeda.service.ejb.entity.Usuarios;
 @Local
 public interface UsuarioManager extends GenericDao<Usuarios, Long>{  
     
-    public Usuarios guardar(Usuarios usuario) throws Exception;
+    public Map<String, Object> guardar(Usuarios usuario) throws Exception;
     
-    public Usuarios editar(Usuarios usuario) throws Exception;
+    public Map<String, Object> editar(Usuarios usuario) throws Exception;
     
     public Map<String, Object> getUsuario(Usuarios usuario) throws Exception;
     

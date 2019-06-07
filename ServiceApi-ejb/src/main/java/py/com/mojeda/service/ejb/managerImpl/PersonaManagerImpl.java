@@ -5,6 +5,10 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -28,6 +32,8 @@ import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
+import py.com.mojeda.service.ejb.utils.Base64Bytes;
+import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
 /**
  *
@@ -62,18 +68,136 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/BarriosManagerImpl")
     private BarriosManager barriosManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
     private ProfesionesManager profesionesManager;
 
     @Override
-    public Personas guardar(Personas usuario) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Personas guardar(Personas persona) throws Exception {
+        Personas ejPersona = new Personas();
+        ejPersona.setDocumento(persona.getDocumento());
+
+        ejPersona = this.get(ejPersona);
+
+        if (ejPersona != null) {
+
+            ejPersona.setPrimerNombre(persona.getPrimerNombre());
+            ejPersona.setSegundoNombre(persona.getSegundoNombre());
+            ejPersona.setPrimerApellido(persona.getPrimerApellido());
+            ejPersona.setSegundoApellido(persona.getSegundoApellido());
+            ejPersona.setEmail(persona.getEmail());
+            ejPersona.setSexo(persona.getSexo());
+            ejPersona.setEstadoCivil(persona.getEstadoCivil());
+            ejPersona.setNumeroHijos(persona.getNumeroHijos());
+            ejPersona.setNumeroDependientes(persona.getNumeroDependientes());
+            ejPersona.setSeparacionBienes(persona.getSeparacionBienes());
+            ejPersona.setTelefonoParticular(persona.getTelefonoParticular());
+            ejPersona.setTelefonoSecundario(persona.getTelefonoSecundario());
+            ejPersona.setTipoPersona(persona.getTipoPersona());
+            ejPersona.setDireccionParticular(persona.getDireccionParticular());
+            ejPersona.setFechaNacimiento(persona.getFechaNacimiento());
+            ejPersona.setDireccionDetallada(persona.getDireccionDetallada());
+            ejPersona.setObservacion(persona.getObservacion());
+            ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            ejPersona.setIdUsuarioModificacion(persona.getIdUsuarioModificacion());
+            ejPersona.setNacionalidad(new Nacionalidades(persona.getNacionalidad().getId()));
+            ejPersona.setPais(new Paises(persona.getPais().getId()));
+            ejPersona.setDepartamento(new DepartamentosPais(persona.getDepartamento().getId()));
+            ejPersona.setCiudad(new Ciudades(persona.getCiudad().getId()));
+            ejPersona.setBarrio((persona.getBarrio() != null && persona.getBarrio().getId() != null) ? new Barrios(persona.getBarrio().getId()) : null);
+            ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
+
+        } else {
+            persona.setActivo("S");
+            persona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            persona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+
+            this.save(persona);
+
+            ejPersona = new Personas();
+            ejPersona.setDocumento(persona.getDocumento());
+            ejPersona = this.get(ejPersona);
+        }
+
+        if (persona.getAvatar() != null
+                && persona.getAvatar().getValue() != null) {
+
+            Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
+            String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + persona.getAvatar().getFilename();
+            FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+            fos.write(Base64Bytes.decode(persona.getAvatar().getValue()));
+            fos.close();
+
+            ejPersona.setImagePath(CONTENT_PATH + path);
+        }
+
+        this.update(ejPersona);
+
+        return ejPersona;
     }
 
     @Override
-    public Personas editar(Personas usuario) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Personas editar(Personas persona) throws Exception {
+        Personas ejPersona = new Personas();
+        ejPersona.setDocumento(persona.getDocumento());
+
+        ejPersona = this.get(ejPersona);
+
+        if (ejPersona != null) {
+
+            ejPersona.setPrimerNombre(persona.getPrimerNombre());
+            ejPersona.setSegundoNombre(persona.getSegundoNombre());
+            ejPersona.setPrimerApellido(persona.getPrimerApellido());
+            ejPersona.setSegundoApellido(persona.getSegundoApellido());
+            ejPersona.setEmail(persona.getEmail());
+            ejPersona.setSexo(persona.getSexo());
+            ejPersona.setEstadoCivil(persona.getEstadoCivil());
+            ejPersona.setNumeroHijos(persona.getNumeroHijos());
+            ejPersona.setNumeroDependientes(persona.getNumeroDependientes());
+            ejPersona.setSeparacionBienes(persona.getSeparacionBienes());
+            ejPersona.setTelefonoParticular(persona.getTelefonoParticular());
+            ejPersona.setTelefonoSecundario(persona.getTelefonoSecundario());
+            ejPersona.setTipoPersona(persona.getTipoPersona());
+            ejPersona.setDireccionParticular(persona.getDireccionParticular());
+            ejPersona.setFechaNacimiento(persona.getFechaNacimiento());
+            ejPersona.setDireccionDetallada(persona.getDireccionDetallada());
+            ejPersona.setObservacion(persona.getObservacion());
+            ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            ejPersona.setIdUsuarioModificacion(persona.getIdUsuarioModificacion());
+            ejPersona.setNacionalidad(new Nacionalidades(persona.getNacionalidad().getId()));
+            ejPersona.setPais(new Paises(persona.getPais().getId()));
+            ejPersona.setDepartamento(new DepartamentosPais(persona.getDepartamento().getId()));
+            ejPersona.setCiudad(new Ciudades(persona.getCiudad().getId()));
+            ejPersona.setBarrio((persona.getBarrio() != null && persona.getBarrio().getId() != null) ? new Barrios(persona.getBarrio().getId()) : null);
+            ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
+
+        } else {
+            persona.setActivo("S");
+            persona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            persona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+
+            this.save(persona);
+
+            ejPersona = new Personas();
+            ejPersona.setDocumento(persona.getDocumento());
+            ejPersona = this.get(ejPersona);
+        }
+
+        if (persona.getAvatar() != null
+                && persona.getAvatar().getValue() != null) {
+
+            Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
+            String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + persona.getAvatar().getFilename();
+            FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
+            fos.write(Base64Bytes.decode(persona.getAvatar().getValue()));
+            fos.close();
+
+            ejPersona.setImagePath(CONTENT_PATH + path);
+        }
+
+        this.update(ejPersona);
+
+        return ejPersona;
     }
 
     @Override
@@ -86,11 +210,11 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
         Map<String, Object> persona = this.getAtributos(personas, atributos.split(","));
         if (persona != null) {
-            
+
             Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString())), "id,nombre,activo".split(","));
             persona.put("profesion", profesion);
             persona.remove("profesion.id");
-            
+
             Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
             persona.put("nacionalidad", nacionalidad);
             persona.remove("nacionalidad.id");

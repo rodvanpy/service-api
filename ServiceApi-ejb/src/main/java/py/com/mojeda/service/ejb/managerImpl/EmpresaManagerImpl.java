@@ -8,9 +8,19 @@ package py.com.mojeda.service.ejb.managerImpl;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import py.com.mojeda.service.ejb.entity.Barrios;
+import py.com.mojeda.service.ejb.entity.Ciudades;
+import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Paises;
+import py.com.mojeda.service.ejb.manager.BarriosManager;
+import py.com.mojeda.service.ejb.manager.CiudadesManager;
+import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
+import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.utils.Base64Bytes;
 import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
@@ -26,10 +36,23 @@ public class EmpresaManagerImpl extends GenericDaoImpl<Empresas, Long>
     protected Class<Empresas> getEntityBeanType() {
         return Empresas.class;
     }
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/PaisesManagerImpl")
+    private PaisesManager paisesManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/DepartamentosPaisManagerImpl")
+    private DepartamentosPaisManager departamentosPaisManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/CiudadesManagerImpl")
+    private CiudadesManager ciudadesManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/BarriosManagerImpl")
+    private BarriosManager barriosManager;
 
     @Override
-    public Empresas guardar(Empresas empresa) throws Exception {
+    public Map<String, Object> guardar(Empresas empresa) throws Exception {
         Empresas object = null;
+        Map<String, Object> model = null;
         if (empresa != null) {
 
             this.save(empresa);
@@ -48,13 +71,14 @@ public class EmpresaManagerImpl extends GenericDaoImpl<Empresas, Long>
 
                 this.update(object);
             }
+            model = this.getEmpresa(new Empresas(object.getId()));
         }
-        return object;
+        return model;
     }
 
     @Override
-    public Empresas editar(Empresas empresa) throws Exception {
-        Empresas object = null;
+    public Map<String, Object> editar(Empresas empresa) throws Exception {
+        Map<String, Object> object = null;
         if (empresa != null) {
             if (empresa.getAvatar() != null
                     && empresa.getAvatar().getValue() != null) {
@@ -68,8 +92,35 @@ public class EmpresaManagerImpl extends GenericDaoImpl<Empresas, Long>
             }
 
             this.update(empresa);
-            object = this.get(empresa);
+            
+            object = this.getEmpresa(new Empresas(empresa.getId()));
         }
         return object;
+    }
+
+    @Override
+    public Map<String, Object> getEmpresa(Empresas empresa) throws Exception {
+        String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,"
+                + "latitud,longitud,activo,pais.id,departamento.id,ciudad.id,barrio.id,imagePath";
+        Map<String, Object> model = this.getAtributos(empresa, atributos.split(","));
+        if (model != null) {
+            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(model.get("pais.id") == null ? "0" : model.get("pais.id").toString())), "id,nombre,activo".split(","));
+            model.put("pais", pais);
+            model.remove("pais.id");
+
+            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(model.get("departamento.id") == null ? "0" : model.get("departamento.id").toString())), "id,nombre,activo".split(","));
+            model.put("departamento", departamento);
+            model.remove("departamento.id");
+
+            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(model.get("ciudad.id") == null ? "0" : model.get("ciudad.id").toString())), "id,nombre,activo".split(","));
+            model.put("ciudad", ciudad);
+            model.remove("ciudad.id");
+
+            Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(model.get("barrio.id") == null ? "0" : model.get("barrio.id").toString())), "id,nombre,activo".split(","));
+            model.put("barrio", barrio);
+            model.remove("barrio.id");
+            
+        }
+        return model;
     }
 }

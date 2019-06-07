@@ -42,9 +42,9 @@ public class BarriosController extends BaseController {
 
     String atributos = "id,nombre,activo";
 
-    @GetMapping("/{id}/ciudad")
+    @GetMapping
     public @ResponseBody
-    ResponseListDTO listar(@ModelAttribute("id") Long id,
+    ResponseListDTO listar(@ModelAttribute("fkModel") Long id,
             @ModelAttribute("_search") boolean filtrar,
             @ModelAttribute("filters") String filtros,
             @ModelAttribute("page") Integer pagina,

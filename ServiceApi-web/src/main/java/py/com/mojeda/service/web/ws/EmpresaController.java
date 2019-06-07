@@ -368,7 +368,7 @@ public class EmpresaController extends BaseController {
         try {
             inicializarEmpresaManager();
 
-            Empresas model = empresaManager.get(id);
+            Map<String, Object> model = empresaManager.getEmpresa(new Empresas(id));                      
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -454,10 +454,10 @@ public class EmpresaController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            model = empresaManager.guardar(model);
+            Map<String, Object> empresaMap = empresaManager.guardar(model);
 
             response.setMessage("La empresa ha sido guardada");
-            response.setModel(model);
+            response.setModel(empresaMap);
             response.setStatus(200);
 
         } catch (Exception e) {
@@ -547,9 +547,9 @@ public class EmpresaController extends BaseController {
             model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
 
-            model = empresaManager.editar(model);
+            Map<String, Object> empresaMap = empresaManager.editar(model);
 
-            response.setModel(model);
+            response.setModel(empresaMap);
             response.setStatus(200);
             response.setMessage("La empresa ha sido guardada");
         } catch (Exception e) {

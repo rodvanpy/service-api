@@ -93,86 +93,27 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/BarriosManagerImpl")
     private BarriosManager barriosManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
     private ProfesionesManager profesionesManager;
 
     @Override
-    public Usuarios guardar(Usuarios usuario) throws Exception {
-        Usuarios object = null;
+    public Map<String, Object> guardar(Usuarios usuario) throws Exception {
+        Map<String, Object> object = null;
         Documentos ejDocumentos = null;
         if (usuario != null
                 && usuario.getPersona() != null) {
 
-            Personas ejPersona = new Personas();
-            ejPersona.setDocumento(usuario.getPersona().getDocumento());
+            usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
 
-            ejPersona = personaManager.get(ejPersona);
+            Personas ejPersona = personaManager.guardar(usuario.getPersona());
 
-            if (ejPersona != null) {
-
-                ejPersona.setPrimerNombre(usuario.getPersona().getPrimerNombre());
-                ejPersona.setSegundoNombre(usuario.getPersona().getSegundoNombre());
-                ejPersona.setPrimerApellido(usuario.getPersona().getPrimerApellido());
-                ejPersona.setSegundoApellido(usuario.getPersona().getSegundoApellido());
-                ejPersona.setEmail(usuario.getPersona().getEmail());
-                ejPersona.setSexo(usuario.getPersona().getSexo());
-                ejPersona.setEstadoCivil(usuario.getPersona().getEstadoCivil());
-                ejPersona.setNumeroHijos(usuario.getPersona().getNumeroHijos());
-                ejPersona.setNumeroDependientes(usuario.getPersona().getNumeroDependientes());
-                ejPersona.setSeparacionBienes(usuario.getPersona().getSeparacionBienes());
-                ejPersona.setTelefonoParticular(usuario.getPersona().getTelefonoParticular());
-                ejPersona.setTelefonoSecundario(usuario.getPersona().getTelefonoSecundario());
-                ejPersona.setTipoPersona(usuario.getPersona().getTipoPersona());
-                ejPersona.setDireccionParticular(usuario.getPersona().getDireccionParticular());
-                ejPersona.setFechaNacimiento(usuario.getPersona().getFechaNacimiento());
-                ejPersona.setDireccionDetallada(usuario.getPersona().getDireccionDetallada());
-                ejPersona.setObservacion(usuario.getPersona().getObservacion());
-                ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                ejPersona.setNacionalidad(new Nacionalidades(usuario.getPersona().getNacionalidad().getId()));
-                ejPersona.setPais(new Paises(usuario.getPersona().getPais().getId()));
-                ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
-                ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
-                ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getBarrio().getId()) : null);
-                ejPersona.setProfesion((usuario.getPersona().getProfesion() != null && usuario.getPersona().getProfesion().getId() != null) ? new Profesiones(usuario.getPersona().getProfesion().getId()) : null);
-
-            } else {
-
-                usuario.getPersona().setActivo("S");
-                usuario.getPersona().setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                usuario.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                usuario.getPersona().setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
-                usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-
-                personaManager.save(usuario.getPersona());
-
-                ejPersona = personaManager.get(usuario.getPersona());
-
-            }
-            
             usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
             usuario.setAlias(usuario.getAlias().toUpperCase());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.save(usuario);
-
-            object = this.get(usuario);
-
-            if (usuario.getPersona().getAvatar() != null
-                    && usuario.getPersona().getAvatar().getValue() != null) {
-
-                Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
-                String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
-                FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
-                fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                fos.close();
-
-                ejPersona.setImagePath(CONTENT_PATH + path);
-            }
-
-            personaManager.update(ejPersona);
 
             UsuarioDepartamentos usuarioDepartamentos;
             for (Map<String, Object> rpm : usuario.getDepartamentos()) {
@@ -182,85 +123,31 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
                 usuarioDepartamentosManager.save(usuarioDepartamentos);
             }
+
+            Usuarios model = new Usuarios();
+            model.setAlias(usuario.getAlias());
+
+            object = this.getUsuario(model);
         }
         return object;
     }
 
     @Override
-    public Usuarios editar(Usuarios usuario) throws Exception {
-        Usuarios object = null;
+    public Map<String, Object> editar(Usuarios usuario) throws Exception {
+        Map<String, Object> object = null;
         Documentos ejDocumentos = null;
         if (usuario != null
                 && usuario.getPersona() != null) {
+            usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
 
-            Personas ejPersona = new Personas();
-            ejPersona.setDocumento(usuario.getPersona().getDocumento());
+            Personas ejPersona = personaManager.editar(usuario.getPersona());
 
-            ejPersona = personaManager.get(ejPersona);
-
-            if (ejPersona != null) {
-
-                ejPersona.setPrimerNombre(usuario.getPersona().getPrimerNombre());
-                ejPersona.setSegundoNombre(usuario.getPersona().getSegundoNombre());
-                ejPersona.setPrimerApellido(usuario.getPersona().getPrimerApellido());
-                ejPersona.setSegundoApellido(usuario.getPersona().getSegundoApellido());
-                ejPersona.setEmail(usuario.getPersona().getEmail());
-                ejPersona.setSexo(usuario.getPersona().getSexo());
-                ejPersona.setEstadoCivil(usuario.getPersona().getEstadoCivil());
-                ejPersona.setNumeroHijos(usuario.getPersona().getNumeroHijos());
-                ejPersona.setNumeroDependientes(usuario.getPersona().getNumeroDependientes());
-                ejPersona.setSeparacionBienes(usuario.getPersona().getSeparacionBienes());
-                ejPersona.setTelefonoParticular(usuario.getPersona().getTelefonoParticular());
-                ejPersona.setTelefonoSecundario(usuario.getPersona().getTelefonoSecundario());
-                ejPersona.setTipoPersona(usuario.getPersona().getTipoPersona());
-                ejPersona.setDireccionParticular(usuario.getPersona().getDireccionParticular());
-                ejPersona.setFechaNacimiento(usuario.getPersona().getFechaNacimiento());
-                ejPersona.setDireccionDetallada(usuario.getPersona().getDireccionDetallada());
-                ejPersona.setObservacion(usuario.getPersona().getObservacion());
-                ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                ejPersona.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                ejPersona.setNacionalidad(new Nacionalidades(usuario.getPersona().getNacionalidad().getId()));
-                ejPersona.setPais(new Paises(usuario.getPersona().getPais().getId()));
-                ejPersona.setDepartamento(new DepartamentosPais(usuario.getPersona().getDepartamento().getId()));
-                ejPersona.setCiudad(new Ciudades(usuario.getPersona().getCiudad().getId()));
-                ejPersona.setBarrio((usuario.getPersona().getBarrio() != null && usuario.getPersona().getBarrio().getId() != null) ? new Barrios(usuario.getPersona().getBarrio().getId()) : null);
-                ejPersona.setProfesion((usuario.getPersona().getProfesion() != null && usuario.getPersona().getProfesion().getId() != null) ? new Profesiones(usuario.getPersona().getProfesion().getId()) : null);
-
-            } else {
-
-                usuario.getPersona().setActivo("S");
-                usuario.getPersona().setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                usuario.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                usuario.getPersona().setIdUsuarioCreacion(usuario.getIdUsuarioCreacion());
-                usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                
-
-                personaManager.save(usuario.getPersona());
-
-                ejPersona = personaManager.get(usuario.getPersona());
-
-            }
-
-            if (usuario.getPersona().getAvatar() != null
-                    && usuario.getPersona().getAvatar().getValue() != null) {
-
-                Files.createDirectories(Paths.get(CONTENT_PATH + ejPersona.getClassName() + "/" + ejPersona.getId()));
-                String path = ejPersona.getClassName() + "/" + ejPersona.getId() + "/" + usuario.getPersona().getAvatar().getFilename();
-                FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
-                fos.write(Base64Bytes.decode(usuario.getPersona().getAvatar().getValue()));
-                fos.close();
-
-                ejPersona.setImagePath(CONTENT_PATH + path);
-            }
-            
             usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
             usuario.setAlias(usuario.getAlias().toUpperCase());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.update(usuario);
-
-            personaManager.update(ejPersona);
 
             UsuarioDepartamentos usuarioDepartamentos = new UsuarioDepartamentos();
             usuarioDepartamentos.setUsuario(usuario);
@@ -278,8 +165,12 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
                 usuarioDepartamentosManager.save(usuarioDepartamentos);
             }
 
-            object = this.get(usuario);
+            Usuarios model = new Usuarios();
+            model.setAlias(usuario.getAlias());
+
+            object = this.getUsuario(model);
         }
+
         return object;
     }
 
@@ -290,11 +181,11 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
         if (model != null) {
             Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
                     "id,nacionalidad.id,profesion.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud,activo".split(","));
-            
+
             Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString())), "id,nombre,activo".split(","));
             persona.put("profesion", profesion);
             persona.remove("profesion.id");
-            
+
             Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
             persona.put("nacionalidad", nacionalidad);
             persona.remove("nacionalidad.id");
@@ -340,10 +231,10 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             List<Map<String, Object>> departamentos = usuarioDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","), true);
 
             for (Map<String, Object> rpm : departamentos) {
-                rpm.put("id", Long.parseLong(rpm.get("departamento.id").toString()));
-                rpm.put("alias", rpm.get("departamento.alias").toString());
-                rpm.put("nombreArea", rpm.get("departamento.nombreArea").toString());
-                rpm.put("descripcionArea", rpm.get("departamento.descripcionArea").toString());
+                rpm.put("id", rpm.get("departamento.id"));
+                rpm.put("alias", rpm.get("departamento.alias"));
+                rpm.put("nombreArea", rpm.get("departamento.nombreArea"));
+                rpm.put("descripcionArea", rpm.get("departamento.descripcionArea"));
 
                 rpm.remove("departamento.id");
                 rpm.remove("departamento.alias");
