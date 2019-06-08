@@ -50,7 +50,7 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
                     
                     this.update(ejIngresosEgresos);
                 } else {
-                    this.save(ejIngresosEgresos);
+                    this.save(ingresosEgresos);
                 }
             } else {
 
@@ -90,7 +90,7 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
                     
                     this.update(ejIngresosEgresos);
                 } else {
-                    this.save(ejIngresosEgresos);
+                    this.save(ingresosEgresos);
                 }
             } else {
 

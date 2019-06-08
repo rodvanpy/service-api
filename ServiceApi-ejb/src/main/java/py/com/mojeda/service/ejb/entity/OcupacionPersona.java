@@ -75,7 +75,7 @@ public class OcupacionPersona extends Base {
     @Column(name = "INGRESOS_MENSUALES")
     private BigDecimal ingresosMensuales;
 
-    @JoinColumn(name = "ID_CLIENTE", referencedColumnName = "id")
+    @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Personas persona;
 

@@ -113,13 +113,12 @@ public class ClienteController extends BaseController {
                 Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(rpm.get("persona.id").toString())),
                         "primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email".split(","));
                 
-                Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("persona.sucursal.id").toString())),
+                Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
                 "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
                 
                 rpm.put("sucursal", sucursal);
                 rpm.put("persona", persona);
                 rpm.remove("persona.id");
-                rpm.remove("rol.id");
                 rpm.remove("sucursal.id");
             }
             
