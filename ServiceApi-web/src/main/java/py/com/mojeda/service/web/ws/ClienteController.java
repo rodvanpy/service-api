@@ -192,6 +192,7 @@ public class ClienteController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         Clientes ejUsuario = new Clientes();
+        Gson gson = new Gson();
         try {
             inicializarClientesManager();
             
@@ -225,6 +226,8 @@ public class ClienteController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
+            
+            logger.info(gson.toJson(model));
             
             Map<String,Object> modelMap = clientesManager.guardar(model);
             

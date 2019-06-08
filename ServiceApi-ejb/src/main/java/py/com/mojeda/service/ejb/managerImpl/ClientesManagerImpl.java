@@ -31,14 +31,18 @@ import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
+import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
+import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
+import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
+import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
@@ -63,35 +67,21 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     @EJB(mappedName = "java:app/ServiceApi-ejb/DocumentoManagerImpl")
     private DocumentoManager documentoManager;
 
-    @EJB(mappedName = "java:app/ServiceApi-ejb/TipoDocumentosManagerImpl")
-    private TipoDocumentosManager tipoDocumentosManager;
-
     @EJB(mappedName = "java:app/ServiceApi-ejb/SucursalManagerImpl")
     private SucursalManager sucursalManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/UsuarioDepartamentosManagerImpl")
-    private UsuarioDepartamentosManager usuarioDepartamentosManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/EmpresaManagerImpl")
-    private EmpresaManager empresaManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/RolManagerImpl")
-    private RolManager rolManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/NacionalidadesManagerImpl")
-    private NacionalidadesManager nacionalidadesManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/PaisesManagerImpl")
-    private PaisesManager paisesManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/DepartamentosPaisManagerImpl")
-    private DepartamentosPaisManager departamentosPaisManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/CiudadesManagerImpl")
-    private CiudadesManager ciudadesManager;
-
-    @EJB(mappedName = "java:app/ServiceApi-ejb/BarriosManagerImpl")
-    private BarriosManager barriosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/BienesManagerImpl")
+    private BienesManager bienesManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/OcupacionPersonaManagerImpl")
+    private OcupacionPersonaManager ocupacionPersonaManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/ReferenciaManagerImpl")
+    private ReferenciaManager referenciaManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/IngresosEgresosManagerImpl")
+    private IngresosEgresosManager ingresosEgresosManager;
+  
 
     @Override
     public Map<String, Object> guardar(Clientes cliente) throws Exception {
@@ -118,11 +108,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
-                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
                 }                
             }
             
@@ -135,11 +127,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
-                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
                 }                
             }
             
@@ -152,11 +146,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
-                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }                
             }
             
@@ -169,11 +165,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
-                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }                
             }
             
@@ -186,11 +184,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
-                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
                 }                
             }
             
@@ -203,11 +203,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
-                    
+                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
                 }                
             }
 
@@ -223,15 +225,132 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
         Documentos ejDocumentos = null;
         if (cliente != null
                 && cliente.getPersona() != null) {
+
             cliente.getPersona().setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+            cliente.getPersona().setIdUsuarioCreacion(cliente.getIdUsuarioCreacion());
 
             Personas ejPersona = personaManager.editar(cliente.getPersona());
-            
+
             cliente.setPersona(new Personas(ejPersona.getId()));
 
             this.update(cliente);
+            
+            for (Bienes rpm : cliente.getBienesInmuebles()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                }                
+            }
+            
+            for (Bienes rpm : cliente.getBienesVehiculo()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                }                
+            }
+            
+            for (IngresosEgresos rpm : cliente.getEgresos()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                }                
+            }
+            
+            for (IngresosEgresos rpm : cliente.getIngresos()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                }                
+            }
+            
+            for (OcupacionPersona rpm : cliente.getOcupaciones()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
+                }                
+            }
+            
+            for (Referencias rpm : cliente.getReferencias()) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                }                
+            }
 
             object = this.getCliente(cliente);
+           
         }
         return object;
     }
@@ -243,7 +362,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
         if (model != null) {
             Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())));           
 
-            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("persona.sucursal.id").toString())),
+            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
                     "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
 
             model.put("sucursal", sucursal);

@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Referencias;
 
@@ -18,4 +19,9 @@ import py.com.mojeda.service.ejb.entity.Referencias;
 @Local
 public interface ReferenciaManager extends GenericDao<Referencias, Long>{   
     
+    public Map<String, Object> guardarReferencia(Referencias referencias) throws Exception;
+    
+    public Map<String, Object> editarReferencia(Referencias referencias) throws Exception;
+    
+    public Map<String, Object> getReferencia(Referencias referencias) throws Exception;
 }

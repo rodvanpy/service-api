@@ -9,6 +9,9 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.Bienes;
+import py.com.mojeda.service.ejb.entity.Ciudades;
+import py.com.mojeda.service.ejb.entity.DepartamentosPais;
+import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
@@ -45,7 +48,20 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     public Map<String, Object> guardarBienes(Bienes bienes) throws Exception {
         Map<String, Object> object = null;
         try {
-            
+            if(bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0){
+                if(bienes.getId() != null){
+                    this.update(bienes);
+                }else{
+                    this.save(bienes);
+                }
+            }else{
+                if(bienes.getId() != null){
+                    this.update(bienes);
+                }else{
+                    this.save(bienes);
+                }
+            }
+            object = this.getBienes(bienes);
         } catch (Exception e) {
             logger.error("Error al guardar registro", e);
         }
@@ -56,15 +72,46 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     public Map<String, Object> editarBienes(Bienes bienes) throws Exception {
         Map<String, Object> object = null;
         try {
-            
+            if(bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0){
+                if(bienes.getId() != null){
+                    this.update(bienes);
+                }else{
+                    this.save(bienes);
+                }
+            }else{
+                if(bienes.getId() != null){
+                    this.update(bienes);
+                }else{
+                    this.save(bienes);
+                }
+            }
+            object = this.getBienes(bienes);
         } catch (Exception e) {
-            logger.error("Error al guardar editar", e);
+            logger.error("Error al  editar registro", e);
         }
         return object;
     }
 
     @Override
     public Map<String, Object> getBienes(Bienes bienes) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,"
+                + "lugarHipoteca,fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,"
+                + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,activo";
+
+        Map<String, Object> bienMap = this.getAtributos(bienes, atributos.split(","));
+        if (bienMap != null) {
+            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(bienMap.get("pais.id") == null ? "0" : bienMap.get("pais.id").toString())), "id,nombre,activo".split(","));
+            bienMap.put("pais", pais);
+            bienMap.remove("pais.id");
+
+            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(bienMap.get("departamento.id") == null ? "0" : bienMap.get("departamento.id").toString())), "id,nombre,activo".split(","));
+            bienMap.put("departamento", departamento);
+            bienMap.remove("departamento.id");
+
+            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(bienMap.get("ciudad.id") == null ? "0" : bienMap.get("ciudad.id").toString())), "id,nombre,activo".split(","));
+            bienMap.put("ciudad", ciudad);
+            bienMap.remove("ciudad.id");
+        }
+        return bienMap;
     }
 }
