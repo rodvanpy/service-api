@@ -209,8 +209,12 @@ public class ClienteController extends BaseController {
             Sucursales ejSucursales = new Sucursales();
             ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
            
+            Personas ejPersona = new Personas();
+            ejPersona.setDocumento(model.getPersona().getDocumento());
+            
             Clientes ejCliente = new Clientes();
             ejCliente.setSucursal(ejSucursales);
+            ejCliente.setPersona(ejPersona);
             
             Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente,"id".split(","));
             
