@@ -353,12 +353,13 @@ public class SucursalController extends BaseController {
                 rpm.setSucursal(sucursal);
                 rpm.setNombreArea(rpm.getNombreArea().toUpperCase());
                 rpm.setAlias(rpm.getAlias().toUpperCase());
+                
                 departamentosSucursalManager.save(rpm);
             }
 
             response.setStatus(200);
             response.setMessage("La sucursal ha sido guardada");
-            response.setModel(sucursalManager.get(sucursal));
+            response.setModel(sucursalManager.getSucursal(sucursal));
 
         } catch (Exception e) {
             logger.error("Error: ", e);
@@ -442,6 +443,7 @@ public class SucursalController extends BaseController {
                     departamentosSucursalManager.save(rpm);
                 }
             }
+            response.setModel(sucursalManager.getSucursal(new Sucursales(id)));
             response.setStatus(200);
             response.setMessage("La sucursal ha sido guardada");
         } catch (Exception e) {

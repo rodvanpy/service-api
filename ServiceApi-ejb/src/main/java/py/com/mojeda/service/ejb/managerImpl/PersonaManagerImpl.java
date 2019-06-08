@@ -244,27 +244,5 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
         }
         return persona;
     }
-  
-
-    @Override
-    public Map<String, Object> guardarReferencias(Referencias referencia) throws Exception {
-        Map<String, Object> object = null;
-        try {
-
-        } catch (Exception e) {
-        }
-        return object;
-    }
-
-    @Override
-    public Map<String, Object> guardarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
-        Map<String, Object> object = null;
-        try {
-
-        } catch (Exception e) {
-        }
-        return object;
-    }
-
     
 }

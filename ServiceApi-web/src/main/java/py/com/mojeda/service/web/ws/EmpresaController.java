@@ -211,9 +211,9 @@ public class EmpresaController extends BaseController {
                 ejDepSucursal.setActivo("S");
                 ejDepSucursal.setSucursal(new Sucursales(Long.parseLong(rpm.get("id").toString())));
                 List<Map<String, Object>> listMapDepart = departamentosSucursalManager.listAtributos(ejDepSucursal, "id,alias,nombreArea,descripcionArea,activo".split(","));
-                if (listMapDepart != null) {
-                    rpm.put("departamentos", listMapDepart);
-                }
+                
+                rpm.put("departamentos", listMapDepart);
+                
                 Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(rpm.get("pais.id") == null ? "0" : rpm.get("pais.id").toString())), "id,nombre,activo".split(","));
                 rpm.put("pais", pais);
                 rpm.remove("pais.id");
@@ -250,6 +250,7 @@ public class EmpresaController extends BaseController {
     /**
      * Mapping para el metodo POST de la vista crear.(crear Empresa)
      *
+     * @param id
      * @param model entidad Usuario recibida de la vista
      * @param errors
      * @return
@@ -342,7 +343,7 @@ public class EmpresaController extends BaseController {
 
             response.setStatus(200);
             response.setMessage("La sucursal ha sido guardada");
-            response.setModel(sucursalManager.get(sucursal));
+            response.setModel(sucursalManager.getSucursal(sucursal));
 
         } catch (Exception e) {
             logger.error("Error: ", e);

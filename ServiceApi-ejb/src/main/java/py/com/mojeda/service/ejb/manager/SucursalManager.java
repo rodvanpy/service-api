@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 
@@ -18,4 +19,9 @@ import py.com.mojeda.service.ejb.entity.Sucursales;
 @Local
 public interface SucursalManager extends GenericDao<Sucursales, Long>{   
     
+    public Map<String, Object> guardar(Sucursales sucursal) throws Exception;
+    
+    public Map<String, Object> editar(Sucursales sucursal) throws Exception;
+        
+    public Map<String, Object> getSucursal(Sucursales sucursal) throws Exception;
 }
