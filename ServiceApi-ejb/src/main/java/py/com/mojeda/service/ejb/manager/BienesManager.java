@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.List;
 import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Bienes;
@@ -23,5 +24,7 @@ public interface BienesManager extends GenericDao<Bienes, Long>{
     
     public Map<String, Object> editarBienes(Bienes bien) throws Exception;
     
-    public Map<String, Object> getBienes(Bienes bien) throws Exception;
+    public Map<String, Object> getBienes(Bienes bien);
+    
+    public List<Map<String, Object>> getListBienes(Bienes bien);
 }

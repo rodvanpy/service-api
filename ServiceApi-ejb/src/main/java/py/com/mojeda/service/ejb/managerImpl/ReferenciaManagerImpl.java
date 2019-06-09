@@ -6,6 +6,8 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -13,7 +15,6 @@ import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.TipoReferencias;
 import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 import py.com.mojeda.service.ejb.manager.TipoReferenciaManager;
-import static py.com.mojeda.service.ejb.managerImpl.OcupacionPersonaManagerImpl.logger;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 
 /**
@@ -135,6 +136,21 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
             ocupacion.remove("tipoReferencia.id");
         }
         return ocupacion;
+    }
+
+    @Override
+    public List<Map<String, Object>> getListReferencias(Referencias referencias) {
+        List<Map<String, Object>> object = new ArrayList<>();
+        try {
+            List<Map<String, Object>> inmueblesMap = this.listAtributos(referencias, "id".split(","));
+            for(Map<String, Object> rpm: inmueblesMap){
+                Map<String, Object> map = this.getReferencia(new Referencias(Long.parseLong(rpm.get("id").toString())));
+                object.add(map);
+            }
+        } catch (Exception e) {
+            logger.error("Error al  obtener registros", e);
+        }
+        return object;
     }
 
 }

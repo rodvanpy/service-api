@@ -6,14 +6,18 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import py.com.mojeda.service.ejb.entity.Bienes;
 import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
+import static py.com.mojeda.service.ejb.managerImpl.BienesManagerImpl.logger;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 
 /**
@@ -167,6 +171,21 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
 
         } catch (Exception e) {
             logger.error("Error al editar ocupacion", e);
+        }
+        return object;
+    }
+
+    @Override
+    public List<Map<String, Object>> getListOcupaciones(OcupacionPersona ocupacionPersona) {
+        List<Map<String, Object>> object = new ArrayList<>();
+        try {
+            List<Map<String, Object>> inmueblesMap = this.listAtributos(ocupacionPersona, "id".split(","));
+            for(Map<String, Object> rpm: inmueblesMap){
+                Map<String, Object> map = this.getOcupacion(new OcupacionPersona(Long.parseLong(rpm.get("id").toString())));
+                object.add(map);
+            }
+        } catch (Exception e) {
+            logger.error("Error al  obtener registros", e);
         }
         return object;
     }

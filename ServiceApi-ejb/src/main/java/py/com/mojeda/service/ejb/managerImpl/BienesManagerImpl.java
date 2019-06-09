@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -93,7 +95,7 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     @Override
-    public Map<String, Object> getBienes(Bienes bienes) throws Exception {
+    public Map<String, Object> getBienes(Bienes bienes){
         String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,"
                 + "lugarHipoteca,fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,"
                 + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,activo";
@@ -113,5 +115,21 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
             bienMap.remove("ciudad.id");
         }
         return bienMap;
+    }
+
+    @Override
+    public List<Map<String, Object>> getListBienes(Bienes bienes){
+        List<Map<String, Object>> object = new ArrayList<>();
+        try {
+            List<Map<String, Object>> inmueblesMap = this.listAtributos(bienes, "id".split(","));
+            for(Map<String, Object> rpm: inmueblesMap){
+                Map<String, Object> map = this.getBienes(new Bienes(Long.parseLong(rpm.get("id").toString())));
+                object.add(map);
+            }
+        } catch (Exception e) {
+            logger.error("Error al  obtener registros", e);
+        }
+        return object;
+        
     }
 }

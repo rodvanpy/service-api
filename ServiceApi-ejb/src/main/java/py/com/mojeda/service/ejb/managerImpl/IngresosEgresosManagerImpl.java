@@ -6,6 +6,8 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -127,5 +129,20 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
             ingresosEgresosMap.remove("tipoIngresosEgresos.id");
         }
         return ingresosEgresosMap;
+    }
+
+    @Override
+    public List<Map<String, Object>> getListIngresosEgresos(IngresosEgresos ingresosEgresos) {
+        List<Map<String, Object>> object = new ArrayList<>();
+        try {
+            List<Map<String, Object>> inmueblesMap = this.listAtributos(ingresosEgresos, "id".split(","));
+            for(Map<String, Object> rpm: inmueblesMap){
+                Map<String, Object> map = this.getIngresosEgresos(new IngresosEgresos(Long.parseLong(rpm.get("id").toString())));
+                object.add(map);
+            }
+        } catch (Exception e) {
+            logger.error("Error al  obtener registros", e);
+        }
+        return object;
     }
 }

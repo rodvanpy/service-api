@@ -20,10 +20,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-
-import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
@@ -80,6 +76,14 @@ public class Clientes extends Base{
      */
     public Clientes(Long id) {
             this.setId(id);
+    }
+    
+    /**
+     * @param personas
+     *            el id de Usuario
+     */
+    public Clientes(Personas personas) {
+            this.setPersona(personas);
     }
     
     /**
