@@ -52,6 +52,10 @@ public class TipoIngresosEgresos extends Base{
     public TipoIngresosEgresos(Long id) {
             this.setId(id);
     }
+    
+    public TipoIngresosEgresos(String tipo) {
+            this.setTipo(tipo);
+    }
 
     /**
      * @return the id

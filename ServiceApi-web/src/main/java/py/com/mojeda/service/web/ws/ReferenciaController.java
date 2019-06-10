@@ -15,15 +15,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Bienes;
+import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Referencias;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.TipoReferencias;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -39,9 +41,12 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @RequestMapping(value = "/referencias")
 public class ReferenciaController extends BaseController {
     
+    String atributos = "id,nombreContacto,telefono,telefonoCelular,tipoReferencia.id,activo";
+    
     @GetMapping
     public @ResponseBody
-    ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
+    ResponseListDTO listar(@ModelAttribute("fkModel") Long id,
+            @ModelAttribute("_search") boolean filtrar,
             @ModelAttribute("filters") String filtros,
             @ModelAttribute("page") Integer pagina,
             @ModelAttribute("rows") Integer cantidad,
@@ -53,9 +58,14 @@ public class ReferenciaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         Referencias model = new Referencias();
+        model.setPersona(new Personas(id));
+        model.setActivo("S");
+        
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarReferenciaManager();
+            inicializarTipoReferenciaManager();
+            
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -92,9 +102,13 @@ public class ReferenciaController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = referenciaManager.listAtributos(model, "id".split(","), todos, inicio, cantidad,
+            listMapGrupos = referenciaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
+            
+            for(Map<String, Object> rpc: listMapGrupos){
+                rpc.put("tipoReferencia", tipoReferenciaManager.getAtributos(new TipoReferencias(Long.parseLong(rpc.get("tipoReferencia.id").toString())), "id,nombre".split(",")));
+            }
             
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
@@ -106,9 +120,12 @@ public class ReferenciaController extends BaseController {
             retorno.setTotal(totalPaginas + 1);
             retorno.setRows(listMapGrupos);
             retorno.setPage(pagina);
-
+            retorno.setStatus(200);
+            retorno.setMessage("OK");
         } catch (Exception e) {
             logger.error("Error: ",e);
+            retorno.setStatus(500);
+            retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
@@ -129,7 +146,7 @@ public class ReferenciaController extends BaseController {
         try {
             inicializarReferenciaManager();
                         
-            Referencias model = referenciaManager.get(id);
+            Map<String, Object> model = referenciaManager.getReferencia(new Referencias(id));
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -238,6 +255,38 @@ public class ReferenciaController extends BaseController {
         return response;
     }
     
-    
+    /**
+     * Mapping para el metodo DELETE de la vista.(eliminar Referencias)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO deleteObject(
+            @ModelAttribute("id") Long id) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarReferenciaManager();
+
+            Referencias model = referenciaManager.get(id);
+            model.setActivo("N");
+            model.setIdUsuarioEliminacion(userDetail.getId());
+            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+
+            referenciaManager.update(model);
+
+            response.setModel(model);
+            response.setStatus(200);
+            response.setMessage("Registro eliminado con exito.");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
     
 }

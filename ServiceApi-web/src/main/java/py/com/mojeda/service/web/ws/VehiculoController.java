@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,29 +22,35 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Clientes;
-import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Bienes;
+import py.com.mojeda.service.ejb.entity.Ciudades;
+import py.com.mojeda.service.ejb.entity.DepartamentosPais;
+import py.com.mojeda.service.ejb.entity.IngresosEgresos;
+import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Personas;
-import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
 import py.com.mojeda.service.web.utils.ReglaDTO;
+import static py.com.mojeda.service.web.ws.BaseController.logger;
 
 /**
  *
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/clientes")
-public class ClienteController extends BaseController {
-    
-    String atributos = "id,persona.id,sucursal.id,activo";
-    
+@RequestMapping(value = "/vehiculos")
+public class VehiculoController extends BaseController {
+
+    String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,lugarHipoteca"
+            + ",fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,activo";
+
     @GetMapping
     public @ResponseBody
-    ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
+    ResponseListDTO listar(@ModelAttribute("fkModel") Long id,
+            @ModelAttribute("_search") boolean filtrar,
             @ModelAttribute("filters") String filtros,
             @ModelAttribute("page") Integer pagina,
             @ModelAttribute("rows") Integer cantidad,
@@ -55,21 +60,20 @@ public class ClienteController extends BaseController {
 
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        
-        //Buscar por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-        
-        Clientes model = new Clientes();
+
+        Bienes model = new Bienes();
         model.setActivo("S");
-        model.setSucursal(ejSucursales);
-        
+        model.setTipoBien("VEHICULO");
+        model.setPersona(new Personas(id));
+
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarClientesManager();
-            inicializarPersonaManager();
-            inicializarSucursalManager();
-            
+            inicializarBienesManager();
+            inicializarPaisesManager();
+            inicializarBarriosManager();
+            inicializarCiudadesManager();
+            inicializarDepartamentosPaisManager();
+
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -96,7 +100,7 @@ public class ClienteController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(clientesManager.list(model).size() + "");
+                total = Long.parseLong(bienesManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -106,28 +110,15 @@ public class ClienteController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = clientesManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = bienesManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
-            for(Map<String, Object> rpm: listMapGrupos){
-                Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(rpm.get("persona.id").toString())),
-                        "primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email".split(","));
-                
-                Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
-                "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-                
-                rpm.put("sucursal", sucursal);
-                rpm.put("persona", persona);
-                rpm.remove("persona.id");
-                rpm.remove("sucursal.id");
-            }
-            
+
+
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
-            
+
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
             retorno.setRecords(total);
@@ -136,18 +127,18 @@ public class ClienteController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
     }
-    
+
     /**
-     * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Persona)
      *
      * @param id de la entidad
      * @return
@@ -155,103 +146,94 @@ public class ClienteController extends BaseController {
     @GetMapping("/{id}")
     public @ResponseBody
     ResponseDTO getObject(
-            @ModelAttribute("id") Long id) {        
+            @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarClientesManager();
-            
-            Map<String, Object> model = clientesManager.getCliente(new Clientes(id));            
-            
+            inicializarBienesManager();
+
+            Map<String, Object> model = bienesManager.getBienes(new Bienes(id));
+
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-       
 
     /**
-     * Mapping para el metodo POST de la vista crear.(crear Usuario)
+     * Mapping para el metodo POST de la vista crear.(crear Persona)
      *
-     * @param model entidad Usuario recibida de la vista
+     * @param model entidad Persona recibida de la vista
      * @param errors
      * @return
      */
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Clientes model,
+            @RequestBody @Valid Bienes model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
-        Clientes ejUsuario = new Clientes();
-        Gson gson = new Gson();
+        IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarClientesManager();
-            
-            if(errors.hasErrors()){
-                
-                response.setStatus(400);
-                response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
-                return response;
-            }
-            //Buscar cliente por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-           
-            Personas ejPersona = new Personas();
-            ejPersona.setDocumento(model.getPersona().getDocumento());
-            
-            Clientes ejCliente = new Clientes();
-            ejCliente.setSucursal(ejSucursales);
-            ejCliente.setPersona(ejPersona);
-            
-            Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente,"id".split(","));
-            
-            if(usuarioMaps != null){
-                response.setStatus(205);
-                response.setMessage("Ya existe un cliente con el mismo documento.");                          
-                return response;
-            }
-            
-            model.setSucursal(new Sucursales(userDetail.getIdSusursal()));
-            model.setActivo("S");
-            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioCreacion(userDetail.getId());
-            model.setIdUsuarioModificacion(userDetail.getId());
-            
-            logger.info(gson.toJson(model));
-            
-            Map<String,Object> modelMap = clientesManager.guardar(model);
-            
-            response.setModel(modelMap);
+            inicializarIngresosEgresosManager();
+
+//            if(errors.hasErrors()){
+//                
+//                response.setStatus(400);
+//                response.setMessage(errors.getAllErrors()
+//				.stream()
+//				.map(x -> x.getDefaultMessage())
+//				.collect(Collectors.joining(",")));
+//                return response;
+//            }
+//
+//            Personas ejPersona = new Personas();
+//            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));        
+//            ejPersona.setDocumento(model.getDocumento());
+//            
+//            Map<String, Object> personaMaps = ocupacionPersonaManager.getLike(ejPersona,"id".split(","));
+//            
+//            if(personaMaps != null){
+//                response.setStatus(205);
+//                response.setMessage("Ya existe una persona con el mismo documento.");                          
+//                return response;
+//            }
+//            
+//            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+//            model.setActivo("S");
+//            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+//            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+//            model.setIdUsuarioCreacion(userDetail.getId());
+//            model.setIdUsuarioModificacion(userDetail.getId());
+//            
+//            //model = usuarioManager.guardar(model);
+//            
+//            response.setModel(model);
             response.setStatus(200);
-            response.setMessage("Registro creado con exito");
+            response.setMessage("Persona creado/a con exito");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
-     * Mapping para el metodo PUT de la vista actualizar.(actualizar Usuario)
+     * Mapping para el metodo PUT de la vista actualizar.(actualizar Persona)
      *
      * @param id de la entidad
-     * @param model entidad Usuario recibida de la vista
+     * @param model entidad Persona recibida de la vista
      * @param errors
      * @return
      */
@@ -259,55 +241,45 @@ public class ClienteController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Clientes model,
+            @RequestBody @Valid Bienes model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarClientesManager();
-            
-            if(errors.hasErrors()){
-                
-                response.setStatus(400);
-                response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
-                return response;
-            }            
-            
-            Personas ejPersona = new Personas();
-            ejPersona.setDocumento(model.getPersona().getDocumento());
-            
-            //Buscar cliente por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
-            Clientes ejCliente = new Clientes();
-            ejCliente.setPersona(ejPersona);
-            ejCliente.setSucursal(ejSucursales);
-            
-            Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente, "id".split(","));
-            if (usuarioMaps != null
-                    && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
-                response.setStatus(205);
-                response.setMessage("Ya existe un cliente con el mismo documento.");
-                return response;
-            }           
-            
-            usuarioMaps = clientesManager.getLike(new Clientes(id), "sucursal.id".split(","));
-            
-            model.setSucursal(new Sucursales(Long.parseLong(usuarioMaps.get("sucursal.id").toString())));
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioModificacion(userDetail.getId());
-            
-            clientesManager.editar(model);
-            
+            inicializarIngresosEgresosManager();
+
+//            if(errors.hasErrors()){
+//                
+//                response.setStatus(400);
+//                response.setMessage(errors.getAllErrors()
+//				.stream()
+//				.map(x -> x.getDefaultMessage())
+//				.collect(Collectors.joining(",")));
+//                return response;
+//            }     
+//            
+//            Personas ejPersona = new Personas();
+//            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));            
+//            ejPersona.setDocumento(model.getDocumento());
+//            
+//            Map<String, Object> personaMaps = personaManager.getLike(ejPersona, "id".split(","));
+//            if (personaMaps != null
+//                    && personaMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+//                response.setStatus(205);
+//                response.setMessage("Ya existe una persona con el mismo documento.");
+//                return response;
+//            }           
+//            
+//            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+//            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+//            model.setIdUsuarioModificacion(userDetail.getId());
+            //usuarioManager.editar(model);
             response.setStatus(200);
-            response.setMessage("Registro modificado con exito");
+            response.setMessage("Persona modificado/a con exito");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -316,7 +288,7 @@ public class ClienteController extends BaseController {
     }
     
     /**
-     * Mapping para el metodo DELETE de la vista.(eliminar Cliente)
+     * Mapping para el metodo DELETE de la vista.(eliminar Bienes)
      *
      * @param id de la entidad
      * @return
@@ -328,14 +300,14 @@ public class ClienteController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarClientesManager();
+            inicializarBienesManager();
 
-            Clientes model = clientesManager.get(id);
+            Bienes model = bienesManager.get(id);
             model.setActivo("N");
             model.setIdUsuarioEliminacion(userDetail.getId());
             model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
 
-            clientesManager.update(model);
+            bienesManager.update(model);
 
             response.setModel(model);
             response.setStatus(200);
@@ -348,7 +320,5 @@ public class ClienteController extends BaseController {
 
         return response;
     }
-    
-    
-    
+
 }

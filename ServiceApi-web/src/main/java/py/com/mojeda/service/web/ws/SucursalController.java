@@ -456,7 +456,7 @@ public class SucursalController extends BaseController {
     }
 
     /**
-     * Mapping para el metodo GET de la vista visualizar.(visualizar Empresa)
+     * Mapping para el metodo DELETE de la vista.(eliminar Sucursal)
      *
      * @param id de la entidad
      * @return

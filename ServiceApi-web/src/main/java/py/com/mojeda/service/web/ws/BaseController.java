@@ -9,6 +9,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
+import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
@@ -31,7 +32,9 @@ import py.com.mojeda.service.ejb.manager.PermisoManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
+import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
+import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
@@ -54,6 +57,12 @@ public class BaseController {
     protected ClientesManager clientesManager;
     
     protected PersonaManager personaManager;
+    
+    protected OcupacionPersonaManager ocupacionPersonaManager;
+    
+    protected IngresosEgresosManager ingresosEgresosManager;
+    
+    protected BienesManager bienesManager;
     
     protected EmpresaManager empresaManager;
     
@@ -109,6 +118,57 @@ public class BaseController {
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
+    
+    protected void inicializarOcupacionPersonaManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (ocupacionPersonaManager == null) {
+            try {
+                ocupacionPersonaManager = (OcupacionPersonaManager) context.lookup("java:app/ServiceApi-ejb/OcupacionPersonaManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarIngresosEgresosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (ingresosEgresosManager == null) {
+            try {
+                ingresosEgresosManager = (IngresosEgresosManager) context.lookup("java:app/ServiceApi-ejb/IngresosEgresosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarBienesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (bienesManager == null) {
+            try {
+                bienesManager = (BienesManager) context.lookup("java:app/ServiceApi-ejb/BienesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarTipoOcupacionesManager() throws Exception {
         if (context == null) {
