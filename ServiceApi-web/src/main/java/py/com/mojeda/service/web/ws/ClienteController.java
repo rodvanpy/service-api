@@ -288,22 +288,23 @@ public class ClienteController extends BaseController {
             ejCliente.setPersona(ejPersona);
             ejCliente.setSucursal(ejSucursales);
             
-            Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente, "id".split(","));
-            if (usuarioMaps != null
-                    && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+            Map<String,Object> clienteMaps = clientesManager.getLike(ejCliente, "id".split(","));
+            if (clienteMaps != null
+                    && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
                 response.setMessage("Ya existe un cliente con el mismo documento.");
                 return response;
             }           
             
-            usuarioMaps = clientesManager.getLike(new Clientes(id), "sucursal.id".split(","));
+            clienteMaps = clientesManager.getLike(new Clientes(id), "sucursal.id".split(","));
             
-            model.setSucursal(new Sucursales(Long.parseLong(usuarioMaps.get("sucursal.id").toString())));
+            model.setSucursal(new Sucursales(Long.parseLong(clienteMaps.get("sucursal.id").toString())));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            clientesManager.editar(model);
+            clienteMaps =clientesManager.editar(model);
             
+            response.setModel(clienteMaps);
             response.setStatus(200);
             response.setMessage("Registro modificado con exito");
         } catch (Exception e) {
