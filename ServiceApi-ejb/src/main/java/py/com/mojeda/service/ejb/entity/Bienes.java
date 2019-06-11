@@ -46,13 +46,13 @@ public class Bienes extends Base {
     private String distrito;
 
     @Column(name = "ESCRITURADO")
-    private String escriturado;
+    private Boolean escriturado;
 
     @Column(name = "EDIFICADO")
-    private String edificado;
+    private Boolean edificado;
 
     @Column(name = "HIPOTECADO")
-    private String hipotecado;
+    private Boolean hipotecado;
 
     @Column(name = "FECHA_HIPOTECA")
     @Temporal(TemporalType.TIMESTAMP)
@@ -179,47 +179,31 @@ public class Bienes extends Base {
         this.distrito = distrito;
     }
 
-    /**
-     * @return the escriturado
-     */
-    public String getEscriturado() {
+    public Boolean getEscriturado() {
         return escriturado;
     }
 
-    /**
-     * @param escriturado the escriturado to set
-     */
-    public void setEscriturado(String escriturado) {
+    public void setEscriturado(Boolean escriturado) {
         this.escriturado = escriturado;
     }
 
-    /**
-     * @return the edificado
-     */
-    public String getEdificado() {
+    public Boolean getEdificado() {
         return edificado;
     }
 
-    /**
-     * @param edificado the edificado to set
-     */
-    public void setEdificado(String edificado) {
+    public void setEdificado(Boolean edificado) {
         this.edificado = edificado;
     }
 
-    /**
-     * @return the hipotecado
-     */
-    public String getHipotecado() {
+    public Boolean getHipotecado() {
         return hipotecado;
     }
 
-    /**
-     * @param hipotecado the hipotecado to set
-     */
-    public void setHipotecado(String hipotecado) {
+    public void setHipotecado(Boolean hipotecado) {
         this.hipotecado = hipotecado;
     }
+
+    
 
     /**
      * @return the fechaHipoteca
