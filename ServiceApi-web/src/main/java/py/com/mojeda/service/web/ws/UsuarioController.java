@@ -35,6 +35,7 @@ import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
+import py.com.mojeda.service.web.utils.Password;
 import py.com.mojeda.service.web.utils.ReglaDTO;
 import static py.com.mojeda.service.web.ws.BaseController.logger;
 
@@ -46,7 +47,8 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @RequestMapping(value = "/usuarios")
 public class UsuarioController extends BaseController {
 
-    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,activo";
+    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,persona.id,"
+            + "rol.id,sucursal.id,sucursal.empresa.id,activo";
 
     @GetMapping
     public @ResponseBody
@@ -63,11 +65,11 @@ public class UsuarioController extends BaseController {
         //Buscar usuario por empresa
         Sucursales ejSucursales = new Sucursales();
         ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-        
+
         Usuarios model = new Usuarios();
         model.setActivo("S");
         model.setSucursal(ejSucursales);
-        
+
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarUsuarioManager();
@@ -227,7 +229,7 @@ public class UsuarioController extends BaseController {
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
+
             ejUsuarios = new Usuarios();
             ejUsuarios.setPersona(ejPersona);
 
@@ -239,6 +241,7 @@ public class UsuarioController extends BaseController {
                 return response;
             }
 
+            model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
             model.setActivo("S");
             model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
@@ -311,7 +314,7 @@ public class UsuarioController extends BaseController {
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
+
             ejUsuarios = new Usuarios();
             ejUsuarios.setPersona(ejPersona);
 
@@ -323,12 +326,18 @@ public class UsuarioController extends BaseController {
                 return response;
             }
 
+            usuarioMaps = usuarioManager.getLike(new Usuarios(id), "claveAcceso".split(","));
+
+            if (usuarioMaps.get("claveAcceso").toString().compareToIgnoreCase(model.getClaveAcceso()) != 0) {
+                model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
+            }
+
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
             Map<String, Object> usuarioMap = usuarioManager.editar(model);
-            
+
             response.setModel(usuarioMap);
             response.setStatus(200);
             response.setMessage("Usuario modificado con exito");
@@ -340,7 +349,65 @@ public class UsuarioController extends BaseController {
 
         return response;
     }
-    
+
+    /**
+     * Mapping para el metodo PUT de la vista actualizar Password.(actualizar
+     * Usuario)
+     *
+     * @param id de la entidad
+     * @param model entidad Usuario recibida de la vista
+     * @param errors
+     * @return
+     */
+    @PutMapping("/password/{id}")
+    public @ResponseBody
+    ResponseDTO updatePassword(
+            @ModelAttribute("id") Long id,
+            @RequestBody @Valid Password model,
+            Errors errors) {
+
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        try {
+            inicializarUsuarioManager();
+
+            if (errors.hasErrors()) {
+
+                response.setStatus(400);
+                response.setMessage(errors.getAllErrors()
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
+                return response;
+            }
+
+            Usuarios object = usuarioManager.get(id);
+
+            if (passwordEncoder.matches(model.getClaveAcceso(), object.getClaveAcceso())) {
+                model.setClaveAcceso(passwordEncoder.encode(model.getNuevaClaveAcceso()));
+            } else {
+                response.setStatus(201);
+                response.setMessage("Clave de Acceso no coincide.");
+                return response;
+            }
+
+            object.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            object.setIdUsuarioModificacion(userDetail.getId());
+
+            usuarioManager.update(object);
+
+            response.setStatus(200);
+            response.setMessage("Password modificado con exito");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+
     /**
      * Mapping para el metodo DELETE de la vista.(eliminar Usuario)
      *
