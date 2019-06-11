@@ -36,13 +36,26 @@ public class RolManagerImpl extends GenericDaoImpl<Rol, Long>
     public Rol guardar(Rol rol) throws Exception {
         Rol object = null;
         if(rol != null){
-            rol.setNombre(rol.getNombre().toUpperCase());            
-            this.save(rol);
-            
+            if(rol.getId() != null){
+                object = this.get(new Rol(rol.getId()));
+                object.setNombre(rol.getNombre().toUpperCase());            
+                this.update(rol);
+            }else{
+                rol.setNombre(rol.getNombre().toUpperCase());            
+                this.save(rol);
+            }
+                        
             object = new Rol();
             object = this.get(rol);
             
-            RolPermiso rolPermiso = null;
+            RolPermiso rolPermiso = new RolPermiso();
+            rolPermiso.setRol(new Rol(object.getId()));
+            
+            List<RolPermiso>  authoList = rolPermisoManager.list(rolPermiso);
+            for(RolPermiso rpm : authoList) {
+                rolPermisoManager.delete(rpm.getId());
+            }
+            
             if(object != null){
                for(Permisos rpm : rol.getAuthorities()) {
                     rolPermiso = new RolPermiso();

@@ -64,6 +64,8 @@ public class SucursalController extends BaseController {
 
         Sucursales model = new Sucursales();
         model.setActivo("S");
+        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+        
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarSucursalManager();
