@@ -385,7 +385,7 @@ public class UsuarioController extends BaseController {
             Usuarios object = usuarioManager.get(id);
 
             if (passwordEncoder.matches(model.getClaveAcceso(), object.getClaveAcceso())) {
-                model.setClaveAcceso(passwordEncoder.encode(model.getNuevaClaveAcceso()));
+                object.setClaveAcceso(passwordEncoder.encode(model.getNuevaClaveAcceso()));
             } else {
                 response.setStatus(201);
                 response.setMessage("Clave de Acceso no coincide.");
