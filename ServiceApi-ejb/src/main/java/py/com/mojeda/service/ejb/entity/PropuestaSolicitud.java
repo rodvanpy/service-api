@@ -834,6 +834,22 @@ public class PropuestaSolicitud extends Base{
     public void setTipoGarantia(TipoGarantias tipoGarantia) {
         this.tipoGarantia = tipoGarantia;
     }
+
+    public TipoPagos getTipoPago() {
+        return tipoPago;
+    }
+
+    public void setTipoPago(TipoPagos tipoPago) {
+        this.tipoPago = tipoPago;
+    }
+
+    public Long getImporteCuota() {
+        return importeCuota;
+    }
+
+    public void setImporteCuota(Long importeCuota) {
+        this.importeCuota = importeCuota;
+    }
     
     
 }
