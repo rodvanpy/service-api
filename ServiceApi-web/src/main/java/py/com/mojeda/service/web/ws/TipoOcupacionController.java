@@ -250,6 +250,17 @@ public class TipoOcupacionController extends BaseController {
             }
             
             TipoOcupaciones dato = tipoOcupacionesManager.get(id);
+            
+            TipoOcupaciones object = new TipoOcupaciones();
+            object.setNombre(model.getNombre());
+            
+            Map<String, Object> objectMaps = tipoOcupacionesManager.getLike(object, "id".split(","));
+            if (objectMaps != null
+                    && objectMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");
+                return response;
+            }
 
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());

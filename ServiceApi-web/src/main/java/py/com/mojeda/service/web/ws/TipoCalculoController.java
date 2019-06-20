@@ -253,7 +253,19 @@ public class TipoCalculoController extends BaseController {
             }
 
             TipoCalculos dato = tipoCalculosManager.get(id);
-
+            
+            TipoCalculos object = new TipoCalculos();
+            object.setNombre(model.getNombre());
+            
+            Map<String, Object> objectMaps = tipoCalculosManager.getLike(object, "id".split(","));
+            if (objectMaps != null
+                    && objectMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");
+                return response;
+            }
+            
+            model.setCodigo(dato.getCodigo());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());

@@ -259,6 +259,19 @@ public class TipoEgresoController extends BaseController {
             
             TipoIngresosEgresos dato = tipoEgresosManager.get(id);
             
+            TipoIngresosEgresos object = new TipoIngresosEgresos();
+            object.setNombre(model.getNombre());
+            model.setTipo("E");
+            
+            Map<String, Object> objectMaps = tipoEgresosManager.getLike(object, "id".split(","));
+            if (objectMaps != null
+                    && objectMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");
+                return response;
+            }
+            
+            model.setCodigo(dato.getCodigo());
             model.setTipo("E");
             model.setActivo(dato.getActivo());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));

@@ -248,6 +248,17 @@ public class TipoReferenciaController extends BaseController {
             
             TipoReferencias dato = tipoReferenciaManager.get(id);
             
+            TipoReferencias object = new TipoReferencias();
+            object.setNombre(model.getNombre());
+            
+            Map<String, Object> objectMaps = tipoReferenciaManager.getLike(object, "id".split(","));
+            if (objectMaps != null
+                    && objectMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");
+                return response;
+            }
+            
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());

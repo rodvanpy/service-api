@@ -39,8 +39,8 @@ public class PeriodoCapital extends Base{
     @Column(name = "NOMBRE")
     private String nombre;
     
-    @Column(name = "DIAS")
-    private Integer dias;
+    @Column(name = "CANTIDAD_DIAS")
+    private Integer cantidadDias;
     
     
     public PeriodoCapital() {
@@ -77,6 +77,16 @@ public class PeriodoCapital extends Base{
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public Integer getCantidadDias() {
+        return cantidadDias;
+    }
+
+    public void setCantidadDias(Integer cantidadDias) {
+        this.cantidadDias = cantidadDias;
+    }
+
+    
    
     
     

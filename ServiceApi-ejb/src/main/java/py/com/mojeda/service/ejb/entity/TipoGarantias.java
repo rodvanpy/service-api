@@ -55,9 +55,6 @@ public class TipoGarantias extends Base{
     @Column(name = "HIPOTECA")
     private Boolean hipoteca;
     
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
     
     public TipoGarantias() {
     }
@@ -92,20 +89,6 @@ public class TipoGarantias extends Base{
      */
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    /**
-     * @return the empresa
-     */
-    public Empresas getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
     }
 
     /**

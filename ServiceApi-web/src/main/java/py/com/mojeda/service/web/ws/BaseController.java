@@ -36,6 +36,7 @@ import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
 import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
+import py.com.mojeda.service.ejb.manager.PeriodoCapitalManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.PropuestaSolicitudManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
@@ -118,8 +119,28 @@ public class BaseController {
     protected ProfesionesManager profesionesManager;
     
     protected PropuestaSolicitudManager propuestaSolicitudManager;
+    
+    protected PeriodoCapitalManager periodoCapitalManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
+    
+    
+    protected void inicializarPeriodoCapitalManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (periodoCapitalManager == null) {
+            try {
+                periodoCapitalManager = (PeriodoCapitalManager) context.lookup("java:app/ServiceApi-ejb/PeriodoCapitalManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarPropuestaSolicitudManager() throws Exception {
         if (context == null) {

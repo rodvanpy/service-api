@@ -54,7 +54,6 @@ public class TipoGarantiaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoGarantias model = new TipoGarantias();
-        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -182,7 +181,6 @@ public class TipoGarantiaController extends BaseController {
             }
             
             TipoGarantias dato = new TipoGarantias();
-            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             dato.setNombre(model.getNombre());
             
             Map<String,Object> objMaps = tipoGarantiasManager.getLike(dato,"id".split(","));
@@ -193,15 +191,11 @@ public class TipoGarantiaController extends BaseController {
                 return response;
             }
             
-            dato = new TipoGarantias();
-            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
+            dato = new TipoGarantias();            
             //Numero Sucursal
             Integer numeroCodigo = tipoGarantiasManager.total(dato) + 1;
             
             model.setCodigo("TG-" + numeroCodigo);
-            
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -259,8 +253,8 @@ public class TipoGarantiaController extends BaseController {
             }
             
             TipoGarantias dato = tipoGarantiasManager.get(id);
-
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
+            model.setCodigo(dato.getCodigo());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());
