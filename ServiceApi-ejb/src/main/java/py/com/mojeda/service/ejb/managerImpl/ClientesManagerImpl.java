@@ -6,6 +6,7 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
@@ -80,7 +81,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
 
             this.save(cliente);
             
-            for (Bienes rpm : cliente.getBienesInmuebles()) {
+            for (Bienes rpm : (cliente.getBienesInmuebles() == null ? new ArrayList<Bienes> (): cliente.getBienesInmuebles())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -99,7 +100,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (Bienes rpm : cliente.getBienesVehiculo()) {
+            for (Bienes rpm : (cliente.getBienesVehiculo()  == null ? new ArrayList<Bienes> (): cliente.getBienesVehiculo())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -118,7 +119,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (IngresosEgresos rpm : cliente.getEgresos()) {
+            for (IngresosEgresos rpm : (cliente.getEgresos() == null ? new ArrayList<IngresosEgresos> (): cliente.getEgresos())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -137,7 +138,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (IngresosEgresos rpm : cliente.getIngresos()) {
+            for (IngresosEgresos rpm : (cliente.getIngresos() == null ? new ArrayList<IngresosEgresos> (): cliente.getIngresos())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -156,7 +157,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (OcupacionPersona rpm : cliente.getOcupaciones()) {
+            for (OcupacionPersona rpm : (cliente.getOcupaciones() == null ? new ArrayList<OcupacionPersona> (): cliente.getOcupaciones())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -175,7 +176,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (Referencias rpm : cliente.getReferencias()) {
+            for (Referencias rpm : (cliente.getReferencias() == null ? new ArrayList<Referencias> (): cliente.getReferencias())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -216,7 +217,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
 
             this.update(cliente);
             
-            for (Bienes rpm : cliente.getBienesInmuebles()) {
+            for (Bienes rpm : (cliente.getBienesInmuebles() == null ? new ArrayList<Bienes> (): cliente.getBienesInmuebles())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setTipoBien("INMUEBLE");
@@ -238,7 +239,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (Bienes rpm : cliente.getBienesVehiculo()) {
+            for (Bienes rpm : (cliente.getBienesVehiculo()  == null ? new ArrayList<Bienes> (): cliente.getBienesVehiculo())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setTipoBien("VEHICULO");
@@ -260,7 +261,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (IngresosEgresos rpm : cliente.getEgresos()) {
+            for (IngresosEgresos rpm : (cliente.getEgresos() == null ? new ArrayList<IngresosEgresos> (): cliente.getEgresos())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -280,7 +281,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (IngresosEgresos rpm : cliente.getIngresos()) {
+            for (IngresosEgresos rpm : (cliente.getIngresos() == null ? new ArrayList<IngresosEgresos> (): cliente.getIngresos())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -300,7 +301,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                 }                
             }
             
-            for (OcupacionPersona rpm : cliente.getOcupaciones()) {
+            for (OcupacionPersona rpm : (cliente.getOcupaciones() == null ? new ArrayList<OcupacionPersona> (): cliente.getOcupaciones())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));

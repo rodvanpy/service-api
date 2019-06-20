@@ -52,6 +52,10 @@ public class Modalidades extends Base {
     private String descripcion;
     
     @ManyToOne
+    @JoinColumn(name = "ID_TIPO_CALCULO", referencedColumnName = "id")
+    private TipoCalculos tipoCalculos;
+    
+    @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
     
@@ -160,6 +164,13 @@ public class Modalidades extends Base {
         this.descripcion = descripcion;
     }
 
+    public TipoCalculos getTipoCalculos() {
+        return tipoCalculos;
+    }
+
+    public void setTipoCalculos(TipoCalculos tipoCalculos) {
+        this.tipoCalculos = tipoCalculos;
+    }
     
     
     

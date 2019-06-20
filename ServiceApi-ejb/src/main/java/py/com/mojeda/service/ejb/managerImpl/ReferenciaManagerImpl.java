@@ -48,11 +48,13 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
                 if (ejReferencias != null) {
                     ejReferencias.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     ejReferencias.setIdUsuarioModificacion(referencias.getIdUsuarioModificacion());
+                    ejReferencias.setNombreContacto(referencias.getNombreContacto()  == null ? null : referencias.getNombreContacto().toUpperCase());
                     ejReferencias.setTelefono(referencias.getTelefono());
                     ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 
-                    this.update(referencias);
+                    this.update(ejReferencias);
                 } else {
+                    referencias.setNombreContacto(referencias.getNombreContacto()  == null ? null : referencias.getNombreContacto().toUpperCase());
                     this.save(referencias);
                 }
             } else {
@@ -60,6 +62,7 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
                 ejReferencias = this.get(referencias.getId());
                 ejReferencias.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejReferencias.setIdUsuarioModificacion(referencias.getIdUsuarioModificacion());
+                ejReferencias.setNombreContacto(referencias.getNombreContacto()  == null ? null : referencias.getNombreContacto().toUpperCase());
                 ejReferencias.setTelefono(referencias.getTelefono());
                 ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 
@@ -92,11 +95,13 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
                 if (ejReferencias != null) {
                     ejReferencias.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     ejReferencias.setIdUsuarioModificacion(referencias.getIdUsuarioModificacion());
+                    ejReferencias.setNombreContacto(referencias.getNombreContacto()  == null ? null : referencias.getNombreContacto().toUpperCase());
                     ejReferencias.setTelefono(referencias.getTelefono());
                     ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 
-                    this.update(referencias);
+                    this.update(ejReferencias);
                 } else {
+                    referencias.setNombreContacto(referencias.getNombreContacto()  == null ? null : referencias.getNombreContacto().toUpperCase());
                     this.save(referencias);
                 }
             } else {
@@ -104,6 +109,7 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
                 ejReferencias = this.get(referencias.getId());
                 ejReferencias.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejReferencias.setIdUsuarioModificacion(referencias.getIdUsuarioModificacion());
+                ejReferencias.setNombreContacto(referencias.getNombreContacto()  == null ? null : referencias.getNombreContacto().toUpperCase());
                 ejReferencias.setTelefono(referencias.getTelefono());
                 ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 

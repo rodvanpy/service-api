@@ -84,10 +84,10 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
         if (ejPersona != null) {
 
-            ejPersona.setPrimerNombre(persona.getPrimerNombre());
-            ejPersona.setSegundoNombre(persona.getSegundoNombre());
-            ejPersona.setPrimerApellido(persona.getPrimerApellido());
-            ejPersona.setSegundoApellido(persona.getSegundoApellido());
+            ejPersona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
+            ejPersona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
+            ejPersona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
+            ejPersona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
             ejPersona.setEmail(persona.getEmail());
             ejPersona.setSexo(persona.getSexo());
             ejPersona.setEstadoCivil(persona.getEstadoCivil());
@@ -111,6 +111,10 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
 
         } else {
+            persona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
+            persona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
+            persona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
+            persona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
             persona.setActivo("S");
             persona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             persona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -149,10 +153,10 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
         if (ejPersona != null) {
 
-            ejPersona.setPrimerNombre(persona.getPrimerNombre());
-            ejPersona.setSegundoNombre(persona.getSegundoNombre());
-            ejPersona.setPrimerApellido(persona.getPrimerApellido());
-            ejPersona.setSegundoApellido(persona.getSegundoApellido());
+            ejPersona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
+            ejPersona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
+            ejPersona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
+            ejPersona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
             ejPersona.setEmail(persona.getEmail());
             ejPersona.setSexo(persona.getSexo());
             ejPersona.setEstadoCivil(persona.getEstadoCivil());
@@ -176,6 +180,10 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
 
         } else {
+            persona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
+            persona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
+            persona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
+            persona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
             persona.setActivo("S");
             persona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             persona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
