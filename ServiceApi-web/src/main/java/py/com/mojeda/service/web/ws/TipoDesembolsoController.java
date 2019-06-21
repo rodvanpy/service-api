@@ -183,6 +183,18 @@ public class TipoDesembolsoController extends BaseController {
             
             TipoDesembolsos dato = new TipoDesembolsos();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            dato.setNombre(model.getNombre());
+            
+            Map<String,Object> objMaps = tipoDesembolsosManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
+            
+            dato = new TipoDesembolsos();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
             //Numero Sucursal
             Integer numeroCodigo = tipoDesembolsosManager.total(dato) + 1;

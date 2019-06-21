@@ -161,7 +161,6 @@ public class TipoReferenciaController extends BaseController {
      * @return
      */
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:4599")
     public @ResponseBody
     ResponseDTO create(
             @RequestBody @Valid TipoReferencias model,
@@ -179,6 +178,17 @@ public class TipoReferenciaController extends BaseController {
 				.stream()
 				.map(x -> x.getDefaultMessage())
 				.collect(Collectors.joining(",")));
+                return response;
+            }
+            
+            TipoReferencias dato = new TipoReferencias();
+            dato.setNombre(model.getNombre());
+            
+            Map<String,Object> objMaps = tipoReferenciaManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
                 return response;
             }
             

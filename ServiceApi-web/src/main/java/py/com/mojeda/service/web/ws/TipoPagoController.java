@@ -159,7 +159,7 @@ public class TipoPagoController extends BaseController {
      * @return
      */
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:4599")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
             @RequestBody @Valid TipoPagos model,
@@ -182,8 +182,19 @@ public class TipoPagoController extends BaseController {
             
             TipoPagos dato = new TipoPagos();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            dato.setNombre(model.getNombre());
             
-            //Numero Sucursal
+            Map<String,Object> objMaps = tipoPagosManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
+            
+            dato = new TipoPagos();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
             Integer numeroCodigo = tipoPagosManager.total(dato) + 1;
             
             model.setCodigo("TI-" + numeroCodigo);
@@ -222,7 +233,7 @@ public class TipoPagoController extends BaseController {
      * @return
      */
     @PutMapping("/{id}")
-    @CrossOrigin(origins = "http://localhost:4599")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,

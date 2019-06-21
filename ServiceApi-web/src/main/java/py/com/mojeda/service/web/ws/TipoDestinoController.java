@@ -186,6 +186,18 @@ public class TipoDestinoController extends BaseController {
             
             TipoDestinos dato = new TipoDestinos();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            dato.setNombre(model.getNombre());
+            
+            Map<String,Object> objMaps = tipoDestinosManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
+            
+            dato = new TipoDestinos();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
             //Numero Sucursal
             Integer numeroCodigo = tipoDestinosManager.total(dato) + 1;

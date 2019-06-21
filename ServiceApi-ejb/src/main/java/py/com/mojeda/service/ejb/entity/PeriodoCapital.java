@@ -22,11 +22,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "TIPO_CALCULOS")
-public class TipoCalculos extends Base{
+@Table(name = "PERIODO_CAPITAL")
+public class PeriodoCapital extends Base{
 
     private static final long serialVersionUID = 1574657L;
-    private static final String SECUENCIA = "seq_tipo_calculo_id";
+    private static final String SECUENCIA = "seq_periodo_capital_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
@@ -39,19 +39,14 @@ public class TipoCalculos extends Base{
     @Column(name = "NOMBRE")
     private String nombre;
     
-    @Column(name = "DESCRIPCION")
-    private String descripcion;
-    
-    @NotEmpty(message = "Ingrese Codigo")
-    @Basic(optional = false)
-    @Column(name = "CODIGO")
-    private String codigo;
+    @Column(name = "DIAS")
+    private Integer dias;
     
     
-    public TipoCalculos() {
+    public PeriodoCapital() {
     }
 
-    public TipoCalculos(Long id) {
+    public PeriodoCapital(Long id) {
             this.setId(id);
     }
 
@@ -82,28 +77,7 @@ public class TipoCalculos extends Base{
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-
-    /**
-     * @return the codigo
-     */
-    public String getCodigo() {
-        return codigo;
-    }
-
-    /**
-     * @param codigo the codigo to set
-     */
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }    
+   
     
     
 }

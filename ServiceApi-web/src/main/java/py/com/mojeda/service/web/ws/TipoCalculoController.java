@@ -57,7 +57,6 @@ public class TipoCalculoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         
         TipoCalculos model = new TipoCalculos();
-        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -183,13 +182,20 @@ public class TipoCalculoController extends BaseController {
             }
             
             TipoCalculos dato = new TipoCalculos();
-            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            dato.setNombre(model.getNombre());
+            
+            Map<String,Object> objMaps = tipoCalculosManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
             
             //Numero Sucursal
-            Integer numeroCodigo = tipoCalculosManager.total(dato) + 1;
+            Integer numeroCodigo = tipoCalculosManager.total(new TipoCalculos()) + 1;
             
             model.setCodigo("TC-" + numeroCodigo);
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -248,7 +254,6 @@ public class TipoCalculoController extends BaseController {
 
             TipoCalculos dato = tipoCalculosManager.get(id);
 
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());

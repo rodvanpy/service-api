@@ -183,6 +183,18 @@ public class TipoGarantiaController extends BaseController {
             
             TipoGarantias dato = new TipoGarantias();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            dato.setNombre(model.getNombre());
+            
+            Map<String,Object> objMaps = tipoGarantiasManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
+            
+            dato = new TipoGarantias();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
             //Numero Sucursal
             Integer numeroCodigo = tipoGarantiasManager.total(dato) + 1;

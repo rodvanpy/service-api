@@ -184,6 +184,17 @@ public class TipoOcupacionController extends BaseController {
                 return response;
             }
             
+            TipoOcupaciones dato = new TipoOcupaciones();
+            dato.setNombre(model.getNombre());
+            
+            Map<String,Object> objMaps = tipoOcupacionesManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
+            
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));

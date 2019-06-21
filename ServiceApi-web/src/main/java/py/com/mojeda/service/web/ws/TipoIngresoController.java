@@ -182,7 +182,18 @@ public class TipoIngresoController extends BaseController {
             
             TipoIngresosEgresos dato = new TipoIngresosEgresos();
             dato.setTipo("I");
+            dato.setNombre(model.getNombre());
             
+            Map<String,Object> objMaps = tipoEgresosManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
+            
+            dato = new TipoIngresosEgresos();
+            dato.setTipo("I");
             //Numero Sucursal
             Integer numeroCodigo = tipoEgresosManager.total(dato) + 1;
             
