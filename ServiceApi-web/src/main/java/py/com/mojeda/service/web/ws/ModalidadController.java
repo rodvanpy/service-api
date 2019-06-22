@@ -24,9 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Modalidades;
-import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.Modalidades;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.TipoCalculos;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -41,7 +39,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @RequestMapping(value = "/modalidades")
 public class ModalidadController extends BaseController {
     
-    String atributos = "id,nombre,codigo,montoMaximo,montoMinimo,descripcion,activo";
+    String atributos = "id,nombre,codigo,montoMaximo,montoMinimo,interes,descripcion,tipoCalculos.id,activo";
     
     @GetMapping
     public @ResponseBody
@@ -60,6 +58,8 @@ public class ModalidadController extends BaseController {
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarModalidadesManager();
+            inicializarTipoCalculosManager();
+            
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -99,6 +99,14 @@ public class ModalidadController extends BaseController {
             listMapGrupos = modalidadesManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
+            
+            for(Map<String, Object> rpm: listMapGrupos){                
+                Map<String, Object> objectMap = tipoCalculosManager.getAtributos(new TipoCalculos(Long.parseLong(rpm.get("tipoCalculos.id").toString())),"id,nombre,descripcion,codigo".split(","));
+                
+                rpm.put("tipoCalculos", objectMap);
+                
+                rpm.remove("tipoCalculos.id");
+            }
             
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
@@ -181,6 +189,26 @@ public class ModalidadController extends BaseController {
 				.collect(Collectors.joining(",")));
                 return response;
             }
+            
+            Modalidades dato = new Modalidades();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            dato.setNombre(model.getNombre().toUpperCase());
+            
+            Map<String,Object> objMaps = modalidadesManager.getLike(dato,"id".split(","));
+            
+            if(objMaps != null){
+                response.setStatus(205);
+                response.setMessage("Ya existe un registro con el mismo nombre.");                          
+                return response;
+            }
+            
+            dato = new Modalidades();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
+            Integer numeroCodigo = modalidadesManager.total(dato) + 1;
+            
+            model.setNombre(model.getNombre().toUpperCase());
+            model.setCodigo("MOD-" + numeroCodigo);           
             model.setActivo("S");
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
@@ -240,6 +268,19 @@ public class ModalidadController extends BaseController {
             
             Modalidades dato = modalidadesManager.get(id);
             
+            Modalidades object = new Modalidades();
+            object.setNombre(model.getNombre());
+            object.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
+            Map<String, Object> objMaps = modalidadesManager.getLike(object, "id,nombre".split(","));
+            if (objMaps != null
+                    && objMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
+                response.setStatus(205);
+                response.setMessage("Ya existe una modalidad con el mismo nombre.");
+                return response;
+            }
+                
+            model.setCodigo(dato.getCodigo());
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());

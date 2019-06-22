@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,10 +44,13 @@ public class Modalidades extends Base {
     private String codigo;
     
     @Column(name = "MONTO_MAXIMO")
-    private String montoMaximo;
+    private BigDecimal montoMaximo;
     
     @Column(name = "MONTO_MINIMO")
-    private String montoMinimo;
+    private BigDecimal montoMinimo;
+    
+    @Column(name = "INTERES")
+    private Double interes;
     
     @Column(name = "DESCRIPCION")
     private String descripcion;
@@ -121,35 +125,7 @@ public class Modalidades extends Base {
     public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
-
-    /**
-     * @return the montoMaximo
-     */
-    public String getMontoMaximo() {
-        return montoMaximo;
-    }
-
-    /**
-     * @param montoMaximo the montoMaximo to set
-     */
-    public void setMontoMaximo(String montoMaximo) {
-        this.montoMaximo = montoMaximo;
-    }
-
-    /**
-     * @return the montoMinimo
-     */
-    public String getMontoMinimo() {
-        return montoMinimo;
-    }
-
-    /**
-     * @param montoMinimo the montoMinimo to set
-     */
-    public void setMontoMinimo(String montoMinimo) {
-        this.montoMinimo = montoMinimo;
-    }
-
+        
     /**
      * @return the descripcion
      */
@@ -170,6 +146,48 @@ public class Modalidades extends Base {
 
     public void setTipoCalculos(TipoCalculos tipoCalculos) {
         this.tipoCalculos = tipoCalculos;
+    }
+
+    /**
+     * @return the montoMaximo
+     */
+    public BigDecimal getMontoMaximo() {
+        return montoMaximo;
+    }
+
+    /**
+     * @param montoMaximo the montoMaximo to set
+     */
+    public void setMontoMaximo(BigDecimal montoMaximo) {
+        this.montoMaximo = montoMaximo;
+    }
+
+    /**
+     * @return the montoMinimo
+     */
+    public BigDecimal getMontoMinimo() {
+        return montoMinimo;
+    }
+
+    /**
+     * @param montoMinimo the montoMinimo to set
+     */
+    public void setMontoMinimo(BigDecimal montoMinimo) {
+        this.montoMinimo = montoMinimo;
+    }
+
+    /**
+     * @return the interes
+     */
+    public Double getInteres() {
+        return interes;
+    }
+
+    /**
+     * @param interes the interes to set
+     */
+    public void setInteres(Double interes) {
+        this.interes = interes;
     }
     
     

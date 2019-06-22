@@ -43,7 +43,10 @@ public class Permisos implements Serializable {
 
     @Column(name = "DESCRIPCION")
     private String descripcion;
-
+    
+    @Column(name = "SUPER_USUARIO")
+    private Boolean superUsuario;
+    
     public Permisos() {
 
     }
@@ -101,7 +104,14 @@ public class Permisos implements Serializable {
     public void setGrupo(String grupo) {
         this.grupo = grupo;
     }
-    
+
+    public Boolean getSuperUsuario() {
+        return superUsuario;
+    }
+
+    public void setSuperUsuario(Boolean superUsuario) {
+        this.superUsuario = superUsuario;
+    }
     
 
 }

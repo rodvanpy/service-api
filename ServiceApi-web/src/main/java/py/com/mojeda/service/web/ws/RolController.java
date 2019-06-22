@@ -203,6 +203,8 @@ public class RolController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         List<Map<String, Object>> listMapGrupos = new ArrayList<>();
         Permisos model = new Permisos();
+        model.setSuperUsuario(false);
+        
         try {
             inicializarPermisoManager();
             
