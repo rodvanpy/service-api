@@ -68,6 +68,21 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "TASA_INTERES")
     private BigDecimal tasaInteres;
     
+    @Column(name = "GASTOS_ADMINISTRATIVOS")
+    private BigDecimal gastosAdministrativos;
+    
+    @Column(name = "IMPUESTOS")
+    private BigDecimal impuestos;
+    
+    @Column(name = "COMISION")
+    private BigDecimal comision;
+    
+    @Column(name = "GASTOS_VARIOS")
+    private BigDecimal gastosVarios;
+    
+    @Column(name = "SEGUROS")
+    private BigDecimal seguros;
+    
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_TIPO_DESEMBOLSO", referencedColumnName = "id")
     private TipoDesembolsos tipoDesembolso;
@@ -153,6 +168,10 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "FECHA_GENERACION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaGeneracion;
+    
+    @Column(name = "PRIMER_VENCIMIENTO")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date primerVencimiento;
     
     @Column(name = "MONTO_SOLICITADO_ORIGINAL")
     private BigDecimal montoSolicitadoOriginal;
@@ -479,6 +498,14 @@ public class PropuestaSolicitud extends Base{
      */
     public void setPlazoOperacion(Short plazoOperacion) {
         this.plazoOperacion = plazoOperacion;
+    }
+
+    public Date getPrimerVencimiento() {
+        return primerVencimiento;
+    }
+
+    public void setPrimerVencimiento(Date primerVencimiento) {
+        this.primerVencimiento = primerVencimiento;
     }
 
     /**
@@ -849,6 +876,46 @@ public class PropuestaSolicitud extends Base{
 
     public void setImporteCuota(Long importeCuota) {
         this.importeCuota = importeCuota;
+    }
+
+    public BigDecimal getGastosAdministrativos() {
+        return gastosAdministrativos;
+    }
+
+    public void setGastosAdministrativos(BigDecimal gastosAdministrativos) {
+        this.gastosAdministrativos = gastosAdministrativos;
+    }
+
+    public BigDecimal getImpuestos() {
+        return impuestos;
+    }
+
+    public void setImpuestos(BigDecimal impuestos) {
+        this.impuestos = impuestos;
+    }
+
+    public BigDecimal getComision() {
+        return comision;
+    }
+
+    public void setComision(BigDecimal comision) {
+        this.comision = comision;
+    }
+
+    public BigDecimal getGastosVarios() {
+        return gastosVarios;
+    }
+
+    public void setGastosVarios(BigDecimal gastosVarios) {
+        this.gastosVarios = gastosVarios;
+    }
+
+    public BigDecimal getSeguros() {
+        return seguros;
+    }
+
+    public void setSeguros(BigDecimal seguros) {
+        this.seguros = seguros;
     }
     
     
