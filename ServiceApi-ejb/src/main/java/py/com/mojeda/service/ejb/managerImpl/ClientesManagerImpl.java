@@ -20,6 +20,7 @@ import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
+import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
@@ -28,6 +29,7 @@ import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
+import py.com.mojeda.service.ejb.manager.VinculoManager;
 
 
 /**
@@ -63,6 +65,9 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     
     @EJB(mappedName = "java:app/ServiceApi-ejb/IngresosEgresosManagerImpl")
     private IngresosEgresosManager ingresosEgresosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/VinculoManagerImpl")
+    private VinculoManager vinculoManager;
   
 
     @Override
@@ -80,6 +85,28 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             cliente.setPersona(new Personas(ejPersona.getId()));
 
             this.save(cliente);
+            
+            for (Vinculos rpm : (cliente.getVinculos() == null ? new ArrayList<Vinculos> (): cliente.getVinculos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
+                }                
+            }
             
             for (Bienes rpm : (cliente.getBienesInmuebles() == null ? new ArrayList<Bienes> (): cliente.getBienesInmuebles())) {
                 if(rpm.getId() == null){
@@ -216,6 +243,28 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             cliente.setPersona(new Personas(ejPersona.getId()));
 
             this.update(cliente);
+            
+            for (Vinculos rpm : (cliente.getVinculos() == null ? new ArrayList<Vinculos> (): cliente.getVinculos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
+                }else{
+                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
+                }                
+            }
             
             for (Bienes rpm : (cliente.getBienesInmuebles() == null ? new ArrayList<Bienes> (): cliente.getBienesInmuebles())) {
                 if(rpm.getId() == null){

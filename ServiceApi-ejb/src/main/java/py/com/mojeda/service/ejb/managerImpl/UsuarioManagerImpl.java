@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
@@ -28,6 +29,7 @@ import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoDocumentos;
 import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
 import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
@@ -43,6 +45,7 @@ import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
+import py.com.mojeda.service.ejb.manager.VinculoManager;
 import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
 /**
@@ -96,6 +99,9 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
     private ProfesionesManager profesionesManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/VinculoManagerImpl")
+    private VinculoManager vinculoManager;
 
     @Override
     public Map<String, Object> guardar(Usuarios usuario) throws Exception {
@@ -114,6 +120,26 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.save(usuario);
+            
+            for (Vinculos rpm : (usuario.getVinculos()== null ? new ArrayList<Vinculos> (): usuario.getVinculos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
+                }                
+            }
 
             UsuarioDepartamentos usuarioDepartamentos;
             for (Map<String, Object> rpm : usuario.getDepartamentos()) {
@@ -148,6 +174,26 @@ public class UsuarioManagerImpl extends GenericDaoImpl<Usuarios, Long>
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.update(usuario);
+            
+            for (Vinculos rpm : (usuario.getVinculos()== null ? new ArrayList<Vinculos> (): usuario.getVinculos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
+                }                
+            }
 
             UsuarioDepartamentos usuarioDepartamentos = new UsuarioDepartamentos();
             usuarioDepartamentos.setUsuario(usuario);

@@ -187,6 +187,39 @@ public class PersonaController extends BaseController {
 
         return response;
     }
+    
+    /**
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Persona)
+     *
+     * @param documento de la entidad
+     * @return
+     */
+    @GetMapping("/ruc/{documento}")
+    public @ResponseBody
+    ResponseDTO getObjectRuc(
+            @ModelAttribute("documento") String documento) {        
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarPersonaManager();
+            
+            Personas ejPersonas = new Personas();
+            ejPersonas.setRuc(documento);
+            ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
+            Map<String, Object> modelMaps = personaManager.getPersona(ejPersonas);            
+            
+            response.setModel(modelMaps);
+            response.setStatus(modelMaps == null ? 404 : 200);
+            response.setMessage(modelMaps == null ? "Registro no encontrado" : "Registro encontrado");
+        } catch (Exception e) {
+            logger.error("Error: ",e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
 
     /**
      * Mapping para el metodo POST de la vista crear.(crear Persona)

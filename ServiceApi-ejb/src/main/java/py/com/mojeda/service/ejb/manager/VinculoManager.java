@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Vinculos;
 
@@ -16,6 +17,12 @@ import py.com.mojeda.service.ejb.entity.Vinculos;
  * @author Miguel
  */
 @Local
-public interface VinculoManager extends GenericDao<Vinculos, Long>{   
+public interface VinculoManager extends GenericDao<Vinculos, Long>{ 
+    
+    public Map<String, Object> guardar(Vinculos vinculo) throws Exception;
+    
+    public Map<String, Object> editar(Vinculos vinculo) throws Exception;
+    
+    public Map<String, Object> getVinculo(Vinculos vinculo) throws Exception;
     
 }

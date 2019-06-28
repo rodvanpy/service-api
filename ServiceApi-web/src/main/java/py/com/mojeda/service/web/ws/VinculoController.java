@@ -12,40 +12,42 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Clientes;
-import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Bienes;
 import py.com.mojeda.service.ejb.entity.Personas;
-import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.Referencias;
+import py.com.mojeda.service.ejb.entity.TipoReferencias;
+import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
 import py.com.mojeda.service.web.utils.ReglaDTO;
+import static py.com.mojeda.service.web.ws.BaseController.logger;
 
 /**
  *
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/clientes")
-public class ClienteController extends BaseController {
+@RequestMapping(value = "/vinculos")
+public class VinculoController extends BaseController {
     
-    String atributos = "id,persona.id,sucursal.id,activo";
+    String atributos = "id,tipoVinculo,persona.id,personaVinculo.id,activo";
     
     @GetMapping
     public @ResponseBody
-    ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
+    ResponseListDTO listar(@ModelAttribute("fkModel") Long id,
+            @ModelAttribute("_search") boolean filtrar,
             @ModelAttribute("filters") String filtros,
             @ModelAttribute("page") Integer pagina,
             @ModelAttribute("rows") Integer cantidad,
@@ -55,20 +57,15 @@ public class ClienteController extends BaseController {
 
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        
-        //Buscar por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-        
-        Clientes model = new Clientes();
+
+        Vinculos model = new Vinculos();
+        model.setPersona(new Personas(id));
         model.setActivo("S");
-        model.setSucursal(ejSucursales);
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarClientesManager();
+            inicializarVinculoManager();
             inicializarPersonaManager();
-            inicializarSucursalManager();
             
             Gson gson = new Gson();
             String camposFiltros = null;
@@ -96,7 +93,7 @@ public class ClienteController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(clientesManager.list(model).size() + "");
+                total = Long.parseLong(vinculoManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -106,27 +103,20 @@ public class ClienteController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = clientesManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = vinculoManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
-            for(Map<String, Object> rpm: listMapGrupos){
-                Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(rpm.get("persona.id").toString())),
-                        "primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email".split(","));
-                
-                Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
-                "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-                
-                rpm.put("sucursal", sucursal);
-                rpm.put("persona", persona);
-                rpm.remove("persona.id");
-                rpm.remove("sucursal.id");
+            for(Map<String, Object> rpc: listMapGrupos){
+                rpc.put("persona", personaManager.getPersona(new Personas(Long.parseLong(rpc.get("persona.id").toString()))));
+                rpc.put("personaVinculo", personaManager.getPersona(new Personas(Long.parseLong(rpc.get("personaVinculo.id").toString()))));
+                rpc.remove("persona.id");
+                rpc.remove("personaVinculo.id");
             }
             
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
             
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
@@ -136,7 +126,6 @@ public class ClienteController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            
         } catch (Exception e) {
             logger.error("Error: ",e);
             retorno.setStatus(500);
@@ -147,7 +136,7 @@ public class ClienteController extends BaseController {
     }
     
     /**
-     * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Referencia)
      *
      * @param id de la entidad
      * @return
@@ -159,13 +148,13 @@ public class ClienteController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarClientesManager();
-            
-            Map<String, Object> model = clientesManager.getCliente(new Clientes(id));            
-            
+            inicializarVinculoManager();
+                        
+            Map<String, Object> model = vinculoManager.getVinculo(new Vinculos(id));
+               
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
-            response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
+            response.setMessage(model == null ? "Registro no encontrado" : "OK");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -174,27 +163,25 @@ public class ClienteController extends BaseController {
 
         return response;
     }
-       
 
     /**
-     * Mapping para el metodo POST de la vista crear.(crear Usuario)
+     * Mapping para el metodo POST de la vista crear.(crear Referencia)
      *
-     * @param model entidad Usuario recibida de la vista
+     * @param model entidad Referencia recibida de la vista
      * @param errors
      * @return
      */
     @PostMapping
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Clientes model,
+            @Valid Vinculos model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
-        Clientes ejUsuario = new Clientes();
-        Gson gson = new Gson();
         try {
-            inicializarClientesManager();
+            inicializarVinculoManager();
             
             if(errors.hasErrors()){
                 
@@ -205,39 +192,17 @@ public class ClienteController extends BaseController {
 				.collect(Collectors.joining(",")));
                 return response;
             }
-            //Buscar cliente por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-           
-            Personas ejPersona = new Personas();
-            ejPersona.setDocumento(model.getPersona().getDocumento());
             
-            Clientes ejCliente = new Clientes();
-            ejCliente.setSucursal(ejSucursales);
-            ejCliente.setPersona(ejPersona);
-            
-            Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente,"id".split(","));
-            
-            if(usuarioMaps != null){
-                response.setStatus(205);
-                response.setMessage("Ya existe un cliente con el mismo documento.");                          
-                return response;
-            }
-            
-            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setSucursal(ejSucursales);
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            
-            Map<String,Object> modelMap = clientesManager.guardar(model);
-            
-            response.setModel(modelMap);
+            vinculoManager.save(model);
+
             response.setStatus(200);
-            response.setMessage("Registro creado con exito");
+            response.setMessage("OK");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -248,24 +213,25 @@ public class ClienteController extends BaseController {
     }
     
     /**
-     * Mapping para el metodo PUT de la vista actualizar.(actualizar Usuario)
+     * Mapping para el metodo PUT de la vista actualizar.(actualizar Referencia)
      *
      * @param id de la entidad
-     * @param model entidad Usuario recibida de la vista
+     * @param model entidad Referencia recibida de la vista
      * @param errors
      * @return
      */
     @PutMapping("/{id}")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Clientes model,
+            @Valid Vinculos model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarClientesManager();
+            inicializarVinculoManager();
             
             if(errors.hasErrors()){
                 
@@ -275,41 +241,15 @@ public class ClienteController extends BaseController {
 				.map(x -> x.getDefaultMessage())
 				.collect(Collectors.joining(",")));
                 return response;
-            }            
+            }
             
-            Personas ejPersona = new Personas();
-            ejPersona.setDocumento(model.getPersona().getDocumento());
-            
-            //Buscar cliente por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
-            Clientes ejCliente = new Clientes();
-            ejCliente.setPersona(ejPersona);
-            ejCliente.setSucursal(ejSucursales);
-            
-            Map<String,Object> clienteMaps = clientesManager.getLike(ejCliente, "id".split(","));
-            if (clienteMaps != null
-                    && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
-                response.setStatus(205);
-                response.setMessage("Ya existe un cliente con el mismo documento.");
-                return response;
-            }           
-            
-            clienteMaps = clientesManager.getLike(new Clientes(id), "sucursal.id".split(","));
-            
-            ejSucursales.setId(Long.parseLong(clienteMaps.get("sucursal.id").toString()));
-            
-            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setSucursal(ejSucursales);
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            clienteMaps =clientesManager.editar(model);
+            vinculoManager.update(model);
             
-            response.setModel(clienteMaps);
             response.setStatus(200);
-            response.setMessage("Registro modificado con exito");
+            response.setMessage("OK");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -320,7 +260,7 @@ public class ClienteController extends BaseController {
     }
     
     /**
-     * Mapping para el metodo DELETE de la vista.(eliminar Cliente)
+     * Mapping para el metodo DELETE de la vista.(eliminar Referencias)
      *
      * @param id de la entidad
      * @return
@@ -332,14 +272,14 @@ public class ClienteController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarClientesManager();
+            inicializarVinculoManager();
 
-            Clientes model = clientesManager.get(id);
+            Vinculos model = vinculoManager.get(id);
             model.setActivo("N");
             model.setIdUsuarioEliminacion(userDetail.getId());
             model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
 
-            clientesManager.update(model);
+            vinculoManager.update(model);
 
             response.setModel(model);
             response.setStatus(200);
@@ -352,7 +292,5 @@ public class ClienteController extends BaseController {
 
         return response;
     }
-    
-    
     
 }

@@ -64,6 +64,9 @@ public class Clientes extends Base{
     
     @Transient
     private List<OcupacionPersona> ocupaciones;
+    
+    @Transient
+    private List<Vinculos> vinculos;
 
     
     public Clientes() {
@@ -215,7 +218,14 @@ public class Clientes extends Base{
     public void setOcupaciones(List<OcupacionPersona> ocupaciones) {
         this.ocupaciones = ocupaciones;
     }
-    
-    
+
+    public List<Vinculos> getVinculos() {
+        return vinculos;
+    }
+
+    public void setVinculos(List<Vinculos> vinculos) {
+        this.vinculos = vinculos;
+    }
+        
            
 }

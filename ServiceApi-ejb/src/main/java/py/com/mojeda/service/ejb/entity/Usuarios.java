@@ -74,6 +74,9 @@ public class Usuarios extends Base {
 
     @Transient
     private List<Map<String, Object>> departamentos;
+    
+    @Transient
+    private List<Vinculos> vinculos;
 
     public Usuarios() {
 
@@ -196,6 +199,14 @@ public class Usuarios extends Base {
 
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
+    }
+
+    public List<Vinculos> getVinculos() {
+        return vinculos;
+    }
+
+    public void setVinculos(List<Vinculos> vinculos) {
+        this.vinculos = vinculos;
     }
     
     

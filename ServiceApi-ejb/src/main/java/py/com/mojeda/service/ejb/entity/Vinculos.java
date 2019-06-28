@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,8 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  *
@@ -34,10 +35,9 @@ public class Vinculos extends Base {
     @Column(name = "id")
     private Long id;
     
-    @ManyToOne
     @NotNull(message = "Ingrese Tipo Vinculo")
-    @JoinColumn(name = "ID_TIPO_VINCULO", referencedColumnName = "id")
-    private TipoVinculos tipoVinculo;
+    @Column(name = "TIPO_VINCULO")
+    private String tipoVinculo;
     
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
@@ -50,6 +50,9 @@ public class Vinculos extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
+    
+    @Transient
+    private List<OcupacionPersona> ocupaciones;
     
     public Vinculos() {
 
@@ -72,20 +75,7 @@ public class Vinculos extends Base {
     public void setId(Long id) {
         this.id = id;
     }
-
-    /**
-     * @return the tipoVinculo
-     */
-    public TipoVinculos getTipoVinculo() {
-        return tipoVinculo;
-    }
-
-    /**
-     * @param tipoVinculo the tipoVinculo to set
-     */
-    public void setTipoVinculo(TipoVinculos tipoVinculo) {
-        this.tipoVinculo = tipoVinculo;
-    }
+   
 
     /**
      * @return the persona
@@ -127,6 +117,28 @@ public class Vinculos extends Base {
      */
     public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
+    }
+
+    /**
+     * @return the tipoVinculo
+     */
+    public String getTipoVinculo() {
+        return tipoVinculo;
+    }
+
+    /**
+     * @param tipoVinculo the tipoVinculo to set
+     */
+    public void setTipoVinculo(String tipoVinculo) {
+        this.tipoVinculo = tipoVinculo;
+    }
+
+    public List<OcupacionPersona> getOcupaciones() {
+        return ocupaciones;
+    }
+
+    public void setOcupaciones(List<OcupacionPersona> ocupaciones) {
+        this.ocupaciones = ocupaciones;
     }
     
     

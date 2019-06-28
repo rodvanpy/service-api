@@ -43,6 +43,7 @@ import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
 import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.TipoIngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
+import py.com.mojeda.service.ejb.manager.VinculoManager;
 
 /**
  *
@@ -121,6 +122,8 @@ public class BaseController {
     protected PropuestaSolicitudManager propuestaSolicitudManager;
     
     protected PeriodoCapitalManager periodoCapitalManager;
+    
+    protected VinculoManager vinculoManager;
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
@@ -136,6 +139,23 @@ public class BaseController {
         if (periodoCapitalManager == null) {
             try {
                 periodoCapitalManager = (PeriodoCapitalManager) context.lookup("java:app/ServiceApi-ejb/PeriodoCapitalManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarVinculoManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (vinculoManager == null) {
+            try {
+                vinculoManager = (VinculoManager) context.lookup("java:app/ServiceApi-ejb/VinculoManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }
