@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Bienes;
+import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.TipoReferencias;
@@ -41,9 +42,9 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @Controller
 @RequestMapping(value = "/vinculos")
 public class VinculoController extends BaseController {
-    
+
     String atributos = "id,tipoVinculo,persona.id,personaVinculo.id,activo";
-    
+
     @GetMapping
     public @ResponseBody
     ResponseListDTO listar(@ModelAttribute("fkModel") Long id,
@@ -61,12 +62,13 @@ public class VinculoController extends BaseController {
         Vinculos model = new Vinculos();
         model.setPersona(new Personas(id));
         model.setActivo("S");
-        
+
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarVinculoManager();
             inicializarPersonaManager();
-            
+            inicializarOcupacionPersonaManager();
+
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -106,18 +108,23 @@ public class VinculoController extends BaseController {
             listMapGrupos = vinculoManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
-            for(Map<String, Object> rpc: listMapGrupos){
+
+            for (Map<String, Object> rpc : listMapGrupos) {
+
+                OcupacionPersona ejOcupacion = new OcupacionPersona();
+                ejOcupacion.setPersona(new Personas(Long.parseLong(rpc.get("personaVinculo.id").toString())));
+
+                rpc.put("ocupaciones", ocupacionPersonaManager.getListOcupaciones(ejOcupacion));
                 rpc.put("persona", personaManager.getPersona(new Personas(Long.parseLong(rpc.get("persona.id").toString()))));
                 rpc.put("personaVinculo", personaManager.getPersona(new Personas(Long.parseLong(rpc.get("personaVinculo.id").toString()))));
                 rpc.remove("persona.id");
                 rpc.remove("personaVinculo.id");
             }
-            
+
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
+
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
             retorno.setRecords(total);
@@ -127,14 +134,14 @@ public class VinculoController extends BaseController {
             retorno.setStatus(200);
             retorno.setMessage("OK");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Referencia)
      *
@@ -144,19 +151,19 @@ public class VinculoController extends BaseController {
     @GetMapping("/{id}")
     public @ResponseBody
     ResponseDTO getObject(
-            @ModelAttribute("id") Long id) {        
+            @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarVinculoManager();
-                        
+
             Map<String, Object> model = vinculoManager.getVinculo(new Vinculos(id));
-               
+
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "OK");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -177,41 +184,41 @@ public class VinculoController extends BaseController {
     ResponseDTO create(
             @Valid Vinculos model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarVinculoManager();
-            
-            if(errors.hasErrors()){
-                
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
-            
+
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
-            
+
             vinculoManager.save(model);
 
             response.setStatus(200);
             response.setMessage("OK");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo PUT de la vista actualizar.(actualizar Referencia)
      *
@@ -227,38 +234,38 @@ public class VinculoController extends BaseController {
             @ModelAttribute("id") Long id,
             @Valid Vinculos model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarVinculoManager();
-            
-            if(errors.hasErrors()){
-                
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
-            
+
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
-            
+
             vinculoManager.update(model);
-            
+
             response.setStatus(200);
             response.setMessage("OK");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo DELETE de la vista.(eliminar Referencias)
      *
@@ -292,5 +299,5 @@ public class VinculoController extends BaseController {
 
         return response;
     }
-    
+
 }
