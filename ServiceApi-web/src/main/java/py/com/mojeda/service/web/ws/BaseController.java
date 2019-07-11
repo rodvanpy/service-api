@@ -124,6 +124,7 @@ public class BaseController {
     protected PeriodoCapitalManager periodoCapitalManager;
     
     protected VinculoManager vinculoManager;
+    
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     

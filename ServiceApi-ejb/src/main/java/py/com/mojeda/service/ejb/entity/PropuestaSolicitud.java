@@ -215,6 +215,10 @@ public class PropuestaSolicitud extends Base{
     @ManyToOne(optional = false)
     private Clientes cliente;
     
+    @JoinColumn(name = "ID_FUNCIONARIO_ALTA", referencedColumnName = "ID")
+    @ManyToOne(optional = false)
+    private Funcionarios funcionario;
+    
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL_ALTA", referencedColumnName = "id")
     private Sucursales sucursal;
@@ -916,6 +920,20 @@ public class PropuestaSolicitud extends Base{
 
     public void setSeguros(BigDecimal seguros) {
         this.seguros = seguros;
+    }
+
+    /**
+     * @return the funcionario
+     */
+    public Funcionarios getFuncionario() {
+        return funcionario;
+    }
+
+    /**
+     * @param funcionario the funcionario to set
+     */
+    public void setFuncionario(Funcionarios funcionario) {
+        this.funcionario = funcionario;
     }
     
     

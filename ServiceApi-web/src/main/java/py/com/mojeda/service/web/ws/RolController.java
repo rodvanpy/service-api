@@ -253,7 +253,7 @@ public class RolController extends BaseController {
                 model = new Permisos();
                 model.setGrupo(rpm.get("grupo").toString());
                 
-                rpm.put("authority", permisoManager.listAtributos(model, "id,grupo,nombre,descripcion".split(","), true));
+                rpm.put("authority", permisoManager.listAtributos(model, "id,grupo,nombre,descripcion".split(","), false));
      
             }
 
