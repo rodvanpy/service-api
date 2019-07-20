@@ -5,7 +5,6 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,15 +13,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 /**
  *
  * @author Miguel
  */
 @Entity
-@Table(name = "USUARIO_DEPARTAMENTOS")
-public class UsuarioDepartamentos{
+@Table(name = "FUNCIONARIO_DEPARTAMENTOS")
+public class FuncionariosDepartamentos{
     
     private static final long serialVersionUID = 7986185608L;
     
@@ -36,8 +34,8 @@ public class UsuarioDepartamentos{
     private DepartamentosSucursal departamento;
    
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_USUARIO", referencedColumnName = "id")
-    private Usuarios usuario; 
+    @JoinColumn(name = "ID_FUNCIONARIO", referencedColumnName = "id")
+    private Funcionarios funcionario; 
     
     
 
@@ -64,18 +62,20 @@ public class UsuarioDepartamentos{
     }
 
     /**
-     * @return the usuario
+     * @return the funcionario
      */
-    public Usuarios getUsuario() {
-        return usuario;
+    public Funcionarios getFuncionario() {
+        return funcionario;
     }
 
     /**
-     * @param usuario the usuario to set
+     * @param funcionario the funcionario to set
      */
-    public void setUsuario(Usuarios usuario) {
-        this.usuario = usuario;
+    public void setFuncionario(Funcionarios funcionario) {
+        this.funcionario = funcionario;
     }
+
+    
     
     
 

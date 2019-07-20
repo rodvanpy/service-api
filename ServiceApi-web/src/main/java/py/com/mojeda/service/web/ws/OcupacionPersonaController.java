@@ -29,7 +29,7 @@ import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;

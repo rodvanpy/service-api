@@ -33,7 +33,7 @@ import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoDocumentos;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;

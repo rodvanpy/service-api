@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -236,10 +236,10 @@ public class PersonaController extends BaseController {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
-        Usuarios ejUsuario = new Usuarios();
+        Funcionarios ejUsuario = new Funcionarios();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
             
             if(errors.hasErrors()){
                 
@@ -303,7 +303,7 @@ public class PersonaController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
             
             if(errors.hasErrors()){
                 

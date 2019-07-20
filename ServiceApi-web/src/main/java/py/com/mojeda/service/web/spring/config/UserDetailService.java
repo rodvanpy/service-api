@@ -19,9 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import py.com.mojeda.service.ejb.entity.RolPermiso;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
-import py.com.mojeda.service.ejb.manager.UsuarioManager;
+import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 
 @Service("userDetailsService")
 public class UserDetailService implements UserDetailsService {
@@ -32,7 +32,7 @@ public class UserDetailService implements UserDetailsService {
             .getLogger("service_documenta");
 
     protected RolPermisoManager rolPermisoManager;
-    protected UsuarioManager usuarioManager;
+    protected FuncionariosManager funcionarioManager;
 
     @Override
     public User loadUserByUsername(String idUser) throws UsernameNotFoundException {
@@ -45,9 +45,8 @@ public class UserDetailService implements UserDetailsService {
         User user = new User();
         List<GrantedAuthority> autoridades = new ArrayList<>();
         
-        Usuarios ejObjeto = usuarioManager.get(Long.parseLong(idUser));
+        Funcionarios ejObjeto = funcionarioManager.get(Long.parseLong(idUser));
         if (ejObjeto != null) {
-            user.setId(ejObjeto.getId());
             user.setId(ejObjeto.getId());
             user.setApellido(ejObjeto.getPersona().getPrimerApellido() + " " + ejObjeto.getPersona().getSegundoApellido() == null ? "" : ejObjeto.getPersona().getSegundoApellido());
             user.setNombre(ejObjeto.getPersona().getPrimerNombre() + " " + ejObjeto.getPersona().getSegundoNombre() == null ? "" : ejObjeto.getPersona().getSegundoNombre());
@@ -85,10 +84,10 @@ public class UserDetailService implements UserDetailsService {
                 throw new RuntimeException("No se puede inicializar el contexto", e1);
             }
         }
-        if (usuarioManager == null) {
+        if (funcionarioManager == null) {
             try {
 
-                usuarioManager = (UsuarioManager) context.lookup("java:app/ServiceApi-ejb/UsuarioManagerImpl");
+                funcionarioManager = (FuncionariosManager) context.lookup("java:app/ServiceApi-ejb/FuncionariosManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

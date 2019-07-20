@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
-import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
-import py.com.mojeda.service.ejb.entity.TipoReferencias;
-import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.TipoHorarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -38,10 +35,10 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/tipos-referencias")
-public class TipoReferenciaController extends BaseController {
+@RequestMapping(value = "/tipos-horarios")
+public class TipoHorariosController extends BaseController {
     
-    String atributos = "id,nombre";
+    String atributos = "id,nombre,codigo,descripcion,fechaInicio,fechaFin,horaEntrada,horaSalida,horaAlmuerzoInicio,horaAlmuerzoFin,activo";
     
     @GetMapping
     public @ResponseBody
@@ -56,11 +53,12 @@ public class TipoReferenciaController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        TipoReferencias model = new TipoReferencias();
+        TipoHorarios model = new TipoHorarios();
+        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoHorariosManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -87,7 +85,7 @@ public class TipoReferenciaController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(tipoReferenciaManager.list(model).size() + "");
+                total = Long.parseLong(tipoHorariosManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -97,7 +95,7 @@ public class TipoReferenciaController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = tipoReferenciaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = tipoHorariosManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -137,9 +135,9 @@ public class TipoReferenciaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoHorariosManager();
                         
-            TipoReferencias model = tipoReferenciaManager.get(id);
+            TipoHorarios model = tipoHorariosManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -161,15 +159,16 @@ public class TipoReferenciaController extends BaseController {
      * @return
      */
     @PostMapping
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid TipoReferencias model,
+            @RequestBody @Valid TipoHorarios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoHorariosManager();
             
             if(errors.hasErrors()){
                 
@@ -181,10 +180,11 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
-            TipoReferencias dato = new TipoReferencias();
+            TipoHorarios dato = new TipoHorarios();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             dato.setNombre(model.getNombre());
             
-            Map<String,Object> objMaps = tipoReferenciaManager.getLike(dato,"id".split(","));
+            Map<String,Object> objMaps = tipoHorariosManager.getLike(dato,"id".split(","));
             
             if(objMaps != null){
                 response.setStatus(205);
@@ -192,20 +192,28 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
+            dato = new TipoHorarios();
+            dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
+            Integer numeroCodigo = tipoHorariosManager.total(dato) + 1;
+            
+            model.setCodigo("TH-" + numeroCodigo);
+            
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            tipoReferenciaManager.save(model);
+            tipoHorariosManager.save(model);
             
-            TipoReferencias empresa = new TipoReferencias();
-            empresa.setNombre(model.getNombre());
+            TipoHorarios empresa = new TipoHorarios();
+            empresa.setCodigo(model.getCodigo());
             
             response.setStatus(200);
-            response.setMessage("El Tipo Referencia ha sido guardado");           
-            response.setModel(tipoReferenciaManager.get(empresa));
+            response.setMessage("El registro ha sido guardado");           
+            response.setModel(tipoHorariosManager.get(empresa));
             
         } catch (Exception e) {
             logger.error("Error: ",e);
@@ -225,16 +233,17 @@ public class TipoReferenciaController extends BaseController {
      * @return
      */
     @PutMapping("/{id}")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid TipoReferencias model,
+            @RequestBody @Valid TipoHorarios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoHorariosManager();
             
             if(errors.hasErrors()){
                 
@@ -246,12 +255,12 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
-            TipoReferencias dato = tipoReferenciaManager.get(id);
+            TipoHorarios dato = tipoHorariosManager.get(id);
             
-            TipoReferencias object = new TipoReferencias();
+            TipoHorarios object = new TipoHorarios();
             object.setNombre(model.getNombre());
             
-            Map<String, Object> objectMaps = tipoReferenciaManager.getLike(object, "id".split(","));
+            Map<String, Object> objectMaps = tipoHorariosManager.getLike(object, "id".split(","));
             if (objectMaps != null
                     && objectMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -259,17 +268,18 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
+            model.setCodigo(dato.getCodigo());
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFechaCreacion(dato.getFechaCreacion());
             model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
-            model.setActivo(dato.getActivo());
             
-            tipoReferenciaManager.update(model);
+            tipoHorariosManager.update(model);
             
             response.setStatus(200);
-            response.setMessage("El Tipo Referencia ha sido guardado");
+            response.setMessage("El registro ha sido guardado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);

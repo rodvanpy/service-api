@@ -14,7 +14,6 @@ import javax.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,11 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Empresas;
-import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
-import py.com.mojeda.service.ejb.entity.TipoReferencias;
-import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.TipoEstudios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -38,10 +33,10 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/tipos-referencias")
-public class TipoReferenciaController extends BaseController {
+@RequestMapping(value = "/tipos-estudios")
+public class TipoEstudioController extends BaseController {
     
-    String atributos = "id,nombre";
+    String atributos = "id,nombre,descripcion,activo";
     
     @GetMapping
     public @ResponseBody
@@ -56,11 +51,11 @@ public class TipoReferenciaController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        TipoReferencias model = new TipoReferencias();
+        TipoEstudios model = new TipoEstudios();
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoEstudiosManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -87,7 +82,7 @@ public class TipoReferenciaController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(tipoReferenciaManager.list(model).size() + "");
+                total = Long.parseLong(tipoEstudiosManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -97,7 +92,7 @@ public class TipoReferenciaController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = tipoReferenciaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = tipoEstudiosManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -137,9 +132,9 @@ public class TipoReferenciaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoEstudiosManager();
                         
-            TipoReferencias model = tipoReferenciaManager.get(id);
+            TipoEstudios model = tipoEstudiosManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -163,13 +158,13 @@ public class TipoReferenciaController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid TipoReferencias model,
+            @RequestBody @Valid TipoEstudios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoEstudiosManager();
             
             if(errors.hasErrors()){
                 
@@ -181,10 +176,10 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
-            TipoReferencias dato = new TipoReferencias();
+            TipoEstudios dato = new TipoEstudios();
             dato.setNombre(model.getNombre());
             
-            Map<String,Object> objMaps = tipoReferenciaManager.getLike(dato,"id".split(","));
+            Map<String,Object> objMaps = tipoEstudiosManager.getLike(dato,"id".split(","));
             
             if(objMaps != null){
                 response.setStatus(205);
@@ -198,14 +193,14 @@ public class TipoReferenciaController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            tipoReferenciaManager.save(model);
+            tipoEstudiosManager.save(model);
             
-            TipoReferencias empresa = new TipoReferencias();
+            TipoEstudios empresa = new TipoEstudios();
             empresa.setNombre(model.getNombre());
             
             response.setStatus(200);
-            response.setMessage("El Tipo Referencia ha sido guardado");           
-            response.setModel(tipoReferenciaManager.get(empresa));
+            response.setMessage("El registro ha sido guardado");           
+            response.setModel(tipoEstudiosManager.get(empresa));
             
         } catch (Exception e) {
             logger.error("Error: ",e);
@@ -228,13 +223,13 @@ public class TipoReferenciaController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid TipoReferencias model,
+            @RequestBody @Valid TipoEstudios model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoReferenciaManager();
+            inicializarTipoEstudiosManager();
             
             if(errors.hasErrors()){
                 
@@ -246,12 +241,12 @@ public class TipoReferenciaController extends BaseController {
                 return response;
             }
             
-            TipoReferencias dato = tipoReferenciaManager.get(id);
+            TipoEstudios dato = tipoEstudiosManager.get(id);
             
-            TipoReferencias object = new TipoReferencias();
+            TipoEstudios object = new TipoEstudios();
             object.setNombre(model.getNombre());
             
-            Map<String, Object> objectMaps = tipoReferenciaManager.getLike(object, "id".split(","));
+            Map<String, Object> objectMaps = tipoEstudiosManager.getLike(object, "id".split(","));
             if (objectMaps != null
                     && objectMaps.get("id").toString().compareToIgnoreCase(dato.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -266,10 +261,10 @@ public class TipoReferenciaController extends BaseController {
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
             model.setActivo(dato.getActivo());
             
-            tipoReferenciaManager.update(model);
+            tipoEstudiosManager.update(model);
             
             response.setStatus(200);
-            response.setMessage("El Tipo Referencia ha sido guardado");
+            response.setMessage("El registro ha sido guardado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);

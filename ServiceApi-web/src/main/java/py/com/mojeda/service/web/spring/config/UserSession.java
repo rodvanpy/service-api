@@ -21,9 +21,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.RolPermiso;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
-import py.com.mojeda.service.ejb.manager.UsuarioManager;
+import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 
 /**
  *
@@ -33,7 +33,7 @@ public class UserSession implements AuthenticationProvider {
 
     private Context context;
 
-    protected UsuarioManager usuarioManager;
+    protected FuncionariosManager usuarioManager;
 
     protected RolPermisoManager rolPermisoManager;
 
@@ -50,7 +50,7 @@ public class UserSession implements AuthenticationProvider {
             String userLogin = authentication.getPrincipal().toString();
             String passwordLogin = authentication.getCredentials().toString();
 
-            Usuarios ejObjeto = new Usuarios();
+            Funcionarios ejObjeto = new Funcionarios();
             ejObjeto.setAlias(userLogin);
 
             ejObjeto = usuarioManager.get(ejObjeto);
@@ -119,7 +119,7 @@ public class UserSession implements AuthenticationProvider {
         if (usuarioManager == null) {
             try {
 
-                usuarioManager = (UsuarioManager) context.lookup("java:app/ServiceApi-ejb/UsuarioManagerImpl");
+                usuarioManager = (FuncionariosManager) context.lookup("java:app/ServiceApi-ejb/UsuarioManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

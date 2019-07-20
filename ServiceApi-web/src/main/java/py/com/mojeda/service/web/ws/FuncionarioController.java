@@ -29,8 +29,8 @@ import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoDocumentos;
-import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
-import py.com.mojeda.service.ejb.entity.Usuarios;
+import py.com.mojeda.service.ejb.entity.FuncionariosDepartamentos;
+import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -44,10 +44,10 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/usuarios")
-public class UsuarioController extends BaseController {
+@RequestMapping(value = "/funcionarios")
+public class FuncionarioController extends BaseController {
 
-    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,persona.id,"
+    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,nroLegajo,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,persona.id,"
             + "rol.id,sucursal.id,sucursal.empresa.id,activo";
 
     @GetMapping
@@ -66,13 +66,13 @@ public class UsuarioController extends BaseController {
         Sucursales ejSucursales = new Sucursales();
         ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-        Usuarios model = new Usuarios();
+        Funcionarios model = new Funcionarios();
         model.setActivo("S");
         model.setSucursal(ejSucursales);
 
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
             inicializarPersonaManager();
             inicializarSucursalManager();
 
@@ -102,7 +102,7 @@ public class UsuarioController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(usuarioManager.list(model).size() + "");
+                total = Long.parseLong(funcionarioManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -112,7 +112,7 @@ public class UsuarioController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = usuarioManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = funcionarioManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
 
@@ -165,9 +165,9 @@ public class UsuarioController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
 
-            Map<String, Object> model = usuarioManager.getUsuario(new Usuarios(id));
+            Map<String, Object> model = funcionarioManager.getUsuario(new Funcionarios(id));
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -191,15 +191,15 @@ public class UsuarioController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Usuarios model,
+            @RequestBody @Valid Funcionarios model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
-        Usuarios ejUsuario = new Usuarios();
+        Funcionarios ejUsuario = new Funcionarios();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
 
             if (errors.hasErrors()) {
 
@@ -214,11 +214,11 @@ public class UsuarioController extends BaseController {
             Sucursales ejSucursales = new Sucursales();
             ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            Usuarios ejUsuarios = new Usuarios();
+            Funcionarios ejUsuarios = new Funcionarios();
             ejUsuarios.setAlias(model.getAlias());
             ejUsuarios.setSucursal(ejSucursales);
 
-            Map<String, Object> usuarioMaps = usuarioManager.getLike(ejUsuarios, "alias".split(","));
+            Map<String, Object> usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
 
             if (usuarioMaps != null) {
                 response.setStatus(205);
@@ -230,10 +230,10 @@ public class UsuarioController extends BaseController {
             ejPersona.setDocumento(model.getPersona().getDocumento());
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            ejUsuarios = new Usuarios();
+            ejUsuarios = new Funcionarios();
             ejUsuarios.setPersona(ejPersona);
 
-            usuarioMaps = usuarioManager.getLike(ejUsuarios, "alias".split(","));
+            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
 
             if (usuarioMaps != null) {
                 response.setStatus(205);
@@ -250,7 +250,7 @@ public class UsuarioController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            Map<String, Object> usuarioMap = usuarioManager.guardar(model);
+            Map<String, Object> usuarioMap = funcionarioManager.guardar(model);
 
             response.setModel(usuarioMap);
             response.setStatus(200);
@@ -276,14 +276,14 @@ public class UsuarioController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Usuarios model,
+            @RequestBody @Valid Funcionarios model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
 
             if (errors.hasErrors()) {
 
@@ -299,11 +299,11 @@ public class UsuarioController extends BaseController {
             Sucursales ejSucursales = new Sucursales();
             ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            Usuarios ejUsuarios = new Usuarios();
+            Funcionarios ejUsuarios = new Funcionarios();
             ejUsuarios.setAlias(model.getAlias());
             ejUsuarios.setSucursal(ejSucursales);
 
-            Map<String, Object> usuarioMaps = usuarioManager.getLike(ejUsuarios, "id".split(","));
+            Map<String, Object> usuarioMaps = funcionarioManager.getLike(ejUsuarios, "id".split(","));
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -315,10 +315,10 @@ public class UsuarioController extends BaseController {
             ejPersona.setDocumento(model.getPersona().getDocumento());
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            ejUsuarios = new Usuarios();
+            ejUsuarios = new Funcionarios();
             ejUsuarios.setPersona(ejPersona);
 
-            usuarioMaps = usuarioManager.getLike(ejUsuarios, "id".split(","));
+            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "id".split(","));
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -326,7 +326,7 @@ public class UsuarioController extends BaseController {
                 return response;
             }
 
-            usuarioMaps = usuarioManager.getLike(new Usuarios(id), "claveAcceso".split(","));
+            usuarioMaps = funcionarioManager.getLike(new Funcionarios(id), "claveAcceso".split(","));
 
             if (usuarioMaps.get("claveAcceso").toString().compareToIgnoreCase(model.getClaveAcceso()) != 0) {
                 model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
@@ -336,7 +336,7 @@ public class UsuarioController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            Map<String, Object> usuarioMap = usuarioManager.editar(model);
+            Map<String, Object> usuarioMap = funcionarioManager.editar(model);
 
             response.setModel(usuarioMap);
             response.setStatus(200);
@@ -370,7 +370,7 @@ public class UsuarioController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
 
             if (errors.hasErrors()) {
 
@@ -382,7 +382,7 @@ public class UsuarioController extends BaseController {
                 return response;
             }
 
-            Usuarios object = usuarioManager.get(id);
+            Funcionarios object = funcionarioManager.get(id);
 
             if (passwordEncoder.matches(model.getClaveAcceso(), object.getClaveAcceso())) {
                 object.setClaveAcceso(passwordEncoder.encode(model.getNuevaClaveAcceso()));
@@ -395,7 +395,7 @@ public class UsuarioController extends BaseController {
             object.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             object.setIdUsuarioModificacion(userDetail.getId());
 
-            usuarioManager.update(object);
+            funcionarioManager.update(object);
 
             response.setStatus(200);
             response.setMessage("Password modificado con exito");
@@ -421,14 +421,14 @@ public class UsuarioController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarUsuarioManager();
+            inicializarFuncionarioManager();
 
-            Usuarios model = usuarioManager.get(id);
+            Funcionarios model = funcionarioManager.get(id);
             model.setActivo("N");
             model.setIdUsuarioEliminacion(userDetail.getId());
             model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
 
-            usuarioManager.update(model);
+            funcionarioManager.update(model);
 
             response.setModel(model);
             response.setStatus(200);

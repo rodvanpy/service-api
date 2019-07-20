@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package py.com.mojeda.service.ejb.entity;
 
 import java.sql.Timestamp;
@@ -23,7 +22,6 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -31,17 +29,34 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "FUNCIONARIOS", uniqueConstraints = @UniqueConstraint(name = "funcionario_persona_uq", columnNames = { "ID_PERSONA" }) )
-public class Funcionarios extends Base{
-    
+@Table(name = "FUNCIONARIOS", uniqueConstraints = @UniqueConstraint(name = "funcionario_alias_uq", columnNames = {"alias"}))
+public class Funcionarios extends Base {
+
     private static final long serialVersionUID = 8538760347986185608L;
     private static final String SECUENCIA = "seq_funcionario_id";
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
+
+    //@NotNull(message = "Ingrese Alias")
+    @NotEmpty(message = "Ingrese Alias")
+    @Column(name = "ALIAS")
+    private String alias;
+
+    //@NotNull(message = " Ingrese Clave Acceso")
+    @NotEmpty(message = "Ingrese Clave Acceso")
+    @Column(name = "CLAVE_ACCESO")
+    private String claveAcceso;
+
+    @Column(name = "SUPER_USUARIO")
+    private Boolean superUsuario;
+
+    @NotNull(message = "Ingrese Tiempo de Expiracion del Tokens")
+    @Column(name = "EXPIRATION_TIME_TOKENS")
+    private Long expirationTimeTokens;
     
     @NotEmpty(message = "Ingrese Nro. Legajo")
     @Column(name = "NRO_LEGAJO")
@@ -53,19 +68,12 @@ public class Funcionarios extends Base{
     
     @Column(name = "FECHA_EGRESO")
     private Timestamp fechaEgreso;
-
-    @NotNull(message = "Ingrese Salario")
-    @Column(name = "SALARIO")
-    private Double salario;
-    
-    @Column(name = "COMISION")
-    private Double comision; 
     
     @NotNull(message = "Ingrese Cargo")
     @ManyToOne
     @JoinColumn(name = "ID_CARGO", referencedColumnName = "id")
     @Valid
-    private Cargos cargo;
+    private TipoCargos cargo;
     
     @NotNull(message = "Ingrese Tipo Funcionario")
     @ManyToOne
@@ -76,35 +84,38 @@ public class Funcionarios extends Base{
     @ManyToOne
     @JoinColumn(name = "ID_TIPO_MOTI_RETIRO", referencedColumnName = "id")
     private TipoMotivosRetiro tipoMotivoRetiro;
-        
+
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @Valid
-    private Personas persona; 
-    
+    private Personas persona;
+
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL", referencedColumnName = "id")
     private Sucursales sucursal;
     
+    @NotNull(message = "Ingrese Rol")
+    @ManyToOne
+    @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
+    private Rol rol;
+
     @Transient
-    private List<Map<String,Object>> departamentos;
+    private List<Map<String, Object>> departamentos;
     
     @Transient
     private List<Vinculos> vinculos;
-        
-    
+
     public Funcionarios() {
 
     }
 
     /**
-     * @param id
-     *            el id de Usuario
+     * @param id el id de Usuario
      */
     public Funcionarios(Long id) {
-            this.setId(id);
+        this.setId(id);
     }
-    
+
     /**
      * @return the id
      */
@@ -117,6 +128,112 @@ public class Funcionarios extends Base{
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the alias
+     */
+    public String getAlias() {
+        return alias;
+    }
+
+    /**
+     * @param alias the alias to set
+     */
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    /**
+     * @return the claveAcceso
+     */
+    public String getClaveAcceso() {
+        return claveAcceso;
+    }
+
+    /**
+     * @param claveAcceso the claveAcceso to set
+     */
+    public void setClaveAcceso(String claveAcceso) {
+        this.claveAcceso = claveAcceso;
+    }
+
+    /**
+     * @return the superUsuario
+     */
+    public Boolean getSuperUsuario() {
+        return superUsuario;
+    }
+
+    /**
+     * @param superUsuario the superUsuario to set
+     */
+    public void setSuperUsuario(Boolean superUsuario) {
+        this.superUsuario = superUsuario;
+    }
+
+    /**
+     * @return the rol
+     */
+    public Rol getRol() {
+        return rol;
+    }
+
+    /**
+     * @param rol the rol to set
+     */
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
+    /**
+     * @return the persona
+     */
+    public Personas getPersona() {
+        return persona;
+    }
+
+    /**
+     * @param persona the persona to set
+     */
+    public void setPersona(Personas persona) {
+        this.persona = persona;
+    }
+
+    public Long getExpirationTimeTokens() {
+        return expirationTimeTokens;
+    }
+
+    public void setExpirationTimeTokens(Long expirationTimeTokens) {
+        this.expirationTimeTokens = expirationTimeTokens;
+    }
+
+    public String getClassName() {
+        return this.getClass().getSimpleName();
+    }
+
+    public List<Map<String, Object>> getDepartamentos() {
+        return departamentos;
+    }
+
+    public void setDepartamentos(List<Map<String, Object>> departamentos) {
+        this.departamentos = departamentos;
+    }
+
+    public Sucursales getSucursal() {
+        return sucursal;
+    }
+
+    public void setSucursal(Sucursales sucursal) {
+        this.sucursal = sucursal;
+    }
+
+    public List<Vinculos> getVinculos() {
+        return vinculos;
+    }
+
+    public void setVinculos(List<Vinculos> vinculos) {
+        this.vinculos = vinculos;
     }
 
     /**
@@ -162,44 +279,16 @@ public class Funcionarios extends Base{
     }
 
     /**
-     * @return the salario
-     */
-    public Double getSalario() {
-        return salario;
-    }
-
-    /**
-     * @param salario the salario to set
-     */
-    public void setSalario(Double salario) {
-        this.salario = salario;
-    }
-
-    /**
-     * @return the comision
-     */
-    public Double getComision() {
-        return comision;
-    }
-
-    /**
-     * @param comision the comision to set
-     */
-    public void setComision(Double comision) {
-        this.comision = comision;
-    }
-
-    /**
      * @return the cargo
      */
-    public Cargos getCargo() {
+    public TipoCargos getCargo() {
         return cargo;
     }
 
     /**
      * @param cargo the cargo to set
      */
-    public void setCargo(Cargos cargo) {
+    public void setCargo(TipoCargos cargo) {
         this.cargo = cargo;
     }
 
@@ -230,64 +319,7 @@ public class Funcionarios extends Base{
     public void setTipoMotivoRetiro(TipoMotivosRetiro tipoMotivoRetiro) {
         this.tipoMotivoRetiro = tipoMotivoRetiro;
     }
-
-    /**
-     * @return the persona
-     */
-    public Personas getPersona() {
-        return persona;
-    }
-
-    /**
-     * @param persona the persona to set
-     */
-    public void setPersona(Personas persona) {
-        this.persona = persona;
-    }
-
-    /**
-     * @return the sucursal
-     */
-    public Sucursales getSucursal() {
-        return sucursal;
-    }
-
-    /**
-     * @param sucursal the sucursal to set
-     */
-    public void setSucursal(Sucursales sucursal) {
-        this.sucursal = sucursal;
-    }
-
-    /**
-     * @return the departamentos
-     */
-    public List<Map<String,Object>> getDepartamentos() {
-        return departamentos;
-    }
-
-    /**
-     * @param departamentos the departamentos to set
-     */
-    public void setDepartamentos(List<Map<String,Object>> departamentos) {
-        this.departamentos = departamentos;
-    }
-
-    /**
-     * @return the vinculos
-     */
-    public List<Vinculos> getVinculos() {
-        return vinculos;
-    }
-
-    /**
-     * @param vinculos the vinculos to set
-     */
-    public void setVinculos(List<Vinculos> vinculos) {
-        this.vinculos = vinculos;
-    }
-
     
     
-           
+
 }

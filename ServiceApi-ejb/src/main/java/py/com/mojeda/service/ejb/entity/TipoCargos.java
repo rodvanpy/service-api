@@ -5,7 +5,6 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
-import java.sql.Timestamp;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -24,11 +22,11 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "TIPO_HORARIOS")
-public class TipoHorarios extends Base{
+@Table(name = "TIPO_CARGOS")
+public class TipoCargos extends Base{
 
     private static final long serialVersionUID = 1574657L;
-    private static final String SECUENCIA = "seq_tipo_horarios_id";
+    private static final String SECUENCIA = "seq_tipo_cargos_id";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO,generator = SECUENCIA)
@@ -49,41 +47,14 @@ public class TipoHorarios extends Base{
     @Column(name = "CODIGO")
     private String codigo;
     
-    @NotNull(message = "Ingrese Fecha Inicio")
-    @Column(name = "FECHA_INICIO")
-    private Timestamp fechaInicio;
-    
-    @Column(name = "FECHA_FIN")
-    private Timestamp fechaFin;
-    
-    @NotEmpty(message = "Ingrese Hora Entrada")
-    @Basic(optional = false)
-    @Column(name = "HORA_ENTRADA")
-    private String horaEntrada;
-    
-    @NotEmpty(message = "Ingrese Hora Salida")
-    @Basic(optional = false)
-    @Column(name = "HORA_SALIDA")
-    private String horaSalida;
-    
-    @NotEmpty(message = "Ingrese Inicio Hora Almuerzo ")
-    @Basic(optional = false)
-    @Column(name = "HORA_ALMUERZO_INICIO")
-    private String horaAlmuerzoInicio;
-    
-    @NotEmpty(message = "Ingrese Inicio Hora Fin ")
-    @Basic(optional = false)
-    @Column(name = "HORA_ALMUERZO_FIN")
-    private String horaAlmuerzoFin;    
-    
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
     
-    public TipoHorarios() {
+    public TipoCargos() {
     }
 
-    public TipoHorarios(Long id) {
+    public TipoCargos(Long id) {
             this.setId(id);
     }
 
@@ -143,75 +114,13 @@ public class TipoHorarios extends Base{
         this.codigo = codigo;
     }
 
-    /**
-     * @return the descripcion
-     */
     public String getDescripcion() {
         return descripcion;
     }
 
-    /**
-     * @param descripcion the descripcion to set
-     */
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-
-    /**
-     * @return the horaEntrada
-     */
-    public String getHoraEntrada() {
-        return horaEntrada;
-    }
-
-    /**
-     * @param horaEntrada the horaEntrada to set
-     */
-    public void setHoraEntrada(String horaEntrada) {
-        this.horaEntrada = horaEntrada;
-    }
-
-    /**
-     * @return the horaSalida
-     */
-    public String getHoraSalida() {
-        return horaSalida;
-    }
-
-    /**
-     * @param horaSalida the horaSalida to set
-     */
-    public void setHoraSalida(String horaSalida) {
-        this.horaSalida = horaSalida;
-    }
-
-    /**
-     * @return the horaAlmuerzoInicio
-     */
-    public String getHoraAlmuerzoInicio() {
-        return horaAlmuerzoInicio;
-    }
-
-    /**
-     * @param horaAlmuerzoInicio the horaAlmuerzoInicio to set
-     */
-    public void setHoraAlmuerzoInicio(String horaAlmuerzoInicio) {
-        this.horaAlmuerzoInicio = horaAlmuerzoInicio;
-    }
-
-    /**
-     * @return the horaAlmuerzoFin
-     */
-    public String getHoraAlmuerzoFin() {
-        return horaAlmuerzoFin;
-    }
-
-    /**
-     * @param horaAlmuerzoFin the horaAlmuerzoFin to set
-     */
-    public void setHoraAlmuerzoFin(String horaAlmuerzoFin) {
-        this.horaAlmuerzoFin = horaAlmuerzoFin;
-    }
-  
+   
     
 }

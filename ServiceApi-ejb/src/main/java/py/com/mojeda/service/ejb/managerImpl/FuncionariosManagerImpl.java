@@ -5,6 +5,9 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,23 +26,23 @@ import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Profesiones;
 import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.UsuarioDepartamentos;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.FuncionariosDepartamentos;
 import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
-import py.com.mojeda.service.ejb.manager.FuncionarioManager;
+import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
+import py.com.mojeda.service.ejb.manager.FuncionarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
-import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.VinculoManager;
 
 /**
@@ -47,8 +50,8 @@ import py.com.mojeda.service.ejb.manager.VinculoManager;
  * @author Miguel
  */
 @Stateless
-public class FuncionarioManagerImpl extends GenericDaoImpl<Funcionarios, Long>
-        implements FuncionarioManager {
+public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
+        implements FuncionariosManager {
 
     @Override
     protected Class<Funcionarios> getEntityBeanType() {
@@ -67,8 +70,8 @@ public class FuncionarioManagerImpl extends GenericDaoImpl<Funcionarios, Long>
     @EJB(mappedName = "java:app/ServiceApi-ejb/SucursalManagerImpl")
     private SucursalManager sucursalManager;
 
-    @EJB(mappedName = "java:app/ServiceApi-ejb/UsuarioDepartamentosManagerImpl")
-    private UsuarioDepartamentosManager usuarioDepartamentosManager;
+    @EJB(mappedName = "java:app/ServiceApi-ejb/FuncionarioDepartamentosManagerImpl")
+    private FuncionarioDepartamentosManager funcionariosDepartamentosManager;
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/EmpresaManagerImpl")
     private EmpresaManager empresaManager;
@@ -98,28 +101,30 @@ public class FuncionarioManagerImpl extends GenericDaoImpl<Funcionarios, Long>
     private VinculoManager vinculoManager;
 
     @Override
-    public Map<String, Object> guardar(Funcionarios funcionario) throws Exception {
+    public Map<String, Object> guardar(Funcionarios usuario) throws Exception {
         Map<String, Object> object = null;
         Documentos ejDocumentos = null;
-        if (funcionario != null
-                && funcionario.getPersona() != null) {
+        if (usuario != null
+                && usuario.getPersona() != null) {
 
-            funcionario.getPersona().setIdUsuarioModificacion(funcionario.getIdUsuarioModificacion());
+            usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
 
-            Personas ejPersona = personaManager.guardar(funcionario.getPersona());
+            Personas ejPersona = personaManager.guardar(usuario.getPersona());
 
-            funcionario.setSucursal(new Sucursales(funcionario.getSucursal().getId()));
-            funcionario.setPersona(new Personas(ejPersona.getId()));
+            usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
+            usuario.setAlias(usuario.getAlias().toUpperCase());
+            usuario.setPersona(new Personas(ejPersona.getId()));
+            usuario.setRol(new Rol(usuario.getRol().getId()));
 
-            this.save(funcionario);
+            this.save(usuario);
             
-            for (Vinculos rpm : (funcionario.getVinculos()== null ? new ArrayList<Vinculos> (): funcionario.getVinculos())) {
+            for (Vinculos rpm : (usuario.getVinculos()== null ? new ArrayList<Vinculos> (): usuario.getVinculos())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(funcionario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(funcionario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
                     Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
@@ -133,16 +138,16 @@ public class FuncionarioManagerImpl extends GenericDaoImpl<Funcionarios, Long>
                 }                
             }
 
-            UsuarioDepartamentos usuarioDepartamentos;
+            FuncionariosDepartamentos usuarioDepartamentos;
             for (Map<String, Object> rpm : usuario.getDepartamentos()) {
-                usuarioDepartamentos = new UsuarioDepartamentos();
-                usuarioDepartamentos.setUsuario(usuario);
+                usuarioDepartamentos = new FuncionariosDepartamentos();
+                usuarioDepartamentos.setFuncionario(usuario);
                 usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(Long.parseLong(rpm.get("id").toString())));
 
-                usuarioDepartamentosManager.save(usuarioDepartamentos);
+                funcionariosDepartamentosManager.save(usuarioDepartamentos);
             }
 
-            Usuarios model = new Usuarios();
+            Funcionarios model = new Funcionarios();
             model.setAlias(usuario.getAlias());
 
             object = this.getUsuario(model);
@@ -151,57 +156,59 @@ public class FuncionarioManagerImpl extends GenericDaoImpl<Funcionarios, Long>
     }
 
     @Override
-    public Map<String, Object> editar(Funcionarios funcionario) throws Exception {
+    public Map<String, Object> editar(Funcionarios usuario) throws Exception {
         Map<String, Object> object = null;
         Documentos ejDocumentos = null;
-        if (funcionario != null
-                && funcionario.getPersona() != null) {
-            funcionario.getPersona().setIdUsuarioModificacion(funcionario.getIdUsuarioModificacion());
+        if (usuario != null
+                && usuario.getPersona() != null) {
+            usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
 
             Personas ejPersona = personaManager.editar(usuario.getPersona());
 
-            funcionario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
-            funcionario.setPersona(new Personas(ejPersona.getId()));
+            usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
+            usuario.setAlias(usuario.getAlias().toUpperCase());
+            usuario.setPersona(new Personas(ejPersona.getId()));
+            usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.update(usuario);
             
-            for (Vinculos rpm : (funcionario.getVinculos()== null ? new ArrayList<Vinculos> (): funcionario.getVinculos())) {
+            for (Vinculos rpm : (usuario.getVinculos()== null ? new ArrayList<Vinculos> (): usuario.getVinculos())) {
                 if(rpm.getId() == null){
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(funcionario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(funcionario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
                     Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(funcionario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
                     
                     Map<String, Object> responseMaps = vinculoManager.editar(rpm);
                 }                
             }
 
-            UsuarioDepartamentos usuarioDepartamentos = new UsuarioDepartamentos();
-            usuarioDepartamentos.setUsuario(usuario);
+            FuncionariosDepartamentos usuarioDepartamentos = new FuncionariosDepartamentos();
+            usuarioDepartamentos.setFuncionario(usuario);
 
-            List<UsuarioDepartamentos> list = usuarioDepartamentosManager.list(usuarioDepartamentos);
-            for (UsuarioDepartamentos rpc : list) {
-                usuarioDepartamentosManager.delete(rpc.getId());
+            List<FuncionariosDepartamentos> list = funcionariosDepartamentosManager.list(usuarioDepartamentos);
+            for (FuncionariosDepartamentos rpc : list) {
+                funcionariosDepartamentosManager.delete(rpc.getId());
             }
 
-            for (Map<String, Object> rpm : funcionario.getDepartamentos()) {
-                usuarioDepartamentos = new UsuarioDepartamentos();
-                usuarioDepartamentos.setUsuario(usuario);
+            for (Map<String, Object> rpm : usuario.getDepartamentos()) {
+                usuarioDepartamentos = new FuncionariosDepartamentos();
+                usuarioDepartamentos.setFuncionario(usuario);
                 usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(Long.parseLong(rpm.get("id").toString())));
 
-                usuarioDepartamentosManager.save(usuarioDepartamentos);
+                funcionariosDepartamentosManager.save(usuarioDepartamentos);
             }
 
-            Usuarios model = new Usuarios();
+            Funcionarios model = new Funcionarios();
             model.setAlias(usuario.getAlias());
 
             object = this.getUsuario(model);
@@ -211,9 +218,9 @@ public class FuncionarioManagerImpl extends GenericDaoImpl<Funcionarios, Long>
     }
 
     @Override
-    public Map<String, Object> getUsuario(Funcionarios funcionario) throws Exception {
+    public Map<String, Object> getUsuario(Funcionarios usuario) throws Exception {
 
-        Map<String, Object> model = this.getAtributos(funcionario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,activo".split(","));
+        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,activo".split(","));
         if (model != null) {
             Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
                     "id,nacionalidad.id,profesion.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud,activo".split(","));
@@ -261,10 +268,10 @@ public class FuncionarioManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             model.put("rol", rol);
             model.remove("rol.id");
 
-            UsuarioDepartamentos ejUsuarioDepartamentos = new UsuarioDepartamentos();
-            ejUsuarioDepartamentos.setUsuario(new Usuarios(Long.parseLong(model.get("id").toString())));
+            FuncionariosDepartamentos ejUsuarioDepartamentos = new FuncionariosDepartamentos();
+            ejUsuarioDepartamentos.setFuncionario(new Funcionarios(Long.parseLong(model.get("id").toString())));
 
-            List<Map<String, Object>> departamentos = usuarioDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","), true);
+            List<Map<String, Object>> departamentos = funcionariosDepartamentosManager.listAtributos(ejUsuarioDepartamentos, "departamento.id,departamento.alias,departamento.nombreArea,departamento.descripcionArea".split(","), true);
 
             for (Map<String, Object> rpm : departamentos) {
                 rpm.put("id", rpm.get("departamento.id"));

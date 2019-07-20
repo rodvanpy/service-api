@@ -25,7 +25,6 @@ import py.com.mojeda.service.ejb.manager.TipoGarantiasManager;
 import py.com.mojeda.service.ejb.manager.TipoPagosManager;
 import py.com.mojeda.service.ejb.manager.TipoReferenciaManager;
 import py.com.mojeda.service.ejb.manager.TipoVinculoManager;
-import py.com.mojeda.service.ejb.manager.UsuarioManager;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 import py.com.mojeda.service.ejb.manager.DepartamentosSucursalManager;
 import py.com.mojeda.service.ejb.manager.PermisoManager;
@@ -40,10 +39,15 @@ import py.com.mojeda.service.ejb.manager.PeriodoCapitalManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.PropuestaSolicitudManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
-import py.com.mojeda.service.ejb.manager.UsuarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.TipoIngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
 import py.com.mojeda.service.ejb.manager.VinculoManager;
+import py.com.mojeda.service.ejb.manager.FuncionarioDepartamentosManager;
+import py.com.mojeda.service.ejb.manager.FuncionariosManager;
+import py.com.mojeda.service.ejb.manager.TipoEstudiosManager;
+import py.com.mojeda.service.ejb.manager.TipoFuncionariosManager;
+import py.com.mojeda.service.ejb.manager.TipoHorariosManager;
+import py.com.mojeda.service.ejb.manager.TipoMotivosRetiroManager;
 
 /**
  *
@@ -55,7 +59,7 @@ public class BaseController {
     
     private Context context;
     
-    protected UsuarioManager usuarioManager;
+    protected FuncionariosManager funcionarioManager;
     
     protected ClientesManager clientesManager;
     
@@ -73,7 +77,7 @@ public class BaseController {
     
     protected DepartamentosSucursalManager departamentosSucursalManager;
     
-    protected UsuarioDepartamentosManager usuarioDepartamentosManager;
+    protected FuncionarioDepartamentosManager usuarioDepartamentosManager;
     
     protected ReferenciaManager referenciaManager;
     
@@ -100,6 +104,14 @@ public class BaseController {
     protected TipoIngresosEgresosManager tipoEgresosManager;
     
     protected TipoPagosManager tipoPagosManager;
+    
+    protected TipoFuncionariosManager tipoFuncionariosManager;
+    
+    protected TipoEstudiosManager tipoEstudiosManager;
+    
+    protected TipoHorariosManager tipoHorariosManager;
+    
+    protected TipoMotivosRetiroManager tipoMotivosRetiroManager;
     
     protected DocumentoManager documentoManager;
     
@@ -379,7 +391,7 @@ public class BaseController {
         if (usuarioDepartamentosManager == null) {
             try {
 
-                usuarioDepartamentosManager = (UsuarioDepartamentosManager) context.lookup("java:app/ServiceApi-ejb/UsuarioDepartamentosManagerImpl");
+                usuarioDepartamentosManager = (FuncionarioDepartamentosManager) context.lookup("java:app/ServiceApi-ejb/UsuarioDepartamentosManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }
@@ -530,6 +542,78 @@ public class BaseController {
         }
     }
     
+    protected void inicializarTipoEstudiosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (tipoEstudiosManager == null) {
+            try {
+
+                tipoEstudiosManager = (TipoEstudiosManager) context.lookup("java:app/ServiceApi-ejb/TipoEstudiosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarTipoHorariosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (tipoHorariosManager == null) {
+            try {
+
+                tipoHorariosManager = (TipoHorariosManager) context.lookup("java:app/ServiceApi-ejb/TipoHorariosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarTipoMotivosRetiroManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (tipoMotivosRetiroManager == null) {
+            try {
+
+                tipoMotivosRetiroManager = (TipoMotivosRetiroManager) context.lookup("java:app/ServiceApi-ejb/TipoMotivosRetiroManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarTipoFuncionariosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (tipoFuncionariosManager == null) {
+            try {
+
+                tipoFuncionariosManager = (TipoFuncionariosManager) context.lookup("java:app/ServiceApi-ejb/TipoFuncionariosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
     protected void inicializarTipoReferenciaManager() throws Exception {
         if (context == null) {
             try {
@@ -658,7 +742,7 @@ public class BaseController {
         }
     }
     
-    protected void inicializarUsuarioManager() throws Exception {
+    protected void inicializarFuncionarioManager() throws Exception {
         if (context == null) {
             try {
                 context = new InitialContext();
@@ -666,10 +750,10 @@ public class BaseController {
                 throw new RuntimeException("No se puede inicializar el contexto", e1);
             }
         }
-        if (usuarioManager == null) {
+        if (funcionarioManager == null) {
             try {
 
-                usuarioManager = (UsuarioManager) context.lookup("java:app/ServiceApi-ejb/UsuarioManagerImpl");
+                funcionarioManager = (FuncionariosManager) context.lookup("java:app/ServiceApi-ejb/FuncionariosManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }
