@@ -119,7 +119,7 @@ public class UserSession implements AuthenticationProvider {
         if (usuarioManager == null) {
             try {
 
-                usuarioManager = (FuncionariosManager) context.lookup("java:app/ServiceApi-ejb/UsuarioManagerImpl");
+                usuarioManager = (FuncionariosManager) context.lookup("java:app/ServiceApi-ejb/FuncionariosManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

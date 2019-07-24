@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
-import py.com.mojeda.service.ejb.entity.TipoDestinos;
+import py.com.mojeda.service.ejb.entity.TipoCargos;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -35,10 +35,10 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
  * @author miguel.ojeda
  */
 @Controller
-@RequestMapping(value = "/tipos-destinos")
-public class TipoDestinoController extends BaseController {
+@RequestMapping(value = "/tipos-cargos")
+public class TipoCargoController extends BaseController {
     
-    String atributos = "id,nombre,codigo,descripcion";
+    String atributos = "id,nombre,codigo,descripcion,activo";
     
     @GetMapping
     public @ResponseBody
@@ -53,12 +53,12 @@ public class TipoDestinoController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        TipoDestinos model = new TipoDestinos();
+        TipoCargos model = new TipoCargos();
         model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
-            inicializarTipoDestinosManager();
+            inicializarTipoCargosManager();
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -85,7 +85,7 @@ public class TipoDestinoController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(tipoDestinosManager.list(model).size() + "");
+                total = Long.parseLong(tipoCargosManager.list(model).size() + "");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -95,7 +95,7 @@ public class TipoDestinoController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
 
-            listMapGrupos = tipoDestinosManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
+            listMapGrupos = tipoCargosManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
             
@@ -135,9 +135,9 @@ public class TipoDestinoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoDestinosManager();
+            inicializarTipoCargosManager();
                         
-            TipoDestinos model = tipoDestinosManager.get(id);
+            TipoCargos model = tipoCargosManager.get(id);
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -163,13 +163,13 @@ public class TipoDestinoController extends BaseController {
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid TipoDestinos model,
+            @RequestBody @Valid TipoCargos model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoDestinosManager();
+            inicializarTipoCargosManager();
             
             if(errors.hasErrors()){
                 
@@ -181,11 +181,11 @@ public class TipoDestinoController extends BaseController {
                 return response;
             }
             
-            TipoDestinos dato = new TipoDestinos();
+            TipoCargos dato = new TipoCargos();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             dato.setNombre(model.getNombre());
             
-            Map<String,Object> objMaps = tipoDestinosManager.getLike(dato,"id".split(","));
+            Map<String,Object> objMaps = tipoCargosManager.getLike(dato,"id".split(","));
             
             if(objMaps != null){
                 response.setStatus(205);
@@ -193,13 +193,13 @@ public class TipoDestinoController extends BaseController {
                 return response;
             }
             
-            dato = new TipoDestinos();
+            dato = new TipoCargos();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
             //Numero Sucursal
-            Integer numeroCodigo = tipoDestinosManager.total(dato) + 1;
+            Integer numeroCodigo = tipoCargosManager.total(dato) + 1;
             
-            model.setCodigo("TD-" + numeroCodigo);
+            model.setCodigo("TC-" + numeroCodigo);
             
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setActivo("S");
@@ -208,14 +208,14 @@ public class TipoDestinoController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            tipoDestinosManager.save(model);
+            tipoCargosManager.save(model);
             
-            TipoDestinos empresa = new TipoDestinos();
+            TipoCargos empresa = new TipoCargos();
             empresa.setCodigo(model.getCodigo());
             
             response.setStatus(200);
-            response.setMessage("El Tipo Destino ha sido guardado");           
-            response.setModel(tipoDestinosManager.get(empresa));
+            response.setMessage("El registro ha sido guardado");           
+            response.setModel(tipoCargosManager.get(empresa));
             
         } catch (Exception e) {
             logger.error("Error: ",e);
@@ -240,13 +240,13 @@ public class TipoDestinoController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid TipoDestinos model,
+            @RequestBody @Valid TipoCargos model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarTipoDestinosManager();
+            inicializarTipoCargosManager();
             
             if(errors.hasErrors()){
                 
@@ -258,7 +258,7 @@ public class TipoDestinoController extends BaseController {
                 return response;
             }
             
-            TipoDestinos dato = tipoDestinosManager.get(id);
+            TipoCargos dato = tipoCargosManager.get(id);
 
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -267,10 +267,10 @@ public class TipoDestinoController extends BaseController {
             model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
             model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
             
-            tipoDestinosManager.update(model);
+            tipoCargosManager.update(model);
             
             response.setStatus(200);
-            response.setMessage("El Tipo Destino ha sido guardado");
+            response.setMessage("El registro ha sido guardado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);

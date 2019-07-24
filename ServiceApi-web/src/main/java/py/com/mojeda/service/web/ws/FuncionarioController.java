@@ -47,7 +47,8 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @RequestMapping(value = "/funcionarios")
 public class FuncionarioController extends BaseController {
 
-    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,nroLegajo,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,persona.id,"
+    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,"
+            + "nroLegajo,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,persona.id,"
             + "rol.id,sucursal.id,sucursal.empresa.id,activo";
 
     @GetMapping
@@ -222,7 +223,19 @@ public class FuncionarioController extends BaseController {
 
             if (usuarioMaps != null) {
                 response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo alias.");
+                response.setMessage("Ya existe un funcionario con el mismo alias.");
+                return response;
+            }
+            
+            ejUsuarios = new Funcionarios();
+            ejUsuarios.setNroLegajo(model.getNroLegajo());
+            ejUsuarios.setSucursal(ejSucursales);
+
+            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
+
+            if (usuarioMaps != null) {
+                response.setStatus(205);
+                response.setMessage("Ya existe un funcionario con el mismo numero de legajo.");
                 return response;
             }
 
@@ -237,7 +250,7 @@ public class FuncionarioController extends BaseController {
 
             if (usuarioMaps != null) {
                 response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo documento.");
+                response.setMessage("Ya existe un funcionario con el mismo documento.");
                 return response;
             }
 
@@ -254,7 +267,7 @@ public class FuncionarioController extends BaseController {
 
             response.setModel(usuarioMap);
             response.setStatus(200);
-            response.setMessage("Usuario creado con exito");
+            response.setMessage("Registro creado con exito");
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);
@@ -307,7 +320,7 @@ public class FuncionarioController extends BaseController {
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo alias.");
+                response.setMessage("Ya existe un funcionario con el mismo alias.");
                 return response;
             }
 
@@ -322,7 +335,7 @@ public class FuncionarioController extends BaseController {
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo documento.");
+                response.setMessage("Ya existe un funcionario con el mismo documento.");
                 return response;
             }
 
@@ -340,7 +353,7 @@ public class FuncionarioController extends BaseController {
 
             response.setModel(usuarioMap);
             response.setStatus(200);
-            response.setMessage("Usuario modificado con exito");
+            response.setMessage("Registro modificado con exito");
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);

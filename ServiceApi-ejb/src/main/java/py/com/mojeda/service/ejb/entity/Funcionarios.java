@@ -104,6 +104,12 @@ public class Funcionarios extends Base {
     
     @Transient
     private List<Vinculos> vinculos;
+    
+    @Transient
+    private List<Estudios> estudios;
+    
+    @Transient
+    private List<Referencias> referencias;
 
     public Funcionarios() {
 
@@ -318,6 +324,28 @@ public class Funcionarios extends Base {
      */
     public void setTipoMotivoRetiro(TipoMotivosRetiro tipoMotivoRetiro) {
         this.tipoMotivoRetiro = tipoMotivoRetiro;
+    }
+
+    /**
+     * @return the estudios
+     */
+    public List<Estudios> getEstudios() {
+        return estudios;
+    }
+
+    /**
+     * @param estudios the estudios to set
+     */
+    public void setEstudios(List<Estudios> estudios) {
+        this.estudios = estudios;
+    }
+
+    public List<Referencias> getReferencias() {
+        return referencias;
+    }
+
+    public void setReferencias(List<Referencias> referencias) {
+        this.referencias = referencias;
     }
     
     

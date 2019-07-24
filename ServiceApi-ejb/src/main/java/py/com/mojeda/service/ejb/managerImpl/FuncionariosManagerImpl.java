@@ -20,6 +20,7 @@ import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
 import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.Estudios;
 import py.com.mojeda.service.ejb.entity.Nacionalidades;
 import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Personas;
@@ -28,6 +29,10 @@ import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.FuncionariosDepartamentos;
+import py.com.mojeda.service.ejb.entity.Referencias;
+import py.com.mojeda.service.ejb.entity.TipoCargos;
+import py.com.mojeda.service.ejb.entity.TipoEstudios;
+import py.com.mojeda.service.ejb.entity.TipoFuncionarios;
 import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
@@ -36,13 +41,18 @@ import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
+import py.com.mojeda.service.ejb.manager.EstudiosManager;
 import py.com.mojeda.service.ejb.manager.FuncionarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
+import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 import py.com.mojeda.service.ejb.manager.RolManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
+import py.com.mojeda.service.ejb.manager.TipoCargosManager;
 import py.com.mojeda.service.ejb.manager.TipoDocumentosManager;
+import py.com.mojeda.service.ejb.manager.TipoEstudiosManager;
+import py.com.mojeda.service.ejb.manager.TipoFuncionariosManager;
 import py.com.mojeda.service.ejb.manager.VinculoManager;
 
 /**
@@ -96,9 +106,21 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
     private ProfesionesManager profesionesManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/VinculoManagerImpl")
     private VinculoManager vinculoManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/EstudiosManagerImpl")
+    private EstudiosManager estudiosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/TipoFuncionariosManagerImpl")
+    private TipoFuncionariosManager tipoFuncionariosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/TipoCargosManagerImpl")
+    private TipoCargosManager tipoCargosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/ReferenciaManagerImpl")
+    private ReferenciaManager referenciaManager;
 
     @Override
     public Map<String, Object> guardar(Funcionarios usuario) throws Exception {
@@ -117,25 +139,25 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.save(usuario);
-            
-            for (Vinculos rpm : (usuario.getVinculos()== null ? new ArrayList<Vinculos> (): usuario.getVinculos())) {
-                if(rpm.getId() == null){
+
+            for (Vinculos rpm : (usuario.getVinculos() == null ? new ArrayList<Vinculos>() : usuario.getVinculos())) {
+                if (rpm.getId() == null) {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                     rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
-                    
+
                     Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
-                }else{
+                } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
-                    
+
                     Map<String, Object> responseMaps = vinculoManager.editar(rpm);
-                }                
+                }
             }
 
             FuncionariosDepartamentos usuarioDepartamentos;
@@ -145,6 +167,46 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
                 usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(Long.parseLong(rpm.get("id").toString())));
 
                 funcionariosDepartamentosManager.save(usuarioDepartamentos);
+            }
+
+            for (Estudios rpm : usuario.getEstudios()) {
+
+                if (rpm.getId() == null) {
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+
+                    estudiosManager.save(rpm);
+                } else {
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+
+                    estudiosManager.update(rpm);
+                }
+            }
+            
+            for (Referencias rpm : (usuario.getReferencias() == null ? new ArrayList<Referencias> (): usuario.getReferencias())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                }                
             }
 
             Funcionarios model = new Funcionarios();
@@ -171,25 +233,25 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
             this.update(usuario);
-            
-            for (Vinculos rpm : (usuario.getVinculos()== null ? new ArrayList<Vinculos> (): usuario.getVinculos())) {
-                if(rpm.getId() == null){
+
+            for (Vinculos rpm : (usuario.getVinculos() == null ? new ArrayList<Vinculos>() : usuario.getVinculos())) {
+                if (rpm.getId() == null) {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                     rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
-                    
+
                     Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
-                }else{
+                } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
-                    
+
                     Map<String, Object> responseMaps = vinculoManager.editar(rpm);
-                }                
+                }
             }
 
             FuncionariosDepartamentos usuarioDepartamentos = new FuncionariosDepartamentos();
@@ -207,6 +269,46 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
 
                 funcionariosDepartamentosManager.save(usuarioDepartamentos);
             }
+            
+            for (Estudios rpm : usuario.getEstudios()) {
+
+                if (rpm.getId() == null) {
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+
+                    estudiosManager.save(rpm);
+                } else {
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+
+                    estudiosManager.update(rpm);
+                }
+            }
+            
+            for (Referencias rpm : (usuario.getReferencias() == null ? new ArrayList<Referencias> (): usuario.getReferencias())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
+                    rpm.setPersona(new Personas(ejPersona.getId()));
+                    
+                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
+                    
+                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                }                
+            }
 
             Funcionarios model = new Funcionarios();
             model.setAlias(usuario.getAlias());
@@ -220,11 +322,19 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
     @Override
     public Map<String, Object> getUsuario(Funcionarios usuario) throws Exception {
 
-        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,activo".split(","));
+        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,nroLegajo,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,activo".split(","));
         if (model != null) {
             Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
                     "id,nacionalidad.id,profesion.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud,activo".split(","));
-
+            
+            Map<String, Object> tipoFuncionario = tipoFuncionariosManager.getAtributos(new TipoFuncionarios(Long.parseLong(model.get("tipoFuncionario.id") == null ? "0" : model.get("tipoFuncionario.id").toString())), "id,nombre,codigo,activo".split(","));
+            model.put("tipoFuncionario", tipoFuncionario);
+            model.remove("tipoFuncionario.id");
+            
+            Map<String, Object> cargo = tipoCargosManager.getAtributos(new TipoCargos(Long.parseLong(model.get("cargo.id") == null ? "0" : model.get("cargo.id").toString())), "id,nombre,codigo,activo".split(","));
+            model.put("cargo", cargo);
+            model.remove("cargo.id");
+            
             Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString())), "id,nombre,activo".split(","));
             persona.put("profesion", profesion);
             persona.remove("profesion.id");
