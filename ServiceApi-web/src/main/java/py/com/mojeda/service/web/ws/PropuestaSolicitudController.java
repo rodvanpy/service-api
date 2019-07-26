@@ -119,7 +119,9 @@ public class PropuestaSolicitudController extends BaseController {
                     null, null, null, null, null, null, null, null, true);
 
             for (Map<String, Object> rpm : listMapGrupos) {
-                Map<String, Object> cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString())));
+                
+                Map<String, Object> cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString()))
+                        ,null);
 
                 Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
                         "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
@@ -167,7 +169,7 @@ public class PropuestaSolicitudController extends BaseController {
         try {
             inicializarFuncionarioManager();
 
-            Map<String, Object> model = funcionarioManager.getUsuario(new Funcionarios(id));
+            Map<String, Object> model = funcionarioManager.getUsuario(new Funcionarios(id),"");
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

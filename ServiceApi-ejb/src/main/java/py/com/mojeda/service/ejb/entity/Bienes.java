@@ -111,6 +111,12 @@ public class Bienes extends Base {
     
     @Column(name = "TIPO_BIEN")
     private String tipoBien;
+    
+    @Column(name = "LATITUD")
+    private Double latitud;
+    
+    @Column(name = "LONGITUD")
+    private Double longitud;
 
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
@@ -455,6 +461,22 @@ public class Bienes extends Base {
      */
     public void setPersona(Personas persona) {
         this.persona = persona;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
     }
 
     

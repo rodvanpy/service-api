@@ -150,18 +150,20 @@ public class ClienteController extends BaseController {
      * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
      *
      * @param id de la entidad
+     * @param included
      * @return
      */
     @GetMapping("/{id}")
     public @ResponseBody
     ResponseDTO getObject(
-            @ModelAttribute("id") Long id) {        
+            @ModelAttribute("id") Long id,
+            @ModelAttribute("included") String included) {        
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarClientesManager();
             
-            Map<String, Object> model = clientesManager.getCliente(new Clientes(id));            
+            Map<String, Object> model = clientesManager.getCliente(new Clientes(id), included);            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

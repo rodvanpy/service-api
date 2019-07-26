@@ -23,6 +23,6 @@ public interface FuncionariosManager extends GenericDao<Funcionarios, Long>{
     
     public Map<String, Object> editar(Funcionarios usuario) throws Exception;
     
-    public Map<String, Object> getUsuario(Funcionarios usuario) throws Exception;
+    public Map<String, Object> getUsuario(Funcionarios usuario, String included) throws Exception;
     
 }

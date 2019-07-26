@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.Barrios;
+import py.com.mojeda.service.ejb.entity.Bienes;
 import py.com.mojeda.service.ejb.entity.Ciudades;
 import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.DepartamentosSucursal;
@@ -29,12 +30,16 @@ import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.FuncionariosDepartamentos;
+import py.com.mojeda.service.ejb.entity.IngresosEgresos;
+import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.TipoCargos;
 import py.com.mojeda.service.ejb.entity.TipoEstudios;
 import py.com.mojeda.service.ejb.entity.TipoFuncionarios;
+import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
 import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
+import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
@@ -43,7 +48,9 @@ import py.com.mojeda.service.ejb.manager.DocumentoManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.EstudiosManager;
 import py.com.mojeda.service.ejb.manager.FuncionarioDepartamentosManager;
+import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
+import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.ReferenciaManager;
@@ -121,6 +128,16 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
     
     @EJB(mappedName = "java:app/ServiceApi-ejb/ReferenciaManagerImpl")
     private ReferenciaManager referenciaManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/BienesManagerImpl")
+    private BienesManager bienesManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/OcupacionPersonaManagerImpl")
+    private OcupacionPersonaManager ocupacionPersonaManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/IngresosEgresosManagerImpl")
+    private IngresosEgresosManager ingresosEgresosManager;
+
 
     @Override
     public Map<String, Object> guardar(Funcionarios usuario) throws Exception {
@@ -212,7 +229,7 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             Funcionarios model = new Funcionarios();
             model.setAlias(usuario.getAlias());
 
-            object = this.getUsuario(model);
+            object = this.getUsuario(model, "referencias,estudios");
         }
         return object;
     }
@@ -273,6 +290,7 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             for (Estudios rpm : usuario.getEstudios()) {
 
                 if (rpm.getId() == null) {
+                    
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
@@ -280,14 +298,15 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
                     rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    estudiosManager.save(rpm);
+                    estudiosManager.guardarEstudios(rpm);
                 } else {
+                    
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    estudiosManager.update(rpm);
+                    estudiosManager.editarEstudios(rpm);
                 }
             }
             
@@ -313,14 +332,14 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             Funcionarios model = new Funcionarios();
             model.setAlias(usuario.getAlias());
 
-            object = this.getUsuario(model);
+            object = this.getUsuario(model,"referencias,estudios");
         }
 
         return object;
     }
 
     @Override
-    public Map<String, Object> getUsuario(Funcionarios usuario) throws Exception {
+    public Map<String, Object> getUsuario(Funcionarios usuario, String included) throws Exception {
 
         Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,nroLegajo,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,activo".split(","));
         if (model != null) {
@@ -395,6 +414,79 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
                 rpm.remove("departamento.descripcionArea");
             }
             model.put("departamentos", departamentos);
+            
+            if (included.contains("inmuebles")) {
+                Bienes ejBienes = new Bienes();
+                ejBienes.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
+                ejBienes.setActivo("S");
+                ejBienes.setTipoBien("INMUEBLE");
+
+                List<Map<String, Object>> inmueblesMap = bienesManager.getListBienes(ejBienes);
+                model.put("bienesInmuebles", inmueblesMap);
+            }
+
+            if (included.contains("vehiculos")) {
+                Bienes ejBienes = new Bienes();
+                ejBienes.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
+                ejBienes.setActivo("S");
+                ejBienes.setTipoBien("VEHICULO");
+
+                List<Map<String, Object>> vehiculosMap = bienesManager.getListBienes(ejBienes);
+                model.put("bienesVehiculo", vehiculosMap);
+            }
+
+            if (included.contains("referencias")) {
+                Referencias ejReferencia = new Referencias();
+                ejReferencia.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
+                ejReferencia.setActivo("S");
+
+                List<Map<String, Object>> referenciasMap = referenciaManager.getListReferencias(ejReferencia);
+                model.put("referencias", referenciasMap);
+            }
+
+            if (included.contains("ingresos")) {
+                TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
+                ejTipoIngresosEgresos.setTipo("I");
+
+                IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
+                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
+                ejIngresosEgresos.setActivo("S");
+                ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
+
+                List<Map<String, Object>> ingresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
+                model.put("ingresos", ingresosMap);
+            }
+
+            if (included.contains("egresos")) {
+                TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
+                ejTipoIngresosEgresos.setTipo("E");
+
+                IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
+                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
+                ejIngresosEgresos.setActivo("S");
+                ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
+
+                List<Map<String, Object>> egresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
+                model.put("egresos", egresosMap);
+            }
+
+            if (included.contains("ocupaciones")) {
+                OcupacionPersona ejOcupaciones = new OcupacionPersona();
+                ejOcupaciones.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
+                ejOcupaciones.setActivo("S");
+
+                List<Map<String, Object>> ocupacionPersonaMap = ocupacionPersonaManager.getListOcupaciones(ejOcupaciones);
+                model.put("ocupaciones", ocupacionPersonaMap);
+            }
+            
+            if (included.contains("estudios")) {
+                Estudios ejEstudios = new Estudios();
+                ejEstudios.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
+                ejEstudios.setActivo("S");
+
+                List<Map<String, Object>> ocupacionPersonaMap = estudiosManager.getListEstudios(ejEstudios);
+                model.put("estudios", ocupacionPersonaMap);
+            }
         }
 
         return model;

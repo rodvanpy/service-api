@@ -122,7 +122,7 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     public Map<String, Object> getBienes(Bienes bienes){
         String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,"
                 + "lugarHipoteca,fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,"
-                + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,activo";
+                + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,latitud,longitud,activo";
 
         Map<String, Object> bienMap = this.getAtributos(bienes, atributos.split(","));
         if (bienMap != null) {

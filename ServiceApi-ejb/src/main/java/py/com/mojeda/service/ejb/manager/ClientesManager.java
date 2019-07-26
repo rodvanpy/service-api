@@ -23,6 +23,6 @@ public interface ClientesManager extends GenericDao<Clientes, Long>{
     
     public Map<String, Object> editar(Clientes cliente) throws Exception;
     
-    public Map<String, Object> getCliente(Clientes cliente) throws Exception;
+    public Map<String, Object> getCliente(Clientes cliente, String included) throws Exception;
     
 }

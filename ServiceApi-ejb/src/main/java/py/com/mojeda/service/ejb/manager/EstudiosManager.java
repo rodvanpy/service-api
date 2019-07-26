@@ -7,6 +7,8 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.List;
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Estudios;
 
@@ -18,4 +20,11 @@ import py.com.mojeda.service.ejb.entity.Estudios;
 @Local
 public interface EstudiosManager extends GenericDao<Estudios, Long>{   
     
+    public Map<String, Object> guardarEstudios(Estudios estudios) throws Exception;
+    
+    public Map<String, Object> editarEstudios(Estudios estudios) throws Exception;
+    
+    public Map<String, Object> getEstudios(Estudios estudios) throws Exception;
+    
+    public List<Map<String, Object>> getListEstudios(Estudios estudios);
 }
