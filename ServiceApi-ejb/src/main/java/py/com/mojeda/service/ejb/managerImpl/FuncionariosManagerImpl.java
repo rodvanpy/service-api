@@ -341,56 +341,15 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
     @Override
     public Map<String, Object> getUsuario(Funcionarios usuario, String included) throws Exception {
 
-        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,sucursal.id,sucursal.empresa.id,nroLegajo,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,activo".split(","));
+        Map<String, Object> model = this.getAtributos(usuario, "id,alias,claveAcceso,expirationTimeTokens,persona.id,rol.id,nroLegajo,sucursal.id,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,activo".split(","));
         if (model != null) {
-            Map<String, Object> persona = personaManager.getAtributos(new Personas(Long.parseLong(model.get("persona.id").toString())),
-                    "id,nacionalidad.id,profesion.id,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,observacion,latitud,longitud,activo".split(","));
+            Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())),included);
+            model.put("persona", persona);
+            model.remove("persona.id");
             
             Map<String, Object> tipoFuncionario = tipoFuncionariosManager.getAtributos(new TipoFuncionarios(Long.parseLong(model.get("tipoFuncionario.id") == null ? "0" : model.get("tipoFuncionario.id").toString())), "id,nombre,codigo,activo".split(","));
             model.put("tipoFuncionario", tipoFuncionario);
             model.remove("tipoFuncionario.id");
-            
-            Map<String, Object> cargo = tipoCargosManager.getAtributos(new TipoCargos(Long.parseLong(model.get("cargo.id") == null ? "0" : model.get("cargo.id").toString())), "id,nombre,codigo,activo".split(","));
-            model.put("cargo", cargo);
-            model.remove("cargo.id");
-            
-            Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString())), "id,nombre,activo".split(","));
-            persona.put("profesion", profesion);
-            persona.remove("profesion.id");
-
-            Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
-            persona.put("nacionalidad", nacionalidad);
-            persona.remove("nacionalidad.id");
-
-            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(persona.get("pais.id") == null ? "0" : persona.get("pais.id").toString())), "id,nombre,activo".split(","));
-            persona.put("pais", pais);
-            persona.remove("pais.id");
-
-            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(persona.get("departamento.id") == null ? "0" : persona.get("departamento.id").toString())), "id,nombre,activo".split(","));
-            persona.put("departamento", departamento);
-            persona.remove("departamento.id");
-
-            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(persona.get("ciudad.id") == null ? "0" : persona.get("ciudad.id").toString())), "id,nombre,activo".split(","));
-            persona.put("ciudad", ciudad);
-            persona.remove("ciudad.id");
-
-            Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(persona.get("barrio.id") == null ? "0" : persona.get("barrio.id").toString())), "id,nombre,activo".split(","));
-            persona.put("barrio", barrio);
-            persona.remove("barrio.id");
-
-            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
-                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-
-            Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(model.get("sucursal.empresa.id").toString())),
-                    "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-            sucursal.put("empresa", empresa);
-
-            model.put("sucursal", sucursal);
-            model.put("persona", persona);
-
-            model.remove("persona.id");
-            model.remove("sucursal.id");
-            model.remove("sucursal.empresa.id");
 
             Map<String, Object> rol = rolManager.getAtributos(new Rol(Long.parseLong(model.get("rol.id").toString())),
                     "id,nombre,activo".split(","));
@@ -415,78 +374,14 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             }
             model.put("departamentos", departamentos);
             
-            if (included.contains("inmuebles")) {
-                Bienes ejBienes = new Bienes();
-                ejBienes.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejBienes.setActivo("S");
-                ejBienes.setTipoBien("INMUEBLE");
-
-                List<Map<String, Object>> inmueblesMap = bienesManager.getListBienes(ejBienes);
-                model.put("bienesInmuebles", inmueblesMap);
-            }
-
-            if (included.contains("vehiculos")) {
-                Bienes ejBienes = new Bienes();
-                ejBienes.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejBienes.setActivo("S");
-                ejBienes.setTipoBien("VEHICULO");
-
-                List<Map<String, Object>> vehiculosMap = bienesManager.getListBienes(ejBienes);
-                model.put("bienesVehiculo", vehiculosMap);
-            }
-
-            if (included.contains("referencias")) {
-                Referencias ejReferencia = new Referencias();
-                ejReferencia.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejReferencia.setActivo("S");
-
-                List<Map<String, Object>> referenciasMap = referenciaManager.getListReferencias(ejReferencia);
-                model.put("referencias", referenciasMap);
-            }
-
-            if (included.contains("ingresos")) {
-                TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
-                ejTipoIngresosEgresos.setTipo("I");
-
-                IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
-                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejIngresosEgresos.setActivo("S");
-                ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
-
-                List<Map<String, Object>> ingresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
-                model.put("ingresos", ingresosMap);
-            }
-
-            if (included.contains("egresos")) {
-                TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
-                ejTipoIngresosEgresos.setTipo("E");
-
-                IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
-                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejIngresosEgresos.setActivo("S");
-                ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
-
-                List<Map<String, Object>> egresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
-                model.put("egresos", egresosMap);
-            }
-
-            if (included.contains("ocupaciones")) {
-                OcupacionPersona ejOcupaciones = new OcupacionPersona();
-                ejOcupaciones.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejOcupaciones.setActivo("S");
-
-                List<Map<String, Object>> ocupacionPersonaMap = ocupacionPersonaManager.getListOcupaciones(ejOcupaciones);
-                model.put("ocupaciones", ocupacionPersonaMap);
+            if (included.contains("sucursal")) {
+                Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
+                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
+                
+                model.put("sucursal", sucursal);
+                model.remove("sucursal.id");
             }
             
-            if (included.contains("estudios")) {
-                Estudios ejEstudios = new Estudios();
-                ejEstudios.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejEstudios.setActivo("S");
-
-                List<Map<String, Object>> ocupacionPersonaMap = estudiosManager.getListEstudios(ejEstudios);
-                model.put("estudios", ocupacionPersonaMap);
-            }
         }
 
         return model;

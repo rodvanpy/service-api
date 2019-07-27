@@ -400,74 +400,11 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
         Map<String, Object> model = this.getAtributos(cliente, "id,persona.id,sucursal.id,activo".split(","));
 
         if (model != null) {
-            Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())));
+            Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())),included);
 
             Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
                     "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-
-            if (included.contains("inmuebles")) {
-                Bienes ejBienes = new Bienes();
-                ejBienes.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejBienes.setActivo("S");
-                ejBienes.setTipoBien("INMUEBLE");
-
-                List<Map<String, Object>> inmueblesMap = bienesManager.getListBienes(ejBienes);
-                model.put("bienesInmuebles", inmueblesMap);
-            }
-
-            if (included.contains("vehiculos")) {
-                Bienes ejBienes = new Bienes();
-                ejBienes.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejBienes.setActivo("S");
-                ejBienes.setTipoBien("VEHICULO");
-
-                List<Map<String, Object>> vehiculosMap = bienesManager.getListBienes(ejBienes);
-                model.put("bienesVehiculo", vehiculosMap);
-            }
-
-            if (included.contains("referencias")) {
-                Referencias ejReferencia = new Referencias();
-                ejReferencia.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejReferencia.setActivo("S");
-
-                List<Map<String, Object>> referenciasMap = referenciaManager.getListReferencias(ejReferencia);
-                model.put("referencias", referenciasMap);
-            }
-
-            if (included.contains("ingresos")) {
-                TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
-                ejTipoIngresosEgresos.setTipo("I");
-
-                IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
-                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejIngresosEgresos.setActivo("S");
-                ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
-
-                List<Map<String, Object>> ingresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
-                model.put("ingresos", ingresosMap);
-            }
-
-            if (included.contains("egresos")) {
-                TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
-                ejTipoIngresosEgresos.setTipo("E");
-
-                IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
-                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejIngresosEgresos.setActivo("S");
-                ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
-
-                List<Map<String, Object>> egresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
-                model.put("egresos", egresosMap);
-            }
-
-            if (included.contains("ocupaciones")) {
-                OcupacionPersona ejOcupaciones = new OcupacionPersona();
-                ejOcupaciones.setPersona(new Personas(Long.parseLong(persona.get("id").toString())));
-                ejOcupaciones.setActivo("S");
-
-                List<Map<String, Object>> ocupacionPersonaMap = ocupacionPersonaManager.getListOcupaciones(ejOcupaciones);
-                model.put("ocupaciones", ocupacionPersonaMap);
-            }
+            
 
             model.put("sucursal", sucursal);
             model.put("persona", persona);
