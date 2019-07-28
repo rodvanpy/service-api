@@ -21,7 +21,6 @@ import py.com.mojeda.service.ejb.manager.PaisesManager;
 import static py.com.mojeda.service.ejb.managerImpl.OcupacionPersonaManagerImpl.logger;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 
-
 /**
  *
  * @author Miguel
@@ -34,9 +33,9 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     protected Class<Bienes> getEntityBeanType() {
         return Bienes.class;
     }
-    
+
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/PaisesManagerImpl")
     private PaisesManager paisesManager;
 
@@ -50,25 +49,27 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     public Map<String, Object> guardarBienes(Bienes bienes) throws Exception {
         Map<String, Object> object = null;
         try {
-            if(bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0){
-                if(bienes.getId() != null){
+            if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
+                if (bienes.getId() != null) {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
                     bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
                     this.update(bienes);
-                }else{
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.save(bienes);
+                } else {
+                    if (bienes.getMarca() != null) {
+                        bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                        bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                        bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                        this.save(bienes);
+                    }
                 }
-            }else{
-                if(bienes.getId() != null){
+            } else {
+                if (bienes.getId() != null) {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
                     bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
                     this.update(bienes);
-                }else{
+                } else {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
                     bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
@@ -86,25 +87,25 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     public Map<String, Object> editarBienes(Bienes bienes) throws Exception {
         Map<String, Object> object = null;
         try {
-            if(bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0){
-                if(bienes.getId() != null){
+            if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
+                if (bienes.getId() != null) {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
                     bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
                     this.update(bienes);
-                }else{
+                } else {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
                     bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
                     this.save(bienes);
                 }
-            }else{
-                if(bienes.getId() != null){
+            } else {
+                if (bienes.getId() != null) {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
                     bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
                     this.update(bienes);
-                }else{
+                } else {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
                     bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
@@ -119,7 +120,7 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     @Override
-    public Map<String, Object> getBienes(Bienes bienes){
+    public Map<String, Object> getBienes(Bienes bienes) {
         String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,"
                 + "lugarHipoteca,fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,"
                 + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,latitud,longitud,activo";
@@ -142,11 +143,11 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     @Override
-    public List<Map<String, Object>> getListBienes(Bienes bienes){
+    public List<Map<String, Object>> getListBienes(Bienes bienes) {
         List<Map<String, Object>> object = new ArrayList<>();
         try {
             List<Map<String, Object>> inmueblesMap = this.listAtributos(bienes, "id".split(","));
-            for(Map<String, Object> rpm: inmueblesMap){
+            for (Map<String, Object> rpm : inmueblesMap) {
                 Map<String, Object> map = this.getBienes(new Bienes(Long.parseLong(rpm.get("id").toString())));
                 object.add(map);
             }
@@ -154,6 +155,6 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
             logger.error("Error al  obtener registros", e);
         }
         return object;
-        
+
     }
 }

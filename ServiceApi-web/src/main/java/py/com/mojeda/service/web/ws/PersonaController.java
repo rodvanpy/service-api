@@ -7,6 +7,7 @@ package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,14 +23,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import py.com.mojeda.service.ejb.entity.Bienes;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.IngresosEgresos;
+import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
+import py.com.mojeda.service.web.utils.PersonasDTO;
 import py.com.mojeda.service.web.utils.ReglaDTO;
 
 /**
@@ -233,7 +239,7 @@ public class PersonaController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Personas model,
+            @RequestBody @Valid PersonasDTO model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -241,7 +247,11 @@ public class PersonaController extends BaseController {
         Funcionarios ejUsuario = new Funcionarios();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarFuncionarioManager();
+            inicializarPersonaManager();
+            inicializarBienesManager();
+            inicializarIngresosEgresosManager();
+            inicializarOcupacionPersonaManager();
+            inicializarReferenciaManager();
             
             if(errors.hasErrors()){
                 
@@ -255,7 +265,7 @@ public class PersonaController extends BaseController {
 
             Personas ejPersona = new Personas();
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));        
-            ejPersona.setDocumento(model.getDocumento());
+            ejPersona.setDocumento(model.getPersona().getDocumento());
             
             Map<String, Object> personaMaps = personaManager.getLike(ejPersona,"id".split(","));
             
@@ -265,16 +275,130 @@ public class PersonaController extends BaseController {
                 return response;
             }
             
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setActivo("S");
-            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioCreacion(userDetail.getId());
-            model.setIdUsuarioModificacion(userDetail.getId());
+            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.getPersona().setActivo("S");
+            model.getPersona().setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            model.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.getPersona().setIdUsuarioCreacion(userDetail.getId());
+            model.getPersona().setIdUsuarioModificacion(userDetail.getId());
             
-            //model = usuarioManager.guardar(model);
+            model.setPersona(personaManager.guardar(model.getPersona()));
             
-            response.setModel(model);
+            for (Bienes rpm : (model.getBienesInmuebles() == null ? new ArrayList<Bienes> (): model.getBienesInmuebles())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                }                
+            }
+            
+            for (Bienes rpm : (model.getBienesVehiculo()  == null ? new ArrayList<Bienes> (): model.getBienesVehiculo())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                }                
+            }
+            
+            for (IngresosEgresos rpm : (model.getEgresos() == null ? new ArrayList<IngresosEgresos> (): model.getEgresos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                }                
+            }
+            
+            for (IngresosEgresos rpm : (model.getIngresos() == null ? new ArrayList<IngresosEgresos> (): model.getIngresos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                }                
+            }
+            
+            for (OcupacionPersona rpm : (model.getOcupaciones() == null ? new ArrayList<OcupacionPersona> (): model.getOcupaciones())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
+                }                
+            }
+            
+            for (Referencias rpm : (model.getReferencias() == null ? new ArrayList<Referencias> (): model.getReferencias())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                }                
+            }
+            
+            response.setModel(personaManager.getPersona(ejPersona, "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
             response.setStatus(200);
             response.setMessage("Persona creado/a con exito");
         } catch (Exception e) {
@@ -298,7 +422,7 @@ public class PersonaController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Personas model,
+            @RequestBody @Valid PersonasDTO model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -318,22 +442,138 @@ public class PersonaController extends BaseController {
             }     
             
             Personas ejPersona = new Personas();
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));            
-            ejPersona.setDocumento(model.getDocumento());
+            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));            
+            ejPersona.setDocumento(model.getPersona().getDocumento());
             
             Map<String, Object> personaMaps = personaManager.getLike(ejPersona, "id".split(","));
             if (personaMaps != null
-                    && personaMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                    && personaMaps.get("id").toString().compareToIgnoreCase(model.getPersona().getId().toString()) != 0) {
                 response.setStatus(205);
                 response.setMessage("Ya existe una persona con el mismo documento.");
                 return response;
             }           
             
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioModificacion(userDetail.getId());
+            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.getPersona().setIdUsuarioModificacion(userDetail.getId());
             
-            //usuarioManager.editar(model);
+            model.setPersona(personaManager.editar(model.getPersona()));
+            
+            for (Bienes rpm : (model.getBienesInmuebles() == null ? new ArrayList<Bienes> (): model.getBienesInmuebles())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                }                
+            }
+            
+            for (Bienes rpm : (model.getBienesVehiculo()  == null ? new ArrayList<Bienes> (): model.getBienesVehiculo())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                }                
+            }
+            
+            for (IngresosEgresos rpm : (model.getEgresos() == null ? new ArrayList<IngresosEgresos> (): model.getEgresos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                }                
+            }
+            
+            for (IngresosEgresos rpm : (model.getIngresos() == null ? new ArrayList<IngresosEgresos> (): model.getIngresos())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                }                
+            }
+            
+            for (OcupacionPersona rpm : (model.getOcupaciones() == null ? new ArrayList<OcupacionPersona> (): model.getOcupaciones())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
+                }                
+            }
+            
+            for (Referencias rpm : (model.getReferencias() == null ? new ArrayList<Referencias> (): model.getReferencias())) {
+                if(rpm.getId() == null){
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    rpm.setIdUsuarioCreacion(userDetail.getId());
+                    rpm.setPersona(new Personas(model.getPersona().getId()));
+                    
+                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                }else{
+                    rpm.setActivo("S");
+                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpm.setIdUsuarioModificacion(userDetail.getId());
+                    
+                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                }                
+            }
+            
+            response.setModel(personaManager.getPersona(ejPersona, "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
             
             response.setStatus(200);
             response.setMessage("Persona modificado/a con exito");
