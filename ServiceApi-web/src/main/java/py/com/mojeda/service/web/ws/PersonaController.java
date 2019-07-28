@@ -429,7 +429,11 @@ public class PersonaController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarFuncionarioManager();
+            inicializarPersonaManager();
+            inicializarBienesManager();
+            inicializarIngresosEgresosManager();
+            inicializarOcupacionPersonaManager();
+            inicializarReferenciaManager();
             
             if(errors.hasErrors()){
                 
