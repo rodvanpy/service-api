@@ -18,6 +18,7 @@ import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.OcupacionPersonaManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.VinculoManager;
+import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 
 /**
  *
@@ -26,6 +27,8 @@ import py.com.mojeda.service.ejb.manager.VinculoManager;
 @Stateless
 public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
         implements VinculoManager {
+    
+    private static final ApplicationLogger logger = ApplicationLogger.getInstance();
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/PersonaManagerImpl")
     private PersonaManager personaManager;
@@ -45,13 +48,13 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                 && vinculo.getPersona() != null && vinculo.getPersonaVinculo() != null) {
 
             if (vinculo.getId() == null) {
-                Personas ejPersonaVinculo = personaManager.guardar(vinculo.getPersonaVinculo());
-                vinculo.setPersonaVinculo(new Personas(ejPersonaVinculo.getId()));
+
+                vinculo.setPersonaVinculo(new Personas(vinculo.getPersonaVinculo().getId()));
 
                 Vinculos ejVinculo;
                 if (vinculo.getTipoVinculo().compareToIgnoreCase("CONYUGE") == 0) {
                     ejVinculo = new Vinculos();
-                    ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                    ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                     ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                     ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
 
@@ -66,7 +69,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     } else {
 
                         ejVinculo = new Vinculos();
-                        ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                        ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                         ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                         ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
                         ejVinculo.setActivo("S");
@@ -81,7 +84,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
 
                 ejVinculo = new Vinculos();
                 ejVinculo.setPersona(new Personas(vinculo.getPersona().getId()));
-                ejVinculo.setPersonaVinculo(new Personas(ejPersonaVinculo.getId()));
+                ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersonaVinculo().getId()));
                 ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
 
                 ejVinculo = this.get(ejVinculo);
@@ -97,33 +100,13 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
 
                 object = this.getVinculo(vinculo);
 
-                for (OcupacionPersona rpm : (vinculo.getOcupaciones() == null ? new ArrayList<OcupacionPersona>() : vinculo.getOcupaciones())) {
-                    if (rpm.getId() == null) {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setIdUsuarioCreacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
-                    } else {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
-                    }
-                }
-
                 return object;
 
             } else {
-                Personas ejPersonaVinculo = personaManager.guardar(vinculo.getPersonaVinculo());
 
                 if (vinculo.getTipoVinculo().compareToIgnoreCase("CONYUGE") == 0) {
                     Vinculos ejVinculo = new Vinculos();
-                    ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                    ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                     ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                     ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
 
@@ -138,7 +121,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     } else {
 
                         ejVinculo = new Vinculos();
-                        ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                        ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                         ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                         ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
                         ejVinculo.setActivo("S");
@@ -151,32 +134,13 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     }
                 }
 
-                vinculo.setPersonaVinculo(new Personas(ejPersonaVinculo.getId()));
+                vinculo.setPersonaVinculo(new Personas(vinculo.getPersonaVinculo().getId()));
                 vinculo.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 vinculo.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
 
                 this.update(vinculo);
 
                 object = this.getVinculo(vinculo);
-
-                for (OcupacionPersona rpm : (vinculo.getOcupaciones() == null ? new ArrayList<OcupacionPersona>() : vinculo.getOcupaciones())) {
-                    if (rpm.getId() == null) {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setIdUsuarioCreacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
-                    } else {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
-                    }
-                }
 
                 return object;
             }
@@ -192,13 +156,13 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                 && vinculo.getPersona() != null && vinculo.getPersonaVinculo() != null) {
 
             if (vinculo.getId() == null) {
-                Personas ejPersonaVinculo = personaManager.guardar(vinculo.getPersonaVinculo());
-                vinculo.setPersonaVinculo(new Personas(ejPersonaVinculo.getId()));
+                
+                vinculo.setPersonaVinculo(new Personas(vinculo.getPersonaVinculo().getId()));
 
                 Vinculos ejVinculo;
                 if (vinculo.getTipoVinculo().compareToIgnoreCase("CONYUGE") == 0) {
                     ejVinculo = new Vinculos();
-                    ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                    ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                     ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                     ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
 
@@ -213,7 +177,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     } else {
 
                         ejVinculo = new Vinculos();
-                        ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                        ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                         ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                         ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
                         ejVinculo.setActivo("S");
@@ -228,7 +192,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
 
                 ejVinculo = new Vinculos();
                 ejVinculo.setPersona(new Personas(vinculo.getPersona().getId()));
-                ejVinculo.setPersonaVinculo(new Personas(ejPersonaVinculo.getId()));
+                ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersonaVinculo().getId()));
                 ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
 
                 ejVinculo = this.get(ejVinculo);
@@ -242,35 +206,15 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     this.save(vinculo);
                 }
 
-                object = this.getVinculo(vinculo);
-                
-                for (OcupacionPersona rpm : (vinculo.getOcupaciones() == null ? new ArrayList<OcupacionPersona>() : vinculo.getOcupaciones())) {
-                    if (rpm.getId() == null) {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setIdUsuarioCreacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
-                    } else {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
-                    }
-                }
+                object = this.getVinculo(vinculo);                
 
                 return object;
 
             } else {
-                Personas ejPersonaVinculo = personaManager.guardar(vinculo.getPersonaVinculo());
 
                 if (vinculo.getTipoVinculo().compareToIgnoreCase("CONYUGE") == 0) {
                     Vinculos ejVinculo = new Vinculos();
-                    ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                    ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                     ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                     ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
 
@@ -285,7 +229,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     } else {
 
                         ejVinculo = new Vinculos();
-                        ejVinculo.setPersona(new Personas(ejPersonaVinculo.getId()));
+                        ejVinculo.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
                         ejVinculo.setPersonaVinculo(new Personas(vinculo.getPersona().getId()));
                         ejVinculo.setTipoVinculo(vinculo.getTipoVinculo());
                         ejVinculo.setActivo("S");
@@ -298,32 +242,13 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     }
                 }
 
-                vinculo.setPersonaVinculo(new Personas(ejPersonaVinculo.getId()));
+                vinculo.setPersonaVinculo(new Personas(vinculo.getPersonaVinculo().getId()));
                 vinculo.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 vinculo.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
 
                 this.update(vinculo);
 
                 object = this.getVinculo(vinculo);
-                
-                for (OcupacionPersona rpm : (vinculo.getOcupaciones() == null ? new ArrayList<OcupacionPersona>() : vinculo.getOcupaciones())) {
-                    if (rpm.getId() == null) {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setIdUsuarioCreacion(vinculo.getIdUsuarioModificacion());
-                        rpm.setPersona(new Personas(vinculo.getPersonaVinculo().getId()));
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
-                    } else {
-                        rpm.setActivo("S");
-                        rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                        rpm.setIdUsuarioModificacion(vinculo.getIdUsuarioModificacion());
-
-                        Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
-                    }
-                }
 
                 return object;
             }
@@ -334,23 +259,33 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
 
     @Override
     public Map<String, Object> getVinculo(Vinculos vinculo) throws Exception {
-        Map<String, Object> model = this.getAtributos(vinculo, "id,tipoVinculo,persona.id,personaVinculo.id,activo".split(","));
+        Map<String, Object> model = this.getAtributos(vinculo, "id,tipoVinculo,personaVinculo.id,activo".split(","));
 
         if (model != null) {
-            Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())));
+            //Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())));
 
             Map<String, Object> personaVinculo = personaManager.getPersona(new Personas(Long.parseLong(model.get("personaVinculo.id").toString())));
 
-            OcupacionPersona ejOcupacion = new OcupacionPersona();
-            ejOcupacion.setPersona(new Personas(Long.parseLong(model.get("personaVinculo.id").toString())));
-            List< Map<String, Object>> ocupaciones = ocupacionPersonaManager.getListOcupaciones(ejOcupacion);
-
-            model.put("ocupaciones", ocupaciones);
-            model.put("persona", persona);
-            model.remove("persona.id");
+            //model.put("persona", persona);
+            //model.remove("persona.id");
             model.put("personaVinculo", personaVinculo);
             model.remove("personaVinculo.id");
         }
         return model;
+    }
+    
+    @Override
+    public List<Map<String, Object>> getListVinculos(Vinculos vinculo) {
+        List<Map<String, Object>> object = new ArrayList<>();
+        try {
+            List<Map<String, Object>> vinculoMap = this.listAtributos(vinculo, "id".split(","));
+            for(Map<String, Object> rpm: vinculoMap){
+                Map<String, Object> map = this.getVinculo(new Vinculos(Long.parseLong(rpm.get("id").toString())));
+                object.add(map);
+            }
+        } catch (Exception e) {
+            logger.error("Error al  obtener registros", e);
+        }
+        return object;
     }
 }

@@ -28,6 +28,7 @@ import py.com.mojeda.service.ejb.entity.Profesiones;
 import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
+import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
@@ -42,6 +43,7 @@ import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.manager.ReferenciaManager;
 import py.com.mojeda.service.ejb.manager.SucursalManager;
+import py.com.mojeda.service.ejb.manager.VinculoManager;
 import py.com.mojeda.service.ejb.utils.Base64Bytes;
 import static py.com.mojeda.service.ejb.utils.Constants.CONTENT_PATH;
 
@@ -96,6 +98,9 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     
     @EJB(mappedName = "java:app/ServiceApi-ejb/EstudiosManagerImpl")
     private EstudiosManager estudiosManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/VinculoManagerImpl")
+    private VinculoManager vinculoManager;
 
 
     @Override
@@ -382,7 +387,16 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
                 List<Map<String, Object>> ocupacionPersonaMap = estudiosManager.getListEstudios(ejEstudios);
                 personaMap.put("estudios", ocupacionPersonaMap);
-            }                       
+            } 
+            
+            if (included.contains("vinculos")) {
+                Vinculos ejVinculos = new Vinculos();
+                ejVinculos.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejVinculos.setActivo("S");
+
+                List<Map<String, Object>> vinculosMap = vinculoManager.getListVinculos(ejVinculos);
+                personaMap.put("vinculos", vinculosMap);
+            }
             
             if (included.contains("empresa")) {
                 Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(personaMap.get("empresa.id").toString())),

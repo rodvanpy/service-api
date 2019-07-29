@@ -167,12 +167,14 @@ public class PersonaController extends BaseController {
      * Mapping para el metodo GET de la vista visualizar.(visualizar Persona)
      *
      * @param documento de la entidad
+     * @param included
      * @return
      */
     @GetMapping("/documento/{documento}")
     public @ResponseBody
     ResponseDTO getObjectCi(
-            @ModelAttribute("documento") String documento) {        
+            @ModelAttribute("documento") String documento,
+            @ModelAttribute("included") String included) {        
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
@@ -182,7 +184,7 @@ public class PersonaController extends BaseController {
             ejPersonas.setDocumento(documento);
             ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
-            Map<String, Object> modelMaps = personaManager.getPersona(ejPersonas);            
+            Map<String, Object> modelMaps = personaManager.getPersona(ejPersonas, included);            
             
             response.setModel(modelMaps);
             response.setStatus(modelMaps == null ? 404 : 200);
