@@ -5,6 +5,10 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.io.File;
+import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,13 +18,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author Miguel
  */
 @Entity
-public class Documentos extends Base{
+public class Documentos extends Base implements Serializable{ 
     /**
     * 
     */
@@ -59,6 +65,11 @@ public class Documentos extends Base{
    @ManyToOne
    @JoinColumn(name = "EMPRESA")
    private Empresas empresa;
+   
+//   @JsonDeserialize(as = MultipartFile.class)
+//   @JsonIgnoreProperties(ignoreUnknown = true)
+   @Transient
+   private MultipartFile file;
 
 
    /**
@@ -196,7 +207,13 @@ public class Documentos extends Base{
         this.tipoArchivo = tipoArchivo;
     }
 
-    
+    public MultipartFile getFile() {
+        return file;
+    }
+
+    public void setFile(MultipartFile file) {
+        this.file = file;
+    }
     
    
 }

@@ -167,9 +167,9 @@ public class PropuestaSolicitudController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarFuncionarioManager();
+            inicializarPropuestaSolicitudManager();
 
-            Map<String, Object> model = funcionarioManager.getUsuario(new Funcionarios(id),"");
+            Map<String, Object> model = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(id),"".split(","));
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -193,15 +193,16 @@ public class PropuestaSolicitudController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid Funcionarios model,
+            @RequestBody @Valid PropuestaSolicitud model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         Funcionarios ejUsuario = new Funcionarios();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        Gson gson = new Gson();
         try {
-            inicializarFuncionarioManager();
+            inicializarPropuestaSolicitudManager();
 
             if (errors.hasErrors()) {
 
@@ -213,50 +214,11 @@ public class PropuestaSolicitudController extends BaseController {
                 return response;
             }
             //Buscar usuario por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
-            Funcionarios ejUsuarios = new Funcionarios();
-            ejUsuarios.setAlias(model.getAlias());
-            ejUsuarios.setSucursal(ejSucursales);
-
-            Map<String, Object> usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
-
-            if (usuarioMaps != null) {
-                response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo alias.");
-                return response;
-            }
-
-            Personas ejPersona = new Personas();
-            ejPersona.setDocumento(model.getPersona().getDocumento());
-            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
-            ejUsuarios = new Funcionarios();
-            ejUsuarios.setPersona(ejPersona);
-
-            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
-
-            if (usuarioMaps != null) {
-                response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo documento.");
-                return response;
-            }
-
-            model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
-            model.setActivo("S");
-            model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
-            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioCreacion(userDetail.getId());
-            model.setIdUsuarioModificacion(userDetail.getId());
-            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
-            Map<String, Object> usuarioMap = funcionarioManager.guardar(model);
-
-            response.setModel(usuarioMap);
+            
+            logger.info(gson.toJson(model));
+            
             response.setStatus(200);
-            response.setMessage("Usuario creado con exito");
+            response.setMessage("Solicitud creada con exito");
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);
@@ -285,7 +247,7 @@ public class PropuestaSolicitudController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
-            inicializarFuncionarioManager();
+            inicializarPropuestaSolicitudManager();
 
             if (errors.hasErrors()) {
 
@@ -353,64 +315,6 @@ public class PropuestaSolicitudController extends BaseController {
     }
 
     /**
-     * Mapping para el metodo PUT de la vista actualizar Password.(actualizar
-     * Usuario)
-     *
-     * @param id de la entidad
-     * @param model entidad Usuario recibida de la vista
-     * @param errors
-     * @return
-     */
-    @PutMapping("/password/{id}")
-    public @ResponseBody
-    ResponseDTO updatePassword(
-            @ModelAttribute("id") Long id,
-            @RequestBody @Valid Password model,
-            Errors errors) {
-
-        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        ResponseDTO response = new ResponseDTO();
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        try {
-            inicializarFuncionarioManager();
-
-            if (errors.hasErrors()) {
-
-                response.setStatus(400);
-                response.setMessage(errors.getAllErrors()
-                        .stream()
-                        .map(x -> x.getDefaultMessage())
-                        .collect(Collectors.joining(",")));
-                return response;
-            }
-
-            Funcionarios object = funcionarioManager.get(id);
-
-            if (passwordEncoder.matches(model.getClaveAcceso(), object.getClaveAcceso())) {
-                object.setClaveAcceso(passwordEncoder.encode(model.getNuevaClaveAcceso()));
-            } else {
-                response.setStatus(201);
-                response.setMessage("Clave de Acceso no coincide.");
-                return response;
-            }
-
-            object.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            object.setIdUsuarioModificacion(userDetail.getId());
-
-            funcionarioManager.update(object);
-
-            response.setStatus(200);
-            response.setMessage("Password modificado con exito");
-        } catch (Exception e) {
-            logger.error("Error: ", e);
-            response.setStatus(500);
-            response.setMessage("Error interno del servidor.");
-        }
-
-        return response;
-    }
-
-    /**
      * Mapping para el metodo DELETE de la vista.(eliminar Usuario)
      *
      * @param id de la entidad
@@ -423,7 +327,7 @@ public class PropuestaSolicitudController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
-            inicializarFuncionarioManager();
+            inicializarPropuestaSolicitudManager();
 
             Funcionarios model = funcionarioManager.get(id);
             model.setActivo("N");

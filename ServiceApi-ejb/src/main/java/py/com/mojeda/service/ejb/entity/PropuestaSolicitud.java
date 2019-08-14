@@ -7,6 +7,7 @@ package py.com.mojeda.service.ejb.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -93,7 +94,7 @@ public class PropuestaSolicitud extends Base{
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_TIPO_CALCULO", referencedColumnName = "id")
-    private TipoCalculos tipoCalculo;
+    private TipoCalculos tipoCalculoImporte;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_TIPO_GARANTIA", referencedColumnName = "id")
@@ -188,9 +189,6 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "IMPORTE_CUOTA")
     private Long importeCuota;
     
-    @Column(name = "TIPO_CALCULO_IMPORTE")
-    private Short tipoCalculoImporte;
-    
     @Column(name = "DETALLE_DESTINO")
     private String detalleDestino;
     
@@ -223,6 +221,17 @@ public class PropuestaSolicitud extends Base{
     @JoinColumn(name = "ID_SUCURSAL_ALTA", referencedColumnName = "id")
     private Sucursales sucursal;
        
+    private transient List<Documentos> documentos;
+    
+    private transient Personas persona;
+    
+    public PropuestaSolicitud() {
+
+    }
+
+    public PropuestaSolicitud(Long id) {
+        this.setId(id);
+    }
 
     /**
      * @return the id
@@ -378,20 +387,7 @@ public class PropuestaSolicitud extends Base{
         this.formaDesembolso = formaDesembolso;
     }
 
-    /**
-     * @return the tipoCalculo
-     */
-    public TipoCalculos getTipoCalculo() {
-        return tipoCalculo;
-    }
-
-    /**
-     * @param tipoCalculo the tipoCalculo to set
-     */
-    public void setTipoCalculo(TipoCalculos tipoCalculo) {
-        this.tipoCalculo = tipoCalculo;
-    }
-
+    
     /**
      * @return the tipoInteres
      */
@@ -722,19 +718,7 @@ public class PropuestaSolicitud extends Base{
         this.observacionFormalizador = observacionFormalizador;
     }
 
-    /**
-     * @return the tipoCalculoImporte
-     */
-    public Short getTipoCalculoImporte() {
-        return tipoCalculoImporte;
-    }
-
-    /**
-     * @param tipoCalculoImporte the tipoCalculoImporte to set
-     */
-    public void setTipoCalculoImporte(Short tipoCalculoImporte) {
-        this.tipoCalculoImporte = tipoCalculoImporte;
-    }
+    
 
     /**
      * @return the detalleDestino
@@ -934,6 +918,48 @@ public class PropuestaSolicitud extends Base{
      */
     public void setFuncionario(Funcionarios funcionario) {
         this.funcionario = funcionario;
+    }
+
+    /**
+     * @return the documentos
+     */
+    public List<Documentos> getDocumentos() {
+        return documentos;
+    }
+
+    /**
+     * @param documentos the documentos to set
+     */
+    public void setDocumentos(List<Documentos> documentos) {
+        this.documentos = documentos;
+    }
+
+    /**
+     * @return the persona
+     */
+    public Personas getPersona() {
+        return persona;
+    }
+
+    /**
+     * @param persona the persona to set
+     */
+    public void setPersona(Personas persona) {
+        this.persona = persona;
+    }
+
+    /**
+     * @return the tipoCalculoImporte
+     */
+    public TipoCalculos getTipoCalculoImporte() {
+        return tipoCalculoImporte;
+    }
+
+    /**
+     * @param tipoCalculoImporte the tipoCalculoImporte to set
+     */
+    public void setTipoCalculoImporte(TipoCalculos tipoCalculoImporte) {
+        this.tipoCalculoImporte = tipoCalculoImporte;
     }
     
     
