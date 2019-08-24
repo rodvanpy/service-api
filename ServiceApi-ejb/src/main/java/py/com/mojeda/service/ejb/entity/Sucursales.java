@@ -100,6 +100,9 @@ public class Sucursales extends Base {
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
     
+    @Column(name = "ENTIDAD")
+    private String entidad = "SUCURSALES";
+    
     @Transient
     private List<DepartamentosSucursal> departamentos;
 
@@ -361,6 +364,18 @@ public class Sucursales extends Base {
         this.barrio = barrio;
     }
     
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
     
 }

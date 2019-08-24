@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -23,6 +24,7 @@ import javax.persistence.TemporalType;
  *
  * @author miguel.ojeda
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "BIENES_SOLICITUDES")
 public class BienesSolicitudes extends Base {
@@ -115,6 +117,19 @@ public class BienesSolicitudes extends Base {
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Personas persona;
+    
+    @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")
+    @ManyToOne
+    private PropuestaSolicitud propuestaSolicitud;
+    
+    @Column(name = "LATITUD")
+    private Double latitud;
+
+    @Column(name = "LONGITUD")
+    private Double longitud;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "BIENES_SOLICITUDES";
 
     public BienesSolicitudes() {
     }
@@ -457,6 +472,44 @@ public class BienesSolicitudes extends Base {
         this.persona = persona;
     }
 
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
 
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
+
+    public PropuestaSolicitud getPropuestaSolicitud() {
+        return propuestaSolicitud;
+    }
+
+    public void setPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) {
+        this.propuestaSolicitud = propuestaSolicitud;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
+    }
+    
+    
+    
 }

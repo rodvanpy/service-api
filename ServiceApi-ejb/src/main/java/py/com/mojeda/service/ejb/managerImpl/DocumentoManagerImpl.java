@@ -34,8 +34,8 @@ public class DocumentoManagerImpl extends GenericDaoImpl<Documentos, Long> imple
     public Documentos guardar(Documentos documento) throws Exception {
         Documentos retorno = null;
         if (documento != null) {
-            Files.createDirectories(Paths.get(CONTENT_PATH + documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
-            String path = documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();
+            Files.createDirectories(Paths.get(CONTENT_PATH + documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
+            String path = documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();
             FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
             fos.write(documento.getDocumento());
             fos.close();
@@ -58,8 +58,8 @@ public class DocumentoManagerImpl extends GenericDaoImpl<Documentos, Long> imple
 
             byte[] archivo = documento.getDocumento();
 
-            Files.createDirectories(Paths.get(CONTENT_PATH + documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
-            String path = documento.getNombreTabla() + "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();
+            Files.createDirectories(Paths.get(CONTENT_PATH + documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
+            String path = documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();
             FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
             fos.write(archivo);
             fos.close();

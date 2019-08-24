@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -23,6 +25,7 @@ import javax.persistence.TemporalType;
  *
  * @author miguel.ojeda
  */
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Entity
 @Table(name = "BIENES")
 public class Bienes extends Base {
@@ -117,10 +120,14 @@ public class Bienes extends Base {
     
     @Column(name = "LONGITUD")
     private Double longitud;
-
+    
+    @JsonIgnore
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Personas persona;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "BIENES";
 
     public Bienes() {
     }
@@ -479,6 +486,18 @@ public class Bienes extends Base {
         this.longitud = longitud;
     }
 
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
 
 }

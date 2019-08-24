@@ -45,6 +45,9 @@ public class Ciudades extends Base{
     @JoinColumn(name = "ID_DEPARTAMENTO_PAIS", referencedColumnName = "id")
     private DepartamentosPais departamentoPais;
     
+    @Column(name = "ENTIDAD")
+    private String entidad = "CIUDADES";
+    
    
     
     public Ciudades() {
@@ -90,6 +93,18 @@ public class Ciudades extends Base{
         this.departamentoPais = departamentoPais;
     }
     
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
     
 }

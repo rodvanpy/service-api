@@ -53,7 +53,7 @@ public class ImagenController extends BaseController {
             if (entidadId != 0) { // Si es un editar
                 
                 Documentos imagen = new Documentos();
-                imagen.setNombreTabla(entidad);
+                imagen.setEntidad(entidad);
                 imagen.setIdEntidad(entidadId);
                 imagen.setEmpresa(new Empresas(idEmpresa));
                 
@@ -84,7 +84,7 @@ public class ImagenController extends BaseController {
                 }
             } else { // Si es un agregar
                 Documentos imagen = new Documentos();
-                imagen.setNombreTabla(entidad);
+                imagen.setEntidad(entidad);
                 imagen.setIdEntidad(0l);
                 
                 imagen = documentoManager.get(imagen);

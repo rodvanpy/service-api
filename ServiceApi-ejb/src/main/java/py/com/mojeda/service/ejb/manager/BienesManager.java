@@ -20,11 +20,11 @@ import py.com.mojeda.service.ejb.entity.Bienes;
 @Local
 public interface BienesManager extends GenericDao<Bienes, Long>{ 
     
-    public Map<String, Object> guardarBienes(Bienes bien) throws Exception;
+    public Bienes guardarBienes(Bienes bien) throws Exception;
     
-    public Map<String, Object> editarBienes(Bienes bien) throws Exception;
+    public Bienes editarBienes(Bienes bien) throws Exception;
     
-    public Map<String, Object> getBienes(Bienes bien);
+    public Bienes getBienes(Bienes bien)throws Exception;
     
-    public List<Map<String, Object>> getListBienes(Bienes bien);
+    public List<Bienes> getListBienes(Bienes bien);
 }

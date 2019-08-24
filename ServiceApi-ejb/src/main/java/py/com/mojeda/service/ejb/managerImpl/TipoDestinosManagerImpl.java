@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.util.Map;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.TipoDestinos;
 import py.com.mojeda.service.ejb.manager.TipoDestinosManager;
@@ -21,5 +22,10 @@ public class TipoDestinosManagerImpl extends GenericDaoImpl<TipoDestinos, Long>
     @Override
     protected Class<TipoDestinos> getEntityBeanType() {
         return TipoDestinos.class;
+    }
+
+    @Override
+    public Map<String, Object> getTipoDestino(TipoDestinos tipoDestinos) throws Exception {
+        return this.getAtributos(tipoDestinos, "id,nombre,codigo".split(","));
     }
 }

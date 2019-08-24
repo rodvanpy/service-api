@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Clientes;
+import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.entity.Sucursales;
@@ -33,6 +35,7 @@ import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
+import py.com.mojeda.service.web.utils.Propuesta;
 import py.com.mojeda.service.web.utils.Password;
 import py.com.mojeda.service.web.utils.ReglaDTO;
 import static py.com.mojeda.service.web.ws.BaseController.logger;
@@ -45,8 +48,8 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @RequestMapping(value = "/solicitud_creditos")
 public class PropuestaSolicitudController extends BaseController {
 
-    String atributos = "id,fechaPresentacion,horaPresentacion,estado,fechaEstado,puntaje,montoSolicitado,tipoCredito,tasaInteres,tipoDesembolso.id,cliente.id,"
-            + "formaDesembolso,tipoCalculo.id,tipoInteres,ordenCheque,formaPago,plazo,montoSolicitadoOriginal,sucursal.id,sucursal.empresa.id,activo";
+    String atributos = "id,fechaPresentacion,horaPresentacion,estado,fechaEstado,puntaje,montoSolicitado,tipoCredito,tasaInteres,tipoDesembolso.id,cliente.id,entidad,"
+            + "tipoCalculoImporte.id,tipoInteres,ordenCheque,formaPago,plazo,montoSolicitadoOriginal,sucursal.id,sucursal.empresa.id,estado.id,activo";
 
     @GetMapping
     public @ResponseBody
@@ -77,6 +80,7 @@ public class PropuestaSolicitudController extends BaseController {
             inicializarPropuestaSolicitudManager();
             inicializarClientesManager();
             inicializarSucursalManager();
+            inicializarEstadosSolicitudManager();
 
             Gson gson = new Gson();
             String camposFiltros = null;
@@ -120,7 +124,7 @@ public class PropuestaSolicitudController extends BaseController {
 
             for (Map<String, Object> rpm : listMapGrupos) {
                 
-                Map<String, Object> cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString()))
+                Clientes cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString()))
                         ,null);
 
                 Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
@@ -128,6 +132,8 @@ public class PropuestaSolicitudController extends BaseController {
 
                 rpm.put("sucursal", sucursal);
                 rpm.put("cliente", cliente);
+                rpm.put("estado", estadosSolicitudManager.get(new EstadosSolicitud(Long.parseLong(rpm.get("estado.id").toString()))));
+                rpm.remove("estado.id");
                 rpm.remove("cliente.id");
                 rpm.remove("sucursal.id");
             }
@@ -193,7 +199,7 @@ public class PropuestaSolicitudController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid PropuestaSolicitud model,
+            @RequestBody @Valid  PropuestaSolicitud model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -214,9 +220,32 @@ public class PropuestaSolicitudController extends BaseController {
                 return response;
             }
             //Buscar usuario por empresa
+            model.setIdUsuarioCreacion(userDetail.getId());
+            model.setIdUsuarioModificacion(userDetail.getId());
+            model.setFuncionario(new Funcionarios(userDetail.getId()));
+            
+            //Buscar cliente con estado pendiente
+            Personas ejPersonas = new Personas();
+            ejPersonas.setDocumento(model.getCliente().getPersona().getDocumento());
+            
+            Clientes ejCliente = new Clientes();
+            ejCliente.setPersona(ejPersonas);
+            
+            PropuestaSolicitud ejPropuestaSolicitud = new PropuestaSolicitud();
+            ejPropuestaSolicitud.setCliente(ejCliente);
+            ejPropuestaSolicitud.setEstado(new EstadosSolicitud(1L));
+            
+            if(propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0){
+                response.setStatus(205);
+                response.setMessage("El cliente cuenta con una solicitud en estado pendiente.");
+                return response;
+            }
             
             logger.info(gson.toJson(model));
             
+            model = propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
+            
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("Solicitud creada con exito");
         } catch (Exception e) {
@@ -300,9 +329,9 @@ public class PropuestaSolicitudController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            Map<String, Object> usuarioMap = funcionarioManager.editar(model);
+            model = funcionarioManager.editar(model);
 
-            response.setModel(usuarioMap);
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("Usuario modificado con exito");
         } catch (Exception e) {

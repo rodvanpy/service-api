@@ -6,6 +6,7 @@
 
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.Column;
@@ -47,27 +48,36 @@ public class Clientes extends Base{
     @Valid
     private Personas persona;
     
+    @Column(name = "ENTIDAD")
+    private String entidad = "CLIENTES";
+    
     @Transient
+    @JsonIgnore
     private List<Bienes> bienesInmuebles;
     
     @Transient
+    @JsonIgnore
     private List<Bienes> bienesVehiculo;
     
     @Transient
+    @JsonIgnore
     private List<Referencias> referencias;
     
     @Transient
+    @JsonIgnore
     private List<IngresosEgresos> egresos;
     
     @Transient
+    @JsonIgnore
     private List<IngresosEgresos> ingresos;
     
     @Transient
+    @JsonIgnore
     private List<OcupacionPersona> ocupaciones;
     
     @Transient
+    @JsonIgnore
     private List<Vinculos> vinculos;
-
     
     public Clientes() {
 
@@ -227,5 +237,17 @@ public class Clientes extends Base{
         this.vinculos = vinculos;
     }
         
-           
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }       
 }

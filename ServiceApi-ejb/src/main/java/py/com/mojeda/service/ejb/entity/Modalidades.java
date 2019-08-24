@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -59,9 +60,13 @@ public class Modalidades extends Base {
     @JoinColumn(name = "ID_TIPO_CALCULO", referencedColumnName = "id")
     private TipoCalculos tipoCalculos;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "MODALIDADES";
     
     public Modalidades() {
     }
@@ -190,6 +195,18 @@ public class Modalidades extends Base {
         this.interes = interes;
     }
     
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
     
 }

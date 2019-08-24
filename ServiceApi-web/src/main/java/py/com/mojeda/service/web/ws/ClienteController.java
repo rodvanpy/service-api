@@ -7,6 +7,7 @@ package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -163,11 +164,60 @@ public class ClienteController extends BaseController {
         try {
             inicializarClientesManager();
             
-            Map<String, Object> model = clientesManager.getCliente(new Clientes(id), included);            
+            Clientes model = clientesManager.getCliente(new Clientes(id), included);            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
+        } catch (Exception e) {
+            logger.error("Error: ",e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
+    /**
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Cliente)
+     *
+     * @param documento de la entidad
+     * @param included
+     * @return
+     */
+    @GetMapping("/documento/{documento}")
+    public @ResponseBody
+    ResponseDTO getObjectCi(
+            @ModelAttribute("documento") String documento,
+            @ModelAttribute("included") String included) {        
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarClientesManager();
+            inicializarPersonaManager();
+            
+            
+            Personas ejPersonas = new Personas();          
+            ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            
+            if(documento.contains("-")){
+                ejPersonas.setRuc(documento);
+            }else{
+                ejPersonas.setDocumento(documento);
+            }
+            
+            Clientes ejCliente = new Clientes();
+            ejCliente.setPersona(ejPersonas);
+            
+            ejCliente =clientesManager.getCliente(ejCliente, included);
+            if(ejCliente == null){
+               ejCliente = new Clientes();
+               ejCliente.setPersona(personaManager.getPersona(ejPersonas, included));
+            }       
+            
+            response.setModel(ejCliente);
+            response.setStatus(ejCliente == null ? 404 : 200);
+            response.setMessage(ejCliente == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -235,7 +285,7 @@ public class ClienteController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             
             
-            Map<String,Object> modelMap = clientesManager.guardar(model);
+            Clientes modelMap = clientesManager.guardar(model);
             
             response.setModel(modelMap);
             response.setStatus(200);
@@ -307,7 +357,7 @@ public class ClienteController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            clienteMaps =clientesManager.editar(model);
+            ejCliente =clientesManager.editar(model);
             
             response.setModel(clienteMaps);
             response.setStatus(200);

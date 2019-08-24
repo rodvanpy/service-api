@@ -6,6 +6,7 @@
 
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;
@@ -27,19 +28,23 @@ public class Base implements Serializable {
 
     @Column(name = "fechaCreacion")
     private Timestamp fechaCreacion;
-
+    
+    @JsonIgnore
     @Column(name = "idUsuarioCreacion")
     private Long idUsuarioCreacion;
 
     @Column(name = "fechaModificacion")
     private Timestamp fechaModificacion;
-
+    
+    @JsonIgnore
     @Column(name = "idUsuarioModificacion")
     private Long idUsuarioModificacion;
-
+    
+    @JsonIgnore
     @Column(name = "fechaEliminacion")
     private Timestamp fechaEliminacion;
-
+    
+    @JsonIgnore
     @Column(name = "idUsuarioEliminacion")
     private Long idUsuarioEliminacion;
     

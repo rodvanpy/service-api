@@ -36,6 +36,9 @@ public class Paises extends Base{
     @Basic(optional = false)
     @Column(name = "NOMBRE")
     private String nombre;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "PAISES";
       
     
     public Paises() {
@@ -71,6 +74,20 @@ public class Paises extends Base{
      */
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
     }
     
 }

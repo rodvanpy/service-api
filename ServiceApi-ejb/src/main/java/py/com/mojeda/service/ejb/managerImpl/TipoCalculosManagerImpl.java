@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.util.Map;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.TipoCalculos;
 import py.com.mojeda.service.ejb.manager.TipoCalculosManager;
@@ -21,5 +22,10 @@ public class TipoCalculosManagerImpl extends GenericDaoImpl<TipoCalculos, Long>
     @Override
     protected Class<TipoCalculos> getEntityBeanType() {
         return TipoCalculos.class;
+    }
+
+    @Override
+    public Map<String, Object> getTipoCalculo(TipoCalculos tipoCalculos) throws Exception {       
+        return this.getAtributos(tipoCalculos, "id,nombre,codigo".split(","));
     }
 }

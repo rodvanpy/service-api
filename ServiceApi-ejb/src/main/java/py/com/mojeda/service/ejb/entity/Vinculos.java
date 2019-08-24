@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,6 +40,7 @@ public class Vinculos extends Base {
     @Column(name = "TIPO_VINCULO")
     private String tipoVinculo;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     private Personas persona;
@@ -47,6 +49,7 @@ public class Vinculos extends Base {
     @JoinColumn(name = "ID_VINCULO", referencedColumnName = "id")
     private Personas personaVinculo;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;

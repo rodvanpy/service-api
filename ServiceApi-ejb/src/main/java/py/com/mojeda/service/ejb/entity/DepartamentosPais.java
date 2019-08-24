@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +41,7 @@ public class DepartamentosPais extends Base{
     @Column(name = "NOMBRE")
     private String nombre;
     
+    @JsonIgnore
     @NotNull(message = "Ingrese Pais")
     @ManyToOne
     @JoinColumn(name = "ID_PAIS", referencedColumnName = "id")

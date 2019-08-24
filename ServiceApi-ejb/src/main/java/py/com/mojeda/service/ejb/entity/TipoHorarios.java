@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -76,6 +77,7 @@ public class TipoHorarios extends Base{
     @Column(name = "HORA_ALMUERZO_FIN")
     private String horaAlmuerzoFin;    
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
     private Empresas empresa;

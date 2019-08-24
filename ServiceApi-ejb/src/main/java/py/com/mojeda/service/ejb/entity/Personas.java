@@ -5,7 +5,10 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.sql.Timestamp;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,6 +28,7 @@ import py.com.mojeda.service.ejb.utils.Avatar;
  *
  * @author Miguel
  */
+@JsonInclude(Include.NON_NULL)
 @Entity
 @Table(name = "PERSONAS")
 public class Personas extends Base {
@@ -144,9 +148,36 @@ public class Personas extends Base {
     @ManyToOne
     @JoinColumn
     private Empresas empresa;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "PERSONAS";
         
     @Transient
     private Avatar avatar;
+    
+    @Transient
+    private List<Bienes> bienesInmuebles;
+    
+    @Transient
+    private List<Bienes> bienesVehiculo;
+    
+    @Transient
+    private List<Referencias> referencias;
+    
+    @Transient
+    private List<IngresosEgresos> egresos;
+    
+    @Transient
+    private List<IngresosEgresos> ingresos;
+    
+    @Transient
+    private List<OcupacionPersona> ocupaciones;
+    
+    @Transient
+    private List<Vinculos> vinculos;
+    
+    @Transient
+    private List<Estudios> estudios;
 
     public Personas() {
 
@@ -576,6 +607,132 @@ public class Personas extends Base {
      */
     public void setEmpresa(Empresas empresa) {
         this.empresa = empresa;
+    }
+    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
+
+    /**
+     * @return the bienesInmuebles
+     */
+    public List<Bienes> getBienesInmuebles() {
+        return bienesInmuebles;
+    }
+
+    /**
+     * @param bienesInmuebles the bienesInmuebles to set
+     */
+    public void setBienesInmuebles(List<Bienes> bienesInmuebles) {
+        this.bienesInmuebles = bienesInmuebles;
+    }
+
+    /**
+     * @return the bienesVehiculo
+     */
+    public List<Bienes> getBienesVehiculo() {
+        return bienesVehiculo;
+    }
+
+    /**
+     * @param bienesVehiculo the bienesVehiculo to set
+     */
+    public void setBienesVehiculo(List<Bienes> bienesVehiculo) {
+        this.bienesVehiculo = bienesVehiculo;
+    }
+
+    /**
+     * @return the referencias
+     */
+    public List<Referencias> getReferencias() {
+        return referencias;
+    }
+
+    /**
+     * @param referencias the referencias to set
+     */
+    public void setReferencias(List<Referencias> referencias) {
+        this.referencias = referencias;
+    }
+
+    /**
+     * @return the egresos
+     */
+    public List<IngresosEgresos> getEgresos() {
+        return egresos;
+    }
+
+    /**
+     * @param egresos the egresos to set
+     */
+    public void setEgresos(List<IngresosEgresos> egresos) {
+        this.egresos = egresos;
+    }
+
+    /**
+     * @return the ingresos
+     */
+    public List<IngresosEgresos> getIngresos() {
+        return ingresos;
+    }
+
+    /**
+     * @param ingresos the ingresos to set
+     */
+    public void setIngresos(List<IngresosEgresos> ingresos) {
+        this.ingresos = ingresos;
+    }
+
+    /**
+     * @return the ocupaciones
+     */
+    public List<OcupacionPersona> getOcupaciones() {
+        return ocupaciones;
+    }
+
+    /**
+     * @param ocupaciones the ocupaciones to set
+     */
+    public void setOcupaciones(List<OcupacionPersona> ocupaciones) {
+        this.ocupaciones = ocupaciones;
+    }
+
+    /**
+     * @return the vinculos
+     */
+    public List<Vinculos> getVinculos() {
+        return vinculos;
+    }
+
+    /**
+     * @param vinculos the vinculos to set
+     */
+    public void setVinculos(List<Vinculos> vinculos) {
+        this.vinculos = vinculos;
+    }
+
+    /**
+     * @return the estudios
+     */
+    public List<Estudios> getEstudios() {
+        return estudios;
+    }
+
+    /**
+     * @param estudios the estudios to set
+     */
+    public void setEstudios(List<Estudios> estudios) {
+        this.estudios = estudios;
     }
     
     

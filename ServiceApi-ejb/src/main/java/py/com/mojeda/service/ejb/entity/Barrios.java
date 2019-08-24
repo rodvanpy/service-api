@@ -50,8 +50,10 @@ public class Barrios extends Base{
     @ManyToOne
     @JoinColumn(name = "ID_CIUDAD", referencedColumnName = "id")
     private Ciudades ciudad;
-  
     
+    @Column(name = "ENTIDAD")
+    private String entidad = "BARRIOS";
+      
     public Barrios() {
     }
 
@@ -121,6 +123,20 @@ public class Barrios extends Base{
      */
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
+    }
+
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
     }
 
     

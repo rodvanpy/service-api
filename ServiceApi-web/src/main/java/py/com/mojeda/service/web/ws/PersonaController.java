@@ -149,7 +149,7 @@ public class PersonaController extends BaseController {
         try {
             inicializarPersonaManager();
             
-            Map<String, Object> model = personaManager.getPersona(new Personas(id), included);            
+            Personas model = personaManager.getPersona(new Personas(id), included);            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -184,11 +184,11 @@ public class PersonaController extends BaseController {
             ejPersonas.setDocumento(documento);
             ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
-            Map<String, Object> modelMaps = personaManager.getPersona(ejPersonas, included);            
+            ejPersonas = personaManager.getPersona(ejPersonas, included);            
             
-            response.setModel(modelMaps);
-            response.setStatus(modelMaps == null ? 404 : 200);
-            response.setMessage(modelMaps == null ? "Registro no encontrado" : "Registro encontrado");
+            response.setModel(ejPersonas);
+            response.setStatus(ejPersonas == null ? 404 : 200);
+            response.setMessage(ejPersonas == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -295,13 +295,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                    rpm = bienesManager.guardarBienes(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                    rpm = bienesManager.editarBienes(rpm);
                 }                
             }
             
@@ -314,13 +314,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                    rpm = bienesManager.guardarBienes(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                    rpm = bienesManager.editarBienes(rpm);
                 }                
             }
             
@@ -333,13 +333,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }                
             }
             
@@ -352,13 +352,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }                
             }
             
@@ -371,13 +371,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
+                    rpm = ocupacionPersonaManager.guardarOcupacion(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
+                    rpm = ocupacionPersonaManager.editarOcupacion(rpm);
                 }                
             }
             
@@ -390,13 +390,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                    rpm = referenciaManager.guardarReferencia(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                    rpm = referenciaManager.editarReferencia(rpm);
                 }                
             }
             
@@ -474,13 +474,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                    rpm = bienesManager.guardarBienes(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                    rpm = bienesManager.editarBienes(rpm);
                 }                
             }
             
@@ -493,13 +493,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                    rpm = bienesManager.guardarBienes(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                    rpm = bienesManager.editarBienes(rpm);
                 }                
             }
             
@@ -512,13 +512,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }                
             }
             
@@ -531,13 +531,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }                
             }
             
@@ -550,13 +550,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
+                    rpm = ocupacionPersonaManager.guardarOcupacion(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
+                    rpm = ocupacionPersonaManager.editarOcupacion(rpm);
                 }                
             }
             
@@ -569,13 +569,13 @@ public class PersonaController extends BaseController {
                     rpm.setIdUsuarioCreacion(userDetail.getId());
                     rpm.setPersona(new Personas(model.getPersona().getId()));
                     
-                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                    rpm = referenciaManager.guardarReferencia(rpm);
                 }else{
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(userDetail.getId());
                     
-                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                    rpm = referenciaManager.editarReferencia(rpm);
                 }                
             }
             

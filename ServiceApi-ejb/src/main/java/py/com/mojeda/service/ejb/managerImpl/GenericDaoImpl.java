@@ -329,6 +329,7 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
                 primerResultado, cantResultados, orderByAttrList,
                 orderByDirList, like, caseSensitive, null, null, campoComparacion, valoresComparacion, tipoFiltro,
                 atrMayIgual, objMayIgual, atrMenIgual, objMenIgual, camposDistintos, distintos);
+        
         return jpaSP.search(em, searchConfig);
     }
 

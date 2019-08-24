@@ -69,8 +69,8 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     private VinculoManager vinculoManager;
 
     @Override
-    public Map<String, Object> guardar(Clientes cliente) throws Exception {
-        Map<String, Object> object = null;
+    public Clientes guardar(Clientes cliente) throws Exception {
+        Clientes object = null;
         Documentos ejDocumentos = null;
         if (cliente != null
                 && cliente.getPersona() != null) {
@@ -115,13 +115,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                    rpm = bienesManager.guardarBienes(rpm);
                 } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
 
-                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                    rpm = bienesManager.editarBienes(rpm);
                 }
             }
 
@@ -134,13 +134,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    Map<String, Object> responseMaps = bienesManager.guardarBienes(rpm);
+                    rpm = bienesManager.guardarBienes(rpm);
                 } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
 
-                    Map<String, Object> responseMaps = bienesManager.editarBienes(rpm);
+                    rpm = bienesManager.editarBienes(rpm);
                 }
             }
 
@@ -153,13 +153,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
 
-                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }
             }
 
@@ -172,13 +172,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    Map<String, Object> responseMaps = ingresosEgresosManager.guardarIngresosEgresos(rpm);
+                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
                 } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
 
-                    Map<String, Object> responseMaps = ingresosEgresosManager.editarIngresosEgresos(rpm);
+                   rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
                 }
             }
 
@@ -191,13 +191,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    Map<String, Object> responseMaps = ocupacionPersonaManager.guardarOcupacion(rpm);
+                    rpm = ocupacionPersonaManager.guardarOcupacion(rpm);
                 } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
 
-                    Map<String, Object> responseMaps = ocupacionPersonaManager.editarOcupacion(rpm);
+                    rpm = ocupacionPersonaManager.editarOcupacion(rpm);
                 }
             }
 
@@ -210,13 +210,13 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
                     rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
                     rpm.setPersona(new Personas(ejPersona.getId()));
 
-                    Map<String, Object> responseMaps = referenciaManager.guardarReferencia(rpm);
+                    rpm = referenciaManager.guardarReferencia(rpm);
                 } else {
                     rpm.setActivo("S");
                     rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
 
-                    Map<String, Object> responseMaps = referenciaManager.editarReferencia(rpm);
+                    rpm = referenciaManager.editarReferencia(rpm);
                 }
             }
 
@@ -227,8 +227,8 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     }
 
     @Override
-    public Map<String, Object> editar(Clientes cliente) throws Exception {
-        Map<String, Object> object = null;
+    public Clientes editar(Clientes cliente) throws Exception {
+        Clientes object = null;
         Documentos ejDocumentos = null;
         if (cliente != null
                 && cliente.getPersona() != null) {
@@ -395,22 +395,14 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     }
 
     @Override
-    public Map<String, Object> getCliente(Clientes cliente, String included) throws Exception {
+    public Clientes getCliente(Clientes cliente, String included) throws Exception {
 
-        Map<String, Object> model = this.getAtributos(cliente, "id,persona.id,sucursal.id,activo".split(","));
-
+        Clientes model = this.get(cliente);       
+        
         if (model != null) {
-            Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())),included);
+            Personas persona = personaManager.getPersona(new Personas(model.getPersona().getId()),included);
 
-            Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(model.get("sucursal.id").toString())),
-                    "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-            
-
-            model.put("sucursal", sucursal);
-            model.put("persona", persona);
-            model.remove("persona.id");
-            model.remove("sucursal.id");
-
+            model.setPersona(persona);
         }
 
         return model;

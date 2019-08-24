@@ -37,14 +37,17 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
     private TipoIngresosEgresosManager tipoIngresosEgresosManager;
 
     @Override
-    public Map<String, Object> guardarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
-        Map<String, Object> object = null;
+    public IngresosEgresos guardarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
+        IngresosEgresos object = null;
         try {
             IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
             if (ingresosEgresos.getId() == null) {
+                ejIngresosEgresos.setActivo("S");
                 ejIngresosEgresos.setPersona(ingresosEgresos.getPersona());
                 ejIngresosEgresos.setTipoIngresosEgresos(ingresosEgresos.getTipoIngresosEgresos());
+                
                 ejIngresosEgresos = this.get(ejIngresosEgresos);
+                
                 if (ejIngresosEgresos != null) {
                     ejIngresosEgresos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     ejIngresosEgresos.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
@@ -77,14 +80,17 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
     }
 
     @Override
-    public Map<String, Object> editarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
-        Map<String, Object> object = null;
+    public IngresosEgresos editarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
+        IngresosEgresos object = null;
         try {
             IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
             if (ingresosEgresos.getId() == null) {
+                ejIngresosEgresos.setActivo("S");
                 ejIngresosEgresos.setPersona(ingresosEgresos.getPersona());
                 ejIngresosEgresos.setTipoIngresosEgresos(ingresosEgresos.getTipoIngresosEgresos());
+                
                 ejIngresosEgresos = this.get(ejIngresosEgresos);
+                
                 if (ejIngresosEgresos != null) {
                     ejIngresosEgresos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     ejIngresosEgresos.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
@@ -117,27 +123,30 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
     }
 
     @Override
-    public Map<String, Object> getIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
+    public IngresosEgresos getIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception {
+        IngresosEgresos model = null;
         String atributos = "id,monto,activo,tipoIngresosEgresos.id";
 
         Map<String, Object> ingresosEgresosMap = this.getAtributos(ingresosEgresos, atributos.split(","));
 
         if (ingresosEgresosMap != null) {
-            Map<String, Object> tipoOcupaciones = tipoIngresosEgresosManager.getAtributos(new TipoIngresosEgresos(Long.parseLong(ingresosEgresosMap.get("tipoIngresosEgresos.id").toString())),
-                    "id,nombre,activo".split(","));
-            ingresosEgresosMap.put("tipoIngresosEgresos", tipoOcupaciones);
-            ingresosEgresosMap.remove("tipoIngresosEgresos.id");
+
+            model = new IngresosEgresos();
+            model.setTipoIngresosEgresos(tipoIngresosEgresosManager.get(new TipoIngresosEgresos(Long.parseLong(ingresosEgresosMap.get("tipoIngresosEgresos.id").toString()))));
+            model.setId(Long.parseLong(ingresosEgresosMap.get("id").toString()));
+            model.setMonto(ingresosEgresosMap.get("monto") == null ? 0.0 : Double.parseDouble(ingresosEgresosMap.get("monto").toString()));
+            model.setActivo(ingresosEgresosMap.get("activo") == null ? "" : ingresosEgresosMap.get("activo").toString());
         }
-        return ingresosEgresosMap;
+        return model;
     }
 
     @Override
-    public List<Map<String, Object>> getListIngresosEgresos(IngresosEgresos ingresosEgresos) {
-        List<Map<String, Object>> object = new ArrayList<>();
+    public List<IngresosEgresos> getListIngresosEgresos(IngresosEgresos ingresosEgresos) {
+        List<IngresosEgresos> object = new ArrayList<>();
         try {
             List<Map<String, Object>> inmueblesMap = this.listAtributos(ingresosEgresos, "id".split(","));
             for(Map<String, Object> rpm: inmueblesMap){
-                Map<String, Object> map = this.getIngresosEgresos(new IngresosEgresos(Long.parseLong(rpm.get("id").toString())));
+                IngresosEgresos map = this.getIngresosEgresos(new IngresosEgresos(Long.parseLong(rpm.get("id").toString())));
                 object.add(map);
             }
         } catch (Exception e) {

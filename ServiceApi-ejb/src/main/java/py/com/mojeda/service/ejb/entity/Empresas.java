@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -102,7 +103,11 @@ public class Empresas extends Base {
     @Column(name = "IMAGE_PATH")
     private String imagePath;
     
+    @Column(name = "ENTIDAD")
+    private String entidad = "EMPRESAS";
+        
     @Transient
+    @JsonIgnore
     private Avatar avatar;   
 
     public Empresas() {
@@ -359,6 +364,18 @@ public class Empresas extends Base {
         this.barrio = barrio;
     }
        
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
     
 }

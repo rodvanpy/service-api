@@ -36,8 +36,8 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
     private TipoReferenciaManager tipoReferenciaManager;
 
     @Override
-    public Map<String, Object> guardarReferencia(Referencias referencias) throws Exception {
-        Map<String, Object> object = null;
+    public Referencias guardarReferencia(Referencias referencias) throws Exception {
+        Referencias object = null;
         try {
             Referencias ejReferencias = new Referencias();
             if (referencias.getId() == null) {
@@ -83,8 +83,8 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
     }
 
     @Override
-    public Map<String, Object> editarReferencia(Referencias referencias) throws Exception {
-        Map<String, Object> object = null;
+    public Referencias editarReferencia(Referencias referencias) throws Exception {
+        Referencias object = null;
         try {
             Referencias ejReferencias = new Referencias();
             if (referencias.getId() == null) {
@@ -130,7 +130,8 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
     }
 
     @Override
-    public Map<String, Object> getReferencia(Referencias referencias) throws Exception {
+    public Referencias getReferencia(Referencias referencias) throws Exception {
+        Referencias model = null;
         String atributos = "id,nombreContacto,telefono,telefonoCelular,activo,tipoReferencia.id";
 
         Map<String, Object> ocupacion = this.getAtributos(referencias, atributos.split(","));
@@ -138,19 +139,29 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
         if (ocupacion != null) {
             Map<String, Object> tipoOcupaciones = tipoReferenciaManager.getAtributos(new TipoReferencias(Long.parseLong(ocupacion.get("tipoReferencia.id").toString())),
                     "id,nombre,activo".split(","));
-            ocupacion.put("tipoReferencia", tipoOcupaciones);
-            ocupacion.remove("tipoReferencia.id");
+            TipoReferencias ejTipoReferencia = new TipoReferencias();
+            ejTipoReferencia.setId(Long.parseLong(tipoOcupaciones.get("id").toString()));
+            ejTipoReferencia.setNombre(tipoOcupaciones.get("nombre") == null ? "" : tipoOcupaciones.get("nombre").toString());
+            ejTipoReferencia.setActivo(tipoOcupaciones.get("activo") == null ? "" : tipoOcupaciones.get("activo").toString());
+            
+            model = new Referencias();
+            model.setTipoReferencia(ejTipoReferencia);
+            model.setId(Long.parseLong(ocupacion.get("id").toString()));
+            model.setNombreContacto(ocupacion.get("nombreContacto") == null ? "" : ocupacion.get("nombreContacto").toString());
+            model.setTelefono(ocupacion.get("telefono") == null ? "" : ocupacion.get("telefono").toString());
+            model.setTelefonoCelular(ocupacion.get("telefonoCelular") == null ? "" : ocupacion.get("telefonoCelular").toString());
+            model.setActivo(ocupacion.get("activo") == null ? "" : ocupacion.get("activo").toString());
         }
-        return ocupacion;
+        return model;
     }
 
     @Override
-    public List<Map<String, Object>> getListReferencias(Referencias referencias) {
-        List<Map<String, Object>> object = new ArrayList<>();
+    public List<Referencias> getListReferencias(Referencias referencias) {
+        List<Referencias> object = new ArrayList<>();
         try {
             List<Map<String, Object>> inmueblesMap = this.listAtributos(referencias, "id".split(","));
             for(Map<String, Object> rpm: inmueblesMap){
-                Map<String, Object> map = this.getReferencia(new Referencias(Long.parseLong(rpm.get("id").toString())));
+                Referencias map = this.getReferencia(new Referencias(Long.parseLong(rpm.get("id").toString())));
                 object.add(map);
             }
         } catch (Exception e) {

@@ -20,11 +20,11 @@ import py.com.mojeda.service.ejb.entity.IngresosEgresos;
 @Local
 public interface IngresosEgresosManager extends GenericDao<IngresosEgresos, Long>{   
     
-    public Map<String, Object> guardarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception;
+    public IngresosEgresos guardarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception;
     
-    public Map<String, Object> editarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception;
+    public IngresosEgresos editarIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception;
     
-    public Map<String, Object> getIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception;
+    public IngresosEgresos getIngresosEgresos(IngresosEgresos ingresosEgresos) throws Exception;
     
-    public List<Map<String, Object>> getListIngresosEgresos(IngresosEgresos ingresosEgresos);
+    public List<IngresosEgresos> getListIngresosEgresos(IngresosEgresos ingresosEgresos);
 }

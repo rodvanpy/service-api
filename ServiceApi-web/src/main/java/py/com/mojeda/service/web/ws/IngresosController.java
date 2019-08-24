@@ -154,7 +154,7 @@ public class IngresosController extends BaseController {
         try {
             inicializarIngresosEgresosManager();
             
-            Map<String, Object> model = ingresosEgresosManager.getIngresosEgresos(new IngresosEgresos(id));            
+            IngresosEgresos model = ingresosEgresosManager.getIngresosEgresos(new IngresosEgresos(id));            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

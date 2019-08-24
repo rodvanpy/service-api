@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,8 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-
+    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    
     @EJB(mappedName = "java:app/ServiceApi-ejb/PaisesManagerImpl")
     private PaisesManager paisesManager;
 
@@ -46,8 +49,8 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     private CiudadesManager ciudadesManager;
 
     @Override
-    public Map<String, Object> guardarBienes(Bienes bienes) throws Exception {
-        Map<String, Object> object = null;
+    public Bienes guardarBienes(Bienes bienes) throws Exception {
+        Bienes object = null;
         try {
             if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
                 if (bienes.getId() != null) {
@@ -84,8 +87,8 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     @Override
-    public Map<String, Object> editarBienes(Bienes bienes) throws Exception {
-        Map<String, Object> object = null;
+    public Bienes editarBienes(Bienes bienes) throws Exception {
+        Bienes object = null;
         try {
             if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
                 if (bienes.getId() != null) {
@@ -120,35 +123,54 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     @Override
-    public Map<String, Object> getBienes(Bienes bienes) {
+    public Bienes getBienes(Bienes bienes)throws Exception {
+        Bienes model = null;
         String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,"
                 + "lugarHipoteca,fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,"
                 + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,latitud,longitud,activo";
 
-        Map<String, Object> bienMap = this.getAtributos(bienes, atributos.split(","));
-        if (bienMap != null) {
-            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(bienMap.get("pais.id") == null ? "0" : bienMap.get("pais.id").toString())), "id,nombre,activo".split(","));
-            bienMap.put("pais", pais);
-            bienMap.remove("pais.id");
-
-            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(bienMap.get("departamento.id") == null ? "0" : bienMap.get("departamento.id").toString())), "id,nombre,activo".split(","));
-            bienMap.put("departamento", departamento);
-            bienMap.remove("departamento.id");
-
-            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(bienMap.get("ciudad.id") == null ? "0" : bienMap.get("ciudad.id").toString())), "id,nombre,activo".split(","));
-            bienMap.put("ciudad", ciudad);
-            bienMap.remove("ciudad.id");
+        Map<String, Object> bienesMap = this.getAtributos(bienes, atributos.split(","));
+        
+        if (bienesMap != null) {
+            model = new Bienes();
+            model.setId(Long.parseLong(bienesMap.get("id").toString()));
+            model.setNumeroFinca(bienesMap.get("numeroFinca") == null ? "" : bienesMap.get("numeroFinca").toString());
+            model.setCuentaCatastral(bienesMap.get("cuentaCatastral") == null ? "" : bienesMap.get("cuentaCatastral").toString());
+            model.setDistrito(bienesMap.get("distrito") == null ? "" : bienesMap.get("distrito").toString());
+            model.setEscriturado(bienesMap.get("escriturado") == null ? false : Boolean.parseBoolean(bienesMap.get("escriturado").toString()));
+            model.setEdificado(bienesMap.get("edificado") == null ? false : Boolean.parseBoolean(bienesMap.get("edificado").toString()));
+            model.setHipotecado(bienesMap.get("hipotecado") == null ? false : Boolean.parseBoolean(bienesMap.get("hipotecado").toString()));
+            model.setFechaHipoteca(bienesMap.get("fechaHipoteca") == null ? null : dateFormat.parse(bienesMap.get("fechaHipoteca").toString()));
+            model.setVencimientoHipoteca(bienesMap.get("vencimientoHipoteca") == null ? null : dateFormat.parse(bienesMap.get("vencimientoHipoteca").toString()));
+            model.setLugarHipoteca(bienesMap.get("lugarHipoteca") == null ? "" : bienesMap.get("lugarHipoteca").toString());
+            model.setFechaDeclaracion(bienesMap.get("fechaDeclaracion") == null ? null : dateFormat.parse(bienesMap.get("fechaDeclaracion").toString()));
+            model.setCuotaMensual(bienesMap.get("cuotaMensual") == null ? 0.0 : Double.parseDouble(bienesMap.get("cuotaMensual").toString()));
+            model.setValorActual(bienesMap.get("valorActual") == null ? 0.0 : Double.parseDouble(bienesMap.get("valorActual").toString()));
+            model.setSaldo(bienesMap.get("saldo") == null ? 0.0 : Double.parseDouble(bienesMap.get("saldo").toString()));
+            model.setDireccion(bienesMap.get("direccion") == null ? "" : bienesMap.get("direccion").toString());
+            model.setMarca(bienesMap.get("marca") == null ? "" : bienesMap.get("marca").toString());
+            model.setModeloAnio(bienesMap.get("modeloAnio") == null ? "" : bienesMap.get("modeloAnio").toString());
+            model.setFechaVenta(bienesMap.get("fechaVenta") == null ? null : dateFormat.parse(bienesMap.get("fechaVenta").toString()));
+            model.setNumeroMatricula(bienesMap.get("numeroMatricula") == null ? "" : bienesMap.get("numeroMatricula").toString());
+            model.setBarrio(bienesMap.get("barrio") == null ? "" : bienesMap.get("barrio").toString());
+            model.setTipoBien(bienesMap.get("tipoBien") == null ? "" : bienesMap.get("tipoBien").toString());
+            model.setLatitud(bienesMap.get("latitud") == null ? null : Double.parseDouble(bienesMap.get("latitud").toString()));
+            model.setLongitud(bienesMap.get("longitud") == null ? null : Double.parseDouble(bienesMap.get("longitud").toString()));
+            model.setActivo(bienesMap.get("activo") == null ? "" : bienesMap.get("activo").toString());            
+            model.setPais(bienesMap.get("pais.id") == null ? null:  paisesManager.get(Long.parseLong(bienesMap.get("pais.id").toString())));
+            model.setDepartamento(bienesMap.get("departamento.id") == null ? null :  departamentosPaisManager.get(Long.parseLong(bienesMap.get("departamento.id").toString())));
+            model.setCiudad(bienesMap.get("ciudad.id") == null ? null :  ciudadesManager.get(Long.parseLong(bienesMap.get("ciudad.id").toString())));
         }
-        return bienMap;
+        return model;
     }
 
     @Override
-    public List<Map<String, Object>> getListBienes(Bienes bienes) {
-        List<Map<String, Object>> object = new ArrayList<>();
+    public List<Bienes> getListBienes(Bienes bienes) {
+        List<Bienes> object = new ArrayList<>();
         try {
             List<Map<String, Object>> inmueblesMap = this.listAtributos(bienes, "id".split(","));
             for (Map<String, Object> rpm : inmueblesMap) {
-                Map<String, Object> map = this.getBienes(new Bienes(Long.parseLong(rpm.get("id").toString())));
+                Bienes map = this.getBienes(new Bienes(Long.parseLong(rpm.get("id").toString())));
                 object.add(map);
             }
         } catch (Exception e) {

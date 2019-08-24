@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Modalidades;
 
@@ -17,5 +18,5 @@ import py.com.mojeda.service.ejb.entity.Modalidades;
  */
 @Local
 public interface ModalidadesManager extends GenericDao<Modalidades, Long>{   
-    
+    public Map<String, Object> getModalidad(Modalidades modalidades) throws Exception;
 }

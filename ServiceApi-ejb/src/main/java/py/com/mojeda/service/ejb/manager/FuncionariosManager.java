@@ -19,10 +19,10 @@ import py.com.mojeda.service.ejb.entity.Funcionarios;
 @Local
 public interface FuncionariosManager extends GenericDao<Funcionarios, Long>{  
     
-    public Map<String, Object> guardar(Funcionarios usuario) throws Exception;
+    public Funcionarios guardar(Funcionarios usuario) throws Exception;
     
-    public Map<String, Object> editar(Funcionarios usuario) throws Exception;
+    public Funcionarios editar(Funcionarios usuario) throws Exception;
     
-    public Map<String, Object> getUsuario(Funcionarios usuario, String included) throws Exception;
+    public Funcionarios getUsuario(Funcionarios usuario, String included) throws Exception;
     
 }

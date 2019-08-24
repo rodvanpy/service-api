@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Column;
@@ -25,6 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  * @author miguel.ojeda
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "OCUPACION_PERSONA")
 public class OcupacionPersona extends Base {
@@ -74,7 +77,8 @@ public class OcupacionPersona extends Base {
     @NotNull(message = "Ingrese Ingreso Mensual")
     @Column(name = "INGRESOS_MENSUALES")
     private BigDecimal ingresosMensuales;
-
+    
+    @JsonIgnore
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Personas persona;

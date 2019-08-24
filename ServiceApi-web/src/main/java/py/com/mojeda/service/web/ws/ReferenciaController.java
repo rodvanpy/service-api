@@ -146,7 +146,7 @@ public class ReferenciaController extends BaseController {
         try {
             inicializarReferenciaManager();
                         
-            Map<String, Object> model = referenciaManager.getReferencia(new Referencias(id));
+            Referencias model = referenciaManager.getReferencia(new Referencias(id));
                
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

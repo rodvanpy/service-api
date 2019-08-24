@@ -23,13 +23,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.Personas;
-import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoDocumentos;
-import py.com.mojeda.service.ejb.entity.FuncionariosDepartamentos;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -170,7 +166,7 @@ public class FuncionarioController extends BaseController {
         try {
             inicializarFuncionarioManager();
 
-            Map<String, Object> model = funcionarioManager.getUsuario(new Funcionarios(id), included);
+            Funcionarios model = funcionarioManager.getUsuario(new Funcionarios(id), included);
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -265,9 +261,9 @@ public class FuncionarioController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            Map<String, Object> usuarioMap = funcionarioManager.guardar(model);
+            model = funcionarioManager.guardar(model);
 
-            response.setModel(usuarioMap);
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("Registro creado con exito");
         } catch (Exception e) {
@@ -351,9 +347,9 @@ public class FuncionarioController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            Map<String, Object> usuarioMap = funcionarioManager.editar(model);
+            model = funcionarioManager.editar(model);
 
-            response.setModel(usuarioMap);
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("Registro modificado con exito");
         } catch (Exception e) {

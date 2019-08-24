@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -21,6 +23,7 @@ import javax.persistence.Table;
  *
  * @author miguel.ojeda
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "INGRESOS_EGRESOS")
 public class IngresosEgresos extends Base {
@@ -38,7 +41,7 @@ public class IngresosEgresos extends Base {
     @Column(name = "MONTO")
     private Double monto;
 
-    
+    @JsonIgnore
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Personas persona;

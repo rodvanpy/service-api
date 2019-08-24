@@ -5,6 +5,9 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -98,17 +101,23 @@ public class Funcionarios extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
     private Rol rol;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "FUNCIONARIOS";
 
     @Transient
-    private List<Map<String, Object>> departamentos;
+    private List<DepartamentosSucursal> departamentos;
     
     @Transient
+    @JsonIgnore
     private List<Vinculos> vinculos;
     
     @Transient
+    @JsonIgnore
     private List<Estudios> estudios;
     
     @Transient
+    @JsonIgnore
     private List<Referencias> referencias;
 
     public Funcionarios() {
@@ -218,11 +227,11 @@ public class Funcionarios extends Base {
         return this.getClass().getSimpleName();
     }
 
-    public List<Map<String, Object>> getDepartamentos() {
+    public List<DepartamentosSucursal> getDepartamentos() {
         return departamentos;
     }
 
-    public void setDepartamentos(List<Map<String, Object>> departamentos) {
+    public void setDepartamentos(List<DepartamentosSucursal> departamentos) {
         this.departamentos = departamentos;
     }
 
@@ -348,6 +357,18 @@ public class Funcionarios extends Base {
         this.referencias = referencias;
     }
     
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
 
 }

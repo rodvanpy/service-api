@@ -152,7 +152,7 @@ public class VehiculoController extends BaseController {
         try {
             inicializarBienesManager();
 
-            Map<String, Object> model = bienesManager.getBienes(new Bienes(id));
+            Bienes model = bienesManager.getBienes(new Bienes(id));
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

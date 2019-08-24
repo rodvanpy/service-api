@@ -20,11 +20,11 @@ import py.com.mojeda.service.ejb.entity.Referencias;
 @Local
 public interface ReferenciaManager extends GenericDao<Referencias, Long>{   
     
-    public Map<String, Object> guardarReferencia(Referencias referencias) throws Exception;
+    public Referencias guardarReferencia(Referencias referencias) throws Exception;
     
-    public Map<String, Object> editarReferencia(Referencias referencias) throws Exception;
+    public Referencias editarReferencia(Referencias referencias) throws Exception;
     
-    public Map<String, Object> getReferencia(Referencias referencias) throws Exception;
+    public Referencias getReferencia(Referencias referencias) throws Exception;
     
-    public List<Map<String, Object>> getListReferencias(Referencias referencias);
+    public List<Referencias> getListReferencias(Referencias referencias);
 }

@@ -153,7 +153,7 @@ public class OcupacionPersonaController extends BaseController {
         try {
             inicializarOcupacionPersonaManager();
             
-            Map<String, Object> model = ocupacionPersonaManager.getOcupacion(new OcupacionPersona(id));            
+            OcupacionPersona model = ocupacionPersonaManager.getOcupacion(new OcupacionPersona(id));            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

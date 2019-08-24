@@ -83,10 +83,10 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
     private ProfesionesManager profesionesManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/ReferenciaManagerImpl")
     private ReferenciaManager referenciaManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/BienesManagerImpl")
     private BienesManager bienesManager;
 
@@ -95,20 +95,19 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/IngresosEgresosManagerImpl")
     private IngresosEgresosManager ingresosEgresosManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/EstudiosManagerImpl")
     private EstudiosManager estudiosManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/VinculoManagerImpl")
     private VinculoManager vinculoManager;
-
 
     @Override
     public Personas guardar(Personas persona) throws Exception {
         Personas ejPersona = new Personas();
         ejPersona.setDocumento(persona.getDocumento());
         ejPersona.setEmpresa(persona.getEmpresa());
-        
+
         ejPersona = this.get(ejPersona);
 
         if (ejPersona != null) {
@@ -177,7 +176,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
         Personas ejPersona = new Personas();
         ejPersona.setDocumento(persona.getDocumento());
         ejPersona.setEmpresa(persona.getEmpresa());
-        
+
         ejPersona = this.get(ejPersona);
 
         if (ejPersona != null) {
@@ -222,7 +221,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             ejPersona = new Personas();
             ejPersona.setDocumento(persona.getDocumento());
             ejPersona.setEmpresa(persona.getEmpresa());
-            
+
             ejPersona = this.get(ejPersona);
         }
 
@@ -283,66 +282,35 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     }
 
     @Override
-    public Map<String, Object> getPersona(Personas persona, String included) throws Exception {
-        String atributos = "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,"
-                + "fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,profesion.id,"
-                + "email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,activo,empresa.id,"
-                + "observacion,latitud,longitud,nacionalidad.id,pais.id,departamento.id,ciudad.id,barrio.id,profesion.id,imagePath";
-
-        Map<String, Object> personaMap = this.getAtributos(persona, atributos.split(","));
+    public Personas getPersona(Personas persona, String included) throws Exception {
+        included = included == null ? "" : included;
+        
+        Personas personaMap = this.get(persona);
         if (personaMap != null) {
-
-            Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(personaMap.get("profesion.id") == null ? "0" : personaMap.get("profesion.id").toString())), "id,nombre,activo".split(","));
-            personaMap.put("profesion", profesion);
-            personaMap.remove("profesion.id");
-
-            Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(personaMap.get("nacionalidad.id") == null ? "0" : personaMap.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
-            personaMap.put("nacionalidad", nacionalidad);
-            personaMap.remove("nacionalidad.id");
-
-            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(personaMap.get("pais.id") == null ? "0" : personaMap.get("pais.id").toString())), "id,nombre,activo".split(","));
-            personaMap.put("pais", pais);
-            personaMap.remove("pais.id");
-
-            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(personaMap.get("departamento.id") == null ? "0" : personaMap.get("departamento.id").toString())), "id,nombre,activo".split(","));
-            personaMap.put("departamento", departamento);
-            personaMap.remove("departamento.id");
-
-            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(personaMap.get("ciudad.id") == null ? "0" : personaMap.get("ciudad.id").toString())), "id,nombre,activo".split(","));
-            personaMap.put("ciudad", ciudad);
-            personaMap.remove("ciudad.id");
-
-            Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(personaMap.get("barrio.id") == null ? "0" : personaMap.get("barrio.id").toString())), "id,nombre,activo".split(","));
-            personaMap.put("barrio", barrio);
-            personaMap.remove("barrio.id");
-            
             if (included.contains("inmuebles")) {
                 Bienes ejBienes = new Bienes();
-                ejBienes.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejBienes.setPersona(new Personas(personaMap.getId()));
                 ejBienes.setActivo("S");
                 ejBienes.setTipoBien("INMUEBLE");
 
-                List<Map<String, Object>> inmueblesMap = bienesManager.getListBienes(ejBienes);
-                personaMap.put("bienesInmuebles", inmueblesMap);
+                personaMap.setBienesInmuebles(bienesManager.getListBienes(ejBienes));
             }
 
             if (included.contains("vehiculos")) {
                 Bienes ejBienes = new Bienes();
-                ejBienes.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejBienes.setPersona(new Personas(personaMap.getId()));
                 ejBienes.setActivo("S");
                 ejBienes.setTipoBien("VEHICULO");
 
-                List<Map<String, Object>> vehiculosMap = bienesManager.getListBienes(ejBienes);
-                personaMap.put("bienesVehiculo", vehiculosMap);
+                personaMap.setBienesVehiculo(bienesManager.getListBienes(ejBienes));
             }
 
             if (included.contains("referencias")) {
                 Referencias ejReferencia = new Referencias();
-                ejReferencia.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejReferencia.setPersona(new Personas(personaMap.getId()));
                 ejReferencia.setActivo("S");
-
-                List<Map<String, Object>> referenciasMap = referenciaManager.getListReferencias(ejReferencia);
-                personaMap.put("referencias", referenciasMap);
+                
+                personaMap.setReferencias(referenciaManager.getListReferencias(ejReferencia));
             }
 
             if (included.contains("ingresos")) {
@@ -350,12 +318,11 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                 ejTipoIngresosEgresos.setTipo("I");
 
                 IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
-                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejIngresosEgresos.setPersona(new Personas(personaMap.getId()));
                 ejIngresosEgresos.setActivo("S");
                 ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
-
-                List<Map<String, Object>> ingresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
-                personaMap.put("ingresos", ingresosMap);
+                
+                personaMap.setIngresos(ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos));
             }
 
             if (included.contains("egresos")) {
@@ -363,51 +330,40 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                 ejTipoIngresosEgresos.setTipo("E");
 
                 IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
-                ejIngresosEgresos.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejIngresosEgresos.setPersona(new Personas(personaMap.getId()));
                 ejIngresosEgresos.setActivo("S");
                 ejIngresosEgresos.setTipoIngresosEgresos(ejTipoIngresosEgresos);
 
-                List<Map<String, Object>> egresosMap = ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos);
-                personaMap.put("egresos", egresosMap);
+                personaMap.setEgresos(ingresosEgresosManager.getListIngresosEgresos(ejIngresosEgresos));
             }
 
             if (included.contains("ocupaciones")) {
                 OcupacionPersona ejOcupaciones = new OcupacionPersona();
-                ejOcupaciones.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejOcupaciones.setPersona(new Personas(personaMap.getId()));
                 ejOcupaciones.setActivo("S");
-
-                List<Map<String, Object>> ocupacionPersonaMap = ocupacionPersonaManager.getListOcupaciones(ejOcupaciones);
-                personaMap.put("ocupaciones", ocupacionPersonaMap);
+                
+                personaMap.setOcupaciones(ocupacionPersonaManager.getListOcupaciones(ejOcupaciones));
             }
-            
+
             if (included.contains("estudios")) {
                 Estudios ejEstudios = new Estudios();
-                ejEstudios.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejEstudios.setPersona(new Personas(personaMap.getId()));
                 ejEstudios.setActivo("S");
+                
+                personaMap.setEstudios(estudiosManager.list(ejEstudios));
+            }
 
-                List<Map<String, Object>> ocupacionPersonaMap = estudiosManager.getListEstudios(ejEstudios);
-                personaMap.put("estudios", ocupacionPersonaMap);
-            } 
-            
             if (included.contains("vinculos")) {
                 Vinculos ejVinculos = new Vinculos();
-                ejVinculos.setPersona(new Personas(Long.parseLong(personaMap.get("id").toString())));
+                ejVinculos.setPersona(new Personas(personaMap.getId()));
                 ejVinculos.setActivo("S");
-
-                List<Map<String, Object>> vinculosMap = vinculoManager.getListVinculos(ejVinculos);
-                personaMap.put("vinculos", vinculosMap);
-            }
-            
-            if (included.contains("empresa")) {
-                Map<String, Object> empresa = empresaManager.getAtributos(new Empresas(Long.parseLong(personaMap.get("empresa.id").toString())),
-                    "id,nombre,ruc,nombreFantasia,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
                 
-                personaMap.put("empresa", empresa);
-                personaMap.remove("empresa.id");
+                personaMap.setVinculos(vinculoManager.list(ejVinculos));
             }
+
 
         }
         return personaMap;
     }
-    
+
 }

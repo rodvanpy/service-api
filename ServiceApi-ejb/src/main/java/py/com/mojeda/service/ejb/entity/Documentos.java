@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.File;
@@ -18,8 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Transient;
-import org.springframework.web.multipart.MultipartFile;
+
 
 /**
  *
@@ -31,7 +31,7 @@ public class Documentos extends Base implements Serializable{
     * 
     */
    private static final long serialVersionUID = 79861856088L;
-    private static final String SECUENCIA = "seq_imagen_id";
+    private static final String SECUENCIA = "seq_documentos_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
@@ -49,8 +49,8 @@ public class Documentos extends Base implements Serializable{
    @Column(name = "NOMBRE_DOCUMENTO")
    private String nombreDocumento;  
 
-   @Column(name = "NOMBRE_TABLA")
-   private String nombreTabla;
+   @Column(name = "ENTIDAD")
+   private String entidad;
    
    @Column(name = "PATH")
    private String path;
@@ -62,14 +62,13 @@ public class Documentos extends Base implements Serializable{
    @JoinColumn(name = "ID_TIPO_DOCUMENTO")
    private TipoDocumentos tipoDocumento;
 
+   @JsonIgnore
    @ManyToOne
    @JoinColumn(name = "EMPRESA")
    private Empresas empresa;
    
 //   @JsonDeserialize(as = MultipartFile.class)
 //   @JsonIgnoreProperties(ignoreUnknown = true)
-   @Transient
-   private MultipartFile file;
 
 
    /**
@@ -99,21 +98,7 @@ public class Documentos extends Base implements Serializable{
      */
     public void setId(Long id) {
         this.id = id;
-    }
-
-    /**
-     * @return the nombreTabla
-     */
-    public String getNombreTabla() {
-        return nombreTabla;
-    }
-
-    /**
-     * @param nombreTabla the nombreTabla to set
-     */
-    public void setNombreTabla(String nombreTabla) {
-        this.nombreTabla = nombreTabla;
-    }
+    }   
 
     /**
      * @return the path
@@ -207,13 +192,20 @@ public class Documentos extends Base implements Serializable{
         this.tipoArchivo = tipoArchivo;
     }
 
-    public MultipartFile getFile() {
-        return file;
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
     }
 
-    public void setFile(MultipartFile file) {
-        this.file = file;
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
     }
+
     
    
 }

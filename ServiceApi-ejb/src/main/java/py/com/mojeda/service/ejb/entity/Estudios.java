@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,9 +59,13 @@ public class Estudios extends Base {
     @JoinColumn(name = "ID_TIPO_ESTUDIO", referencedColumnName = "id")
     private TipoEstudios tipoEstudio;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     private Personas persona;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "ESTUDIOS";
     
     public Estudios() {
     }
@@ -185,6 +190,18 @@ public class Estudios extends Base {
         this.nombre = nombre;
     }
 
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
     
 }

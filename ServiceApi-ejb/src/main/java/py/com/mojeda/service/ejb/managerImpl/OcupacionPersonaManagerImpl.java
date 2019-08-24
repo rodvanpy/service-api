@@ -5,7 +5,10 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +37,14 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
     }
 
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
+    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/TipoOcupacionesManagerImpl")
     private TipoOcupacionesManager tipoOcupacionesManager;
 
     @Override
-    public Map<String, Object> guardarOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
-        Map<String, Object> object = null;
+    public OcupacionPersona guardarOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
+        OcupacionPersona object = null;
         try {
             OcupacionPersona ejOcupacionPersona = new OcupacionPersona();
             ejOcupacionPersona.setPersona(new Personas(ocupacionPersona.getPersona().getId()));
@@ -73,13 +77,13 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
 
                 this.save(ocupacionPersona);
             }
-            
+
             ejOcupacionPersona = new OcupacionPersona();
             ejOcupacionPersona.setPersona(new Personas(ocupacionPersona.getPersona().getId()));
             ejOcupacionPersona.setTipoOcupacion(new TipoOcupaciones(ocupacionPersona.getTipoOcupacion().getId()));
             ejOcupacionPersona.setActivo("S");
             ejOcupacionPersona.setEmpresa(ocupacionPersona.getEmpresa());
-            
+
             object = this.getOcupacion(ejOcupacionPersona);
 
         } catch (Exception e) {
@@ -89,24 +93,8 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
     }
 
     @Override
-    public Map<String, Object> getOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
-        String atributos = "id,cargo,empresa,tipoTrabajo,direccion,telefonoPrincipal,"
-                + "telefonoSecundario,fechaIngreso,fechaSalida,interno,ingresosMensuales,tipoOcupacion.id";
-
-        Map<String, Object> ocupacion = this.getAtributos(ocupacionPersona, atributos.split(","));
-
-        if (ocupacion != null) {
-            Map<String, Object> tipoOcupaciones = tipoOcupacionesManager.getAtributos(new TipoOcupaciones(Long.parseLong(ocupacion.get("tipoOcupacion.id").toString())),
-                    "id,nombre,descripcion,activo".split(","));
-            ocupacion.put("tipoOcupacion", tipoOcupaciones);
-            ocupacion.remove("tipoOcupacion.id");
-        }
-        return ocupacion;
-    }
-
-    @Override
-    public Map<String, Object> editarOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
-        Map<String, Object> object = null;
+    public OcupacionPersona editarOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
+        OcupacionPersona object = null;
         try {
             OcupacionPersona ejOcupacionPersona = new OcupacionPersona();
             if (ocupacionPersona.getId() == null) {
@@ -160,13 +148,13 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
 
                 this.update(ejOcupacionPersona);
             }
-            
+
             ejOcupacionPersona = new OcupacionPersona();
             ejOcupacionPersona.setPersona(new Personas(ocupacionPersona.getPersona().getId()));
             ejOcupacionPersona.setTipoOcupacion(new TipoOcupaciones(ocupacionPersona.getTipoOcupacion().getId()));
             ejOcupacionPersona.setActivo("S");
             ejOcupacionPersona.setEmpresa(ocupacionPersona.getEmpresa());
-            
+
             object = this.getOcupacion(ejOcupacionPersona);
 
         } catch (Exception e) {
@@ -176,12 +164,44 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
     }
 
     @Override
-    public List<Map<String, Object>> getListOcupaciones(OcupacionPersona ocupacionPersona) {
-        List<Map<String, Object>> object = new ArrayList<>();
+    public OcupacionPersona getOcupacion(OcupacionPersona ocupacionPersona) throws Exception {
+        OcupacionPersona model = null;
+        String atributos = "id,cargo,empresa,tipoTrabajo,direccion,telefonoPrincipal,"
+                + "telefonoSecundario,fechaIngreso,fechaSalida,interno,ingresosMensuales,tipoOcupacion.id";
+
+        Map<String, Object> ocupacion = this.getAtributos(ocupacionPersona, atributos.split(","));
+
+        if (ocupacion != null) {
+            Map<String, Object> tipoOcupaciones = tipoOcupacionesManager.getAtributos(new TipoOcupaciones(Long.parseLong(ocupacion.get("tipoOcupacion.id").toString())),
+                    "id,nombre,descripcion,activo".split(","));
+            ocupacion.put("tipoOcupacion", tipoOcupaciones);
+            ocupacion.remove("tipoOcupacion.id");
+            
+            model = new OcupacionPersona();
+            model.setTipoOcupacion(tipoOcupacionesManager.get(new TipoOcupaciones(Long.parseLong(ocupacion.get("tipoOcupacion.id").toString()))));
+            model.setId(Long.parseLong(ocupacion.get("id").toString()));
+            model.setIngresosMensuales(ocupacion.get("ingresosMensuales") == null ? null : new BigDecimal(ocupacion.get("ingresosMensuales").toString()));
+            model.setCargo(ocupacion.get("cargo") == null ? "" : ocupacion.get("cargo").toString());
+            model.setDireccion(ocupacion.get("direccion") == null ? "" : ocupacion.get("direccion").toString());
+            model.setEmpresa(ocupacion.get("empresa") == null ? "" : ocupacion.get("empresa").toString());
+            model.setFechaIngreso(ocupacion.get("fechaIngreso") == null ? null : dateFormat.parse(ocupacion.get("fechaIngreso").toString()));
+            model.setFechaSalida(ocupacion.get("fechaSalida") == null ? null : dateFormat.parse(ocupacion.get("fechaSalida").toString()));
+            model.setInterno(ocupacion.get("interno") == null ? "" : ocupacion.get("interno").toString());
+            model.setTelefonoPrincipal(ocupacion.get("telefonoPrincipal") == null ? "" : ocupacion.get("telefonoPrincipal").toString());
+            model.setTelefonoSecundario(ocupacion.get("telefonoSecundario") == null ? "" : ocupacion.get("telefonoSecundario").toString());
+            model.setTipoTrabajo(ocupacion.get("tipoTrabajo") == null ? "" : ocupacion.get("tipoTrabajo").toString());
+            model.setActivo(ocupacion.get("activo") == null ? "" : ocupacion.get("activo").toString());
+        }
+        return model;
+    }
+
+    @Override
+    public List<OcupacionPersona> getListOcupaciones(OcupacionPersona ocupacionPersona) {
+        List<OcupacionPersona> object = new ArrayList<>();
         try {
             List<Map<String, Object>> inmueblesMap = this.listAtributos(ocupacionPersona, "id".split(","));
-            for(Map<String, Object> rpm: inmueblesMap){
-                Map<String, Object> map = this.getOcupacion(new OcupacionPersona(Long.parseLong(rpm.get("id").toString())));
+            for (Map<String, Object> rpm : inmueblesMap) {
+                OcupacionPersona map = this.getOcupacion(new OcupacionPersona(Long.parseLong(rpm.get("id").toString())));
                 object.add(map);
             }
         } catch (Exception e) {

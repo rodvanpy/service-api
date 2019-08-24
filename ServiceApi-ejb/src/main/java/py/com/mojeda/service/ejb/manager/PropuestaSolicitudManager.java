@@ -18,4 +18,10 @@ import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 @Local
 public interface PropuestaSolicitudManager extends GenericDao<PropuestaSolicitud, Long>{   
     
+    public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception;
+    
+    public PropuestaSolicitud editar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception;
+    
+    public PropuestaSolicitud getPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) throws Exception;
+    
 }

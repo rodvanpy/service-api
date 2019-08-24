@@ -47,9 +47,9 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "HORA_PRESENTACION")
     private String horaPresentacion;
     
-    @Basic(optional = false)
-    @Column(name = "ESTADO")
-    private Long estado;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ID_ESTADO_SOLICITUD", referencedColumnName = "id")
+    private EstadosSolicitud estado;
     
     @Basic(optional = false)
     @Column(name = "FECHA_ESTADO")
@@ -66,6 +66,9 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "TIPO_CREDITO")
     private String tipoCredito;
     
+    @Column(name = "TIPO_DESCUENTO")
+    private String tipoDescuento;
+    
     @Column(name = "TASA_INTERES")
     private BigDecimal tasaInteres;
     
@@ -73,24 +76,23 @@ public class PropuestaSolicitud extends Base{
     private BigDecimal gastosAdministrativos;
     
     @Column(name = "IMPUESTOS")
-    private BigDecimal impuestos;
+    private Long impuestos;
     
     @Column(name = "COMISION")
-    private BigDecimal comision;
+    private Long comision;
     
     @Column(name = "GASTOS_VARIOS")
-    private BigDecimal gastosVarios;
+    private Long gastosVarios;
     
     @Column(name = "SEGUROS")
-    private BigDecimal seguros;
+    private Long seguros;
+    
+    @Column(name = "VENCIMIENTO_INTERES")
+    private Long vencimientoInteres;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_TIPO_DESEMBOLSO", referencedColumnName = "id")
     private TipoDesembolsos tipoDesembolso;
-    
-    @Basic(optional = false)
-    @Column(name = "FORMA_DESEMBOLSO")
-    private String formaDesembolso;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_TIPO_CALCULO", referencedColumnName = "id")
@@ -108,7 +110,7 @@ public class PropuestaSolicitud extends Base{
     @JoinColumn(name = "ID_TIPO_DESTINO", referencedColumnName = "id")
     private TipoDestinos tipoDestino;
     
-    @Basic(optional = false)
+    @Basic(optional = true)
     @Column(name = "TIPO_INTERES")
     private String tipoInteres;
     
@@ -189,6 +191,9 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "IMPORTE_CUOTA")
     private Long importeCuota;
     
+    @Column(name = "IMPORTE_ENTREGAR")
+    private Long importeEntregar;
+    
     @Column(name = "DETALLE_DESTINO")
     private String detalleDestino;
     
@@ -202,7 +207,7 @@ public class PropuestaSolicitud extends Base{
     private String tipoEnvioSolicitud;
     
     @JoinColumn(name = "ID_MONEDA", referencedColumnName = "ID")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     private Monedas moneda;
     
     @JoinColumn(name = "ID_MODALIDAD", referencedColumnName = "ID")
@@ -213,6 +218,10 @@ public class PropuestaSolicitud extends Base{
     @ManyToOne(optional = false)
     private Clientes cliente;
     
+    @JoinColumn(name = "ID_PERSONA_CODEUDOR", referencedColumnName = "ID")
+    @ManyToOne(optional = true)
+    private Personas codeudor;
+    
     @JoinColumn(name = "ID_FUNCIONARIO_ALTA", referencedColumnName = "ID")
     @ManyToOne(optional = false)
     private Funcionarios funcionario;
@@ -220,10 +229,10 @@ public class PropuestaSolicitud extends Base{
     @ManyToOne
     @JoinColumn(name = "ID_SUCURSAL_ALTA", referencedColumnName = "id")
     private Sucursales sucursal;
-       
-    private transient List<Documentos> documentos;
     
-    private transient Personas persona;
+    @Column(name = "ENTIDAD")
+    private String entidad = "PROPUESTA_SOLICITUD";
+       
     
     public PropuestaSolicitud() {
 
@@ -274,20 +283,7 @@ public class PropuestaSolicitud extends Base{
     public void setHoraPresentacion(String horaPresentacion) {
         this.horaPresentacion = horaPresentacion;
     }
-
-    /**
-     * @return the estado
-     */
-    public Long getEstado() {
-        return estado;
-    }
-
-    /**
-     * @param estado the estado to set
-     */
-    public void setEstado(Long estado) {
-        this.estado = estado;
-    }
+   
 
     /**
      * @return the fechaEstado
@@ -371,20 +367,6 @@ public class PropuestaSolicitud extends Base{
      */
     public void setTipoDesembolso(TipoDesembolsos tipoDesembolso) {
         this.tipoDesembolso = tipoDesembolso;
-    }
-
-    /**
-     * @return the formaDesembolso
-     */
-    public String getFormaDesembolso() {
-        return formaDesembolso;
-    }
-
-    /**
-     * @param formaDesembolso the formaDesembolso to set
-     */
-    public void setFormaDesembolso(String formaDesembolso) {
-        this.formaDesembolso = formaDesembolso;
     }
 
     
@@ -874,35 +856,35 @@ public class PropuestaSolicitud extends Base{
         this.gastosAdministrativos = gastosAdministrativos;
     }
 
-    public BigDecimal getImpuestos() {
+    public Long getImpuestos() {
         return impuestos;
     }
 
-    public void setImpuestos(BigDecimal impuestos) {
+    public void setImpuestos(Long impuestos) {
         this.impuestos = impuestos;
     }
 
-    public BigDecimal getComision() {
+    public Long getComision() {
         return comision;
     }
 
-    public void setComision(BigDecimal comision) {
+    public void setComision(Long comision) {
         this.comision = comision;
     }
 
-    public BigDecimal getGastosVarios() {
+    public Long getGastosVarios() {
         return gastosVarios;
     }
 
-    public void setGastosVarios(BigDecimal gastosVarios) {
+    public void setGastosVarios(Long gastosVarios) {
         this.gastosVarios = gastosVarios;
     }
 
-    public BigDecimal getSeguros() {
+    public Long getSeguros() {
         return seguros;
     }
 
-    public void setSeguros(BigDecimal seguros) {
+    public void setSeguros(Long seguros) {
         this.seguros = seguros;
     }
 
@@ -921,34 +903,6 @@ public class PropuestaSolicitud extends Base{
     }
 
     /**
-     * @return the documentos
-     */
-    public List<Documentos> getDocumentos() {
-        return documentos;
-    }
-
-    /**
-     * @param documentos the documentos to set
-     */
-    public void setDocumentos(List<Documentos> documentos) {
-        this.documentos = documentos;
-    }
-
-    /**
-     * @return the persona
-     */
-    public Personas getPersona() {
-        return persona;
-    }
-
-    /**
-     * @param persona the persona to set
-     */
-    public void setPersona(Personas persona) {
-        this.persona = persona;
-    }
-
-    /**
      * @return the tipoCalculoImporte
      */
     public TipoCalculos getTipoCalculoImporte() {
@@ -960,6 +914,90 @@ public class PropuestaSolicitud extends Base{
      */
     public void setTipoCalculoImporte(TipoCalculos tipoCalculoImporte) {
         this.tipoCalculoImporte = tipoCalculoImporte;
+    }
+
+    /**
+     * @return the tipoDescuento
+     */
+    public String getTipoDescuento() {
+        return tipoDescuento;
+    }
+
+    /**
+     * @param tipoDescuento the tipoDescuento to set
+     */
+    public void setTipoDescuento(String tipoDescuento) {
+        this.tipoDescuento = tipoDescuento;
+    }
+
+    /**
+     * @return the importeEntregar
+     */
+    public Long getImporteEntregar() {
+        return importeEntregar;
+    }
+
+    /**
+     * @param importeEntregar the importeEntregar to set
+     */
+    public void setImporteEntregar(Long importeEntregar) {
+        this.importeEntregar = importeEntregar;
+    }
+
+    /**
+     * @return the vencimientoInteres
+     */
+    public Long getVencimientoInteres() {
+        return vencimientoInteres;
+    }
+
+    /**
+     * @param vencimientoInteres the vencimientoInteres to set
+     */
+    public void setVencimientoInteres(Long vencimientoInteres) {
+        this.vencimientoInteres = vencimientoInteres;
+    }
+
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
+
+    /**
+     * @return the estado
+     */
+    public EstadosSolicitud getEstado() {
+        return estado;
+    }
+
+    /**
+     * @param estado the estado to set
+     */
+    public void setEstado(EstadosSolicitud estado) {
+        this.estado = estado;
+    }
+
+    /**
+     * @return the codeudor
+     */
+    public Personas getCodeudor() {
+        return codeudor;
+    }
+
+    /**
+     * @param codeudor the codeudor to set
+     */
+    public void setCodeudor(Personas codeudor) {
+        this.codeudor = codeudor;
     }
     
     

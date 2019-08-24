@@ -41,6 +41,9 @@ public class Nacionalidades extends Base{
     @Basic(optional = false)
     @Column(name = "CODIGO")
     private String codigo;
+    
+    @Column(name = "ENTIDAD")
+    private String entidad = "NACIONALIDADES";
    
     
     public Nacionalidades() {
@@ -93,7 +96,19 @@ public class Nacionalidades extends Base{
         this.codigo = codigo;
     }
 
-    
+    /**
+     * @return the entidad
+     */
+    public String getEntidad() {
+        return entidad;
+    }
+
+    /**
+     * @param entidad the entidad to set
+     */
+    public void setEntidad(String entidad) {
+        this.entidad = entidad;
+    }
     
     
 }

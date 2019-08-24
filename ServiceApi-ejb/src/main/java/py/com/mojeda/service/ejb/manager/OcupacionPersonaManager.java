@@ -19,12 +19,12 @@ import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 @Local
 public interface OcupacionPersonaManager extends GenericDao<OcupacionPersona, Long>{   
     
-    public Map<String, Object> guardarOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
+    public OcupacionPersona guardarOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
     
-    public Map<String, Object> editarOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
+    public OcupacionPersona editarOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
     
-    public Map<String, Object> getOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
+    public OcupacionPersona getOcupacion(OcupacionPersona ocupacionPersona) throws Exception;
     
-    public List<Map<String, Object>> getListOcupaciones(OcupacionPersona ocupacionPersona);
+    public List<OcupacionPersona> getListOcupaciones(OcupacionPersona ocupacionPersona);
     
 }

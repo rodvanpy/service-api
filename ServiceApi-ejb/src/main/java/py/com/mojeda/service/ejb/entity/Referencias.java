@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +23,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  * @author miguel.ojeda
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "REFERENCIAS")
 public class Referencias extends Base {
@@ -49,6 +52,7 @@ public class Referencias extends Base {
     @JoinColumn(name = "ID_TIPO_REFERENCIA", referencedColumnName = "id")
     private TipoReferencias tipoReferencia;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     private Personas persona;

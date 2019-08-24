@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.util.Map;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.TipoGarantias;
 import py.com.mojeda.service.ejb.manager.TipoGarantiasManager;
@@ -21,5 +22,10 @@ public class TipoGarantiasManagerImpl extends GenericDaoImpl<TipoGarantias, Long
     @Override
     protected Class<TipoGarantias> getEntityBeanType() {
         return TipoGarantias.class;
+    }
+
+    @Override
+    public Map<String, Object> getTipoGarantia(TipoGarantias tipoGarantias) throws Exception {
+        return this.getAtributos(tipoGarantias, "id,nombre,codigo,codeudor,hipoteca".split(","));
     }
 }

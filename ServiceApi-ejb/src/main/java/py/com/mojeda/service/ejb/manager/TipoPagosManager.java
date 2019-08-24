@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.Map;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.TipoPagos;
 
@@ -17,5 +18,5 @@ import py.com.mojeda.service.ejb.entity.TipoPagos;
  */
 @Local
 public interface TipoPagosManager extends GenericDao<TipoPagos, Long>{   
-    
+    public Map<String, Object> getTipoPago(TipoPagos tipoPagos) throws Exception;
 }
