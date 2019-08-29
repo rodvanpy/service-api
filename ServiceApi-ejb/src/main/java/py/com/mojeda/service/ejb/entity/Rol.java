@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,6 +39,7 @@ public class Rol extends Base {
     @Column(name = "nombre")
     private String nombre;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn
     private Empresas empresa;

@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.Column;
@@ -74,11 +75,13 @@ public class OcupacionSolicitudes extends Base {
     @NotNull(message = "Ingrese Ingreso Mensual")
     @Column(name = "INGRESOS_MENSUALES")
     private BigDecimal ingresosMensuales;
-
+    
+    @JsonIgnore
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Personas persona;
     
+    @JsonIgnore
     @JoinColumn(name = "ID_PROPUESTA_SOLICITUD", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private PropuestaSolicitud propuestaSolicitud;

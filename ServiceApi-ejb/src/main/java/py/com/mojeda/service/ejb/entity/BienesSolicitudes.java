@@ -24,7 +24,6 @@ import javax.persistence.TemporalType;
  *
  * @author miguel.ojeda
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "BIENES_SOLICITUDES")
 public class BienesSolicitudes extends Base {

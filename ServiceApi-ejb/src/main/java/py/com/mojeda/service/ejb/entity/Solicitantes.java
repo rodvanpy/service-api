@@ -87,7 +87,7 @@ public class Solicitantes implements Serializable {
     private String dejarMensaje;
     
     @JoinColumn(name = "ID_PERSONA_CONYUGE", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     private Personas idPersonaConyuge;
     
     @Column(name = "CONSIDERAR_CONYUGE")

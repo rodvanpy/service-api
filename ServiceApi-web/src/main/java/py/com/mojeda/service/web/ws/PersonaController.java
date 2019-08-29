@@ -445,19 +445,7 @@ public class PersonaController extends BaseController {
 				.map(x -> x.getDefaultMessage())
 				.collect(Collectors.joining(",")));
                 return response;
-            }     
-            
-            Personas ejPersona = new Personas();
-            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));            
-            ejPersona.setDocumento(model.getPersona().getDocumento());
-            
-            Map<String, Object> personaMaps = personaManager.getLike(ejPersona, "id".split(","));
-            if (personaMaps != null
-                    && personaMaps.get("id").toString().compareToIgnoreCase(model.getPersona().getId().toString()) != 0) {
-                response.setStatus(205);
-                response.setMessage("Ya existe una persona con el mismo documento.");
-                return response;
-            }           
+            } 
             
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -579,8 +567,7 @@ public class PersonaController extends BaseController {
                 }                
             }
             
-            response.setModel(personaManager.getPersona(ejPersona, "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
-            
+            response.setModel(model.getPersona());            
             response.setStatus(200);
             response.setMessage("Persona modificado/a con exito");
         } catch (Exception e) {

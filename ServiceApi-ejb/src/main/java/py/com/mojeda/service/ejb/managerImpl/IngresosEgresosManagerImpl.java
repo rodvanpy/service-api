@@ -60,6 +60,7 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
             } else {
 
                 ejIngresosEgresos = this.get(ingresosEgresos.getId());
+                
                 ejIngresosEgresos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejIngresosEgresos.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
                 ejIngresosEgresos.setMonto(ingresosEgresos.getMonto());
@@ -67,11 +68,7 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
                 this.update(ejIngresosEgresos);
             }
             
-            ejIngresosEgresos = new IngresosEgresos();
-            ejIngresosEgresos.setPersona(ingresosEgresos.getPersona());
-            ejIngresosEgresos.setTipoIngresosEgresos(ingresosEgresos.getTipoIngresosEgresos());
-            
-            object = this.getIngresosEgresos(ejIngresosEgresos);
+            object = this.getIngresosEgresos(new IngresosEgresos(ingresosEgresos.getId() == null ? ejIngresosEgresos.getId() :  ingresosEgresos.getId()));
             
         } catch (Exception e) {
             logger.error("Error al guardar ingreso/egreso", e);
@@ -103,6 +100,7 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
             } else {
 
                 ejIngresosEgresos = this.get(ingresosEgresos.getId());
+                
                 ejIngresosEgresos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejIngresosEgresos.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
                 ejIngresosEgresos.setMonto(ingresosEgresos.getMonto());
@@ -110,11 +108,7 @@ public class IngresosEgresosManagerImpl extends GenericDaoImpl<IngresosEgresos, 
                 this.update(ejIngresosEgresos);
             }
             
-            ejIngresosEgresos = new IngresosEgresos();
-            ejIngresosEgresos.setPersona(ingresosEgresos.getPersona());
-            ejIngresosEgresos.setTipoIngresosEgresos(ingresosEgresos.getTipoIngresosEgresos());
-            
-            object = this.getIngresosEgresos(ejIngresosEgresos);
+            object = this.getIngresosEgresos(new IngresosEgresos(ingresosEgresos.getId() == null ? ejIngresosEgresos.getId() :  ingresosEgresos.getId()));
             
         } catch (Exception e) {
             logger.error("Error al guardar ingreso/egreso", e);

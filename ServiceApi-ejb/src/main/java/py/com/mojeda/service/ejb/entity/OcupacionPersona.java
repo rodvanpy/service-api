@@ -27,7 +27,6 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  * @author miguel.ojeda
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "OCUPACION_PERSONA")
 public class OcupacionPersona extends Base {

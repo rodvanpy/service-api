@@ -7,7 +7,6 @@ package py.com.mojeda.service.ejb.managerImpl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -19,7 +18,6 @@ import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
-import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
 import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
@@ -69,7 +67,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     private VinculoManager vinculoManager;
 
     @Override
-    public Clientes guardar(Clientes cliente) throws Exception {
+    public Clientes guardar(Clientes cliente, Long idSucursal) throws Exception {
         Clientes object = null;
         Documentos ejDocumentos = null;
         if (cliente != null
@@ -81,153 +79,18 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             Personas ejPersona = personaManager.guardar(cliente.getPersona());
 
             cliente.setPersona(new Personas(ejPersona.getId()));
-
+            cliente.setSucursal(new Sucursales(idSucursal));
+            
             this.save(cliente);
-
-            for (Vinculos rpm : (cliente.getVinculos() == null ? new ArrayList<Vinculos>() : cliente.getVinculos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
-                }
-            }
-
-            for (Bienes rpm : (cliente.getBienesInmuebles() == null ? new ArrayList<Bienes>() : cliente.getBienesInmuebles())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    rpm = bienesManager.guardarBienes(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    rpm = bienesManager.editarBienes(rpm);
-                }
-            }
-
-            for (Bienes rpm : (cliente.getBienesVehiculo() == null ? new ArrayList<Bienes>() : cliente.getBienesVehiculo())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    rpm = bienesManager.guardarBienes(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    rpm = bienesManager.editarBienes(rpm);
-                }
-            }
-
-            for (IngresosEgresos rpm : (cliente.getEgresos() == null ? new ArrayList<IngresosEgresos>() : cliente.getEgresos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }
-            }
-
-            for (IngresosEgresos rpm : (cliente.getIngresos() == null ? new ArrayList<IngresosEgresos>() : cliente.getIngresos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                   rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }
-            }
-
-            for (OcupacionPersona rpm : (cliente.getOcupaciones() == null ? new ArrayList<OcupacionPersona>() : cliente.getOcupaciones())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    rpm = ocupacionPersonaManager.guardarOcupacion(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    rpm = ocupacionPersonaManager.editarOcupacion(rpm);
-                }
-            }
-
-            for (Referencias rpm : (cliente.getReferencias() == null ? new ArrayList<Referencias>() : cliente.getReferencias())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    rpm = referenciaManager.guardarReferencia(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    rpm = referenciaManager.editarReferencia(rpm);
-                }
-            }
-
-            object = this.getCliente(cliente,"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
+                       
+            object = this.getCliente(new Clientes(cliente.getId()),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
 
         }
         return object;
     }
 
     @Override
-    public Clientes editar(Clientes cliente) throws Exception {
+    public Clientes editar(Clientes cliente, Long idSucursal) throws Exception {
         Clientes object = null;
         Documentos ejDocumentos = null;
         if (cliente != null
@@ -239,156 +102,11 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             Personas ejPersona = personaManager.editar(cliente.getPersona());
 
             cliente.setPersona(new Personas(ejPersona.getId()));
-
+            cliente.setSucursal(new Sucursales(idSucursal));
+            
             this.update(cliente);
-
-            for (Vinculos rpm : (cliente.getVinculos() == null ? new ArrayList<Vinculos>() : cliente.getVinculos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
-                } else {
-                    rpm.getPersonaVinculo().setEmpresa(ejPersona.getEmpresa());
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
-                }
-            }
-
-            for (Bienes rpm : (cliente.getBienesInmuebles() == null ? new ArrayList<Bienes>() : cliente.getBienesInmuebles())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setTipoBien("INMUEBLE");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    bienesManager.guardarBienes(rpm);
-                } else {
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    rpm.setTipoBien("INMUEBLE");
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    bienesManager.editarBienes(rpm);
-                }
-            }
-
-            for (Bienes rpm : (cliente.getBienesVehiculo() == null ? new ArrayList<Bienes>() : cliente.getBienesVehiculo())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setTipoBien("VEHICULO");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    bienesManager.guardarBienes(rpm);
-                } else {
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    rpm.setTipoBien("VEHICULO");
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    bienesManager.editarBienes(rpm);
-                }
-            }
-
-            for (IngresosEgresos rpm : (cliente.getEgresos() == null ? new ArrayList<IngresosEgresos>() : cliente.getEgresos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                } else {
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }
-            }
-
-            for (IngresosEgresos rpm : (cliente.getIngresos() == null ? new ArrayList<IngresosEgresos>() : cliente.getIngresos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                } else {
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }
-            }
-
-            for (OcupacionPersona rpm : (cliente.getOcupaciones() == null ? new ArrayList<OcupacionPersona>() : cliente.getOcupaciones())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    ocupacionPersonaManager.guardarOcupacion(rpm);
-                } else {
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    ocupacionPersonaManager.editarOcupacion(rpm);
-                }
-            }
-
-            for (Referencias rpm : cliente.getReferencias()) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(cliente.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    referenciaManager.guardarReferencia(rpm);
-                } else {
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(cliente.getIdUsuarioModificacion());
-
-                    referenciaManager.editarReferencia(rpm);
-                }
-            }
-
-            object = this.getCliente(cliente,"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
+                     
+            object = this.getCliente(new Clientes(cliente.getId()),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
 
         }
         return object;
@@ -396,13 +114,17 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
 
     @Override
     public Clientes getCliente(Clientes cliente, String included) throws Exception {
-
-        Clientes model = this.get(cliente);       
+        Clientes model = null;
+        Map<String, Object> modelMaps = this.getAtributos(cliente, "id,persona.id,sucursal.id,activo".split(","));       
         
-        if (model != null) {
-            Personas persona = personaManager.getPersona(new Personas(model.getPersona().getId()),included);
-
-            model.setPersona(persona);
+        if (modelMaps != null) {
+            model = new Clientes();
+            model.setActivo(modelMaps.get("activo").toString());
+            model.setId(Long.parseLong(modelMaps.get("id").toString()));
+            
+            model.setPersona(personaManager.getPersona(new Personas(Long.parseLong(modelMaps.get("persona.id").toString())),included));
+            model.setSucursal(sucursalManager.get(new Sucursales(Long.parseLong(modelMaps.get("sucursal.id").toString()))));
+            //model.getSucursal().setEmpresa(null);
         }
 
         return model;

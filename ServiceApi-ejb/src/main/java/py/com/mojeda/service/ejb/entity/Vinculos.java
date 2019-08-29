@@ -49,10 +49,10 @@ public class Vinculos extends Base {
     @JoinColumn(name = "ID_VINCULO", referencedColumnName = "id")
     private Personas personaVinculo;
     
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
-    private Empresas empresa;
+//    @JsonIgnore
+//    @ManyToOne
+//    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
+//    private Empresas empresa;
     
     @Transient
     private List<OcupacionPersona> ocupaciones;
@@ -106,20 +106,6 @@ public class Vinculos extends Base {
      */
     public void setPersonaVinculo(Personas personaVinculo) {
         this.personaVinculo = personaVinculo;
-    }
-
-    /**
-     * @return the empresa
-     */
-    public Empresas getEmpresa() {
-        return empresa;
-    }
-
-    /**
-     * @param empresa the empresa to set
-     */
-    public void setEmpresa(Empresas empresa) {
-        this.empresa = empresa;
     }
 
     /**

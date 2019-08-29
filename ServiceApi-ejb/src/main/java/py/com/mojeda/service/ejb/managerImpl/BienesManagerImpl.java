@@ -54,10 +54,15 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
         try {
             if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
                 if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
+                    
+                    Bienes upBienes = this.get(bienes.getId());
+                    
+                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                    
+                    this.update(upBienes);
+                    
                 } else {
                     if (bienes.getMarca() != null) {
                         bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
@@ -68,10 +73,13 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
                 }
             } else {
                 if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
+                    Bienes upBienes = this.get(bienes.getId());
+                    
+                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                    
+                    this.update(upBienes);
                 } else {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
@@ -79,7 +87,7 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
                     this.save(bienes);
                 }
             }
-            object = this.getBienes(bienes);
+            object = this.getBienes(new Bienes(bienes.getId()));
         } catch (Exception e) {
             logger.error("Error al guardar registro", e);
         }
@@ -92,10 +100,13 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
         try {
             if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
                 if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
+                    Bienes upBienes = this.get(bienes.getId());
+                    
+                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                    
+                    this.update(upBienes);
                 } else {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
@@ -104,10 +115,14 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
                 }
             } else {
                 if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
+                    
+                    Bienes upBienes = this.get(bienes.getId());
+                    
+                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                    
+                    this.update(upBienes);
                 } else {
                     bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
                     bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
@@ -115,7 +130,7 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
                     this.save(bienes);
                 }
             }
-            object = this.getBienes(bienes);
+            object = this.getBienes(new Bienes(bienes.getId()));
         } catch (Exception e) {
             logger.error("Error al  editar registro", e);
         }

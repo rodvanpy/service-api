@@ -70,7 +70,7 @@ public class ReferenciaSolicitudesManagerImpl extends GenericDaoImpl<Referencias
                 ejReferencias.setTelefono(referencias.getTelefono());
                 ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 
-                this.update(referencias);
+                this.update(ejReferencias);
             }
             
             ejReferencias = new ReferenciasSolicitudes();
@@ -123,7 +123,7 @@ public class ReferenciaSolicitudesManagerImpl extends GenericDaoImpl<Referencias
                 ejReferencias.setTelefono(referencias.getTelefono());
                 ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 
-                this.update(referencias);
+                this.update(ejReferencias);
             }
             
             ejReferencias = new ReferenciasSolicitudes();

@@ -294,13 +294,22 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
                 null, null, null, null,
                 null, false);
     }
-
+    
     @Override
     public List<T> list(T ejemplo, String orderByAttrList, String orderByDirList) {
         return this.list(ejemplo, true, null, null,
                 new String[]{orderByAttrList},
                 new String[]{orderByDirList}, false,
                 false, null, null, null,
+                null, null, null, null, null, false);
+    }
+
+    @Override
+    public List<T> list(T ejemplo, boolean all, String campoComparacion, List<Object> valoresComparacion, String tipoFiltro) {
+        return this.list(ejemplo, all, null, null,
+                null,
+                null, false,
+                false, campoComparacion, valoresComparacion, tipoFiltro,
                 null, null, null, null, null, false);
     }
 
@@ -318,7 +327,7 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
     @Override
     public List<T> list(T ejemplo, boolean all, Integer primerResultado,
             Integer cantResultados, String[] orderByAttrList,
-            String[] orderByDirList, boolean like, boolean caseSensitive, String campoComparacion, List<Long> valoresComparacion, String tipoFiltro,
+            String[] orderByDirList, boolean like, boolean caseSensitive, String campoComparacion, List<Object> valoresComparacion, String tipoFiltro,
             List<String> atrMayIgual, List<Object> objMayIgual, List<String> atrMenIgual, List<Object> objMenIgual,
             String camposDistintos, boolean distintos) {
 
@@ -363,7 +372,7 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
             String[] atributos, boolean all, Integer primerResultado,
             Integer cantResultados, String[] orderByAttrList,
             String[] orderByDirList, boolean like, boolean caseSensitive,
-            String propiedadFiltroComunes, String comun, String campoComparacion, List<Long> valoresComparacion, String tipoFiltro,
+            String propiedadFiltroComunes, String comun, String campoComparacion, List<Object> valoresComparacion, String tipoFiltro,
             List<String> atrMayIgual, List<Object> objMayIgual, List<String> atrMenIgual, List<Object> objMenIgual,
             String camposDistintos, boolean distintos) {
         if (atributos == null || atributos.length == 0) {
@@ -387,7 +396,7 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
             Integer cantResultados, String[] orderByAttrList,
             String[] orderByDirList, boolean like, boolean caseSensitive,
             String propiedadFiltroComunes, String valorComun,
-            String campoComparacion, List<Long> valoresComparacion, String tipoFiltro,
+            String campoComparacion, List<Object> valoresComparacion, String tipoFiltro,
             List<String> atrMayIgual, List<Object> objMayIgual,
             List<String> atrMenIgual, List<Object> objMenIgual,
             String camposDistintos, boolean distintos) {

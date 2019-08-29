@@ -143,26 +143,6 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
 
             this.save(usuario);
 
-            for (Vinculos rpm : (usuario.getVinculos() == null ? new ArrayList<Vinculos>() : usuario.getVinculos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
-                }
-            }
-
             FuncionariosDepartamentos usuarioDepartamentos;
             for (DepartamentosSucursal rpm : usuario.getDepartamentos()) {
                 usuarioDepartamentos = new FuncionariosDepartamentos();
@@ -172,50 +152,10 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
                 funcionariosDepartamentosManager.save(usuarioDepartamentos);
             }
 
-            for (Estudios rpm : usuario.getEstudios()) {
-
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    estudiosManager.save(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    estudiosManager.update(rpm);
-                }
-            }
-            
-            for (Referencias rpm : (usuario.getReferencias() == null ? new ArrayList<Referencias> (): usuario.getReferencias())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    
-                    rpm = referenciaManager.guardarReferencia(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    
-                    rpm = referenciaManager.editarReferencia(rpm);
-                }                
-            }
-
-            Funcionarios model = new Funcionarios();
-            model.setAlias(usuario.getAlias());
-
-            object = this.getUsuario(model, "referencias,estudios");
+//            Funcionarios model = new Funcionarios();
+//            model.setAlias(usuario.getAlias());
+//
+//            object = this.getUsuario(model, "referencias,estudios");
         }
         return object;
     }
@@ -237,25 +177,6 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
 
             this.update(usuario);
 
-            for (Vinculos rpm : (usuario.getVinculos() == null ? new ArrayList<Vinculos>() : usuario.getVinculos())) {
-                if (rpm.getId() == null) {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.guardar(rpm);
-                } else {
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    Map<String, Object> responseMaps = vinculoManager.editar(rpm);
-                }
-            }
 
             FuncionariosDepartamentos usuarioDepartamentos = new FuncionariosDepartamentos();
             usuarioDepartamentos.setFuncionario(usuario);
@@ -271,54 +192,12 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
                 usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(rpm.getId()));
 
                 funcionariosDepartamentosManager.save(usuarioDepartamentos);
-            }
-            
-            for (Estudios rpm : usuario.getEstudios()) {
+            }           
 
-                if (rpm.getId() == null) {
-                    
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    estudiosManager.guardarEstudios(rpm);
-                } else {
-                    
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-
-                    estudiosManager.editarEstudios(rpm);
-                }
-            }
-            
-            for (Referencias rpm : (usuario.getReferencias() == null ? new ArrayList<Referencias> (): usuario.getReferencias())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    rpm.setIdUsuarioCreacion(usuario.getIdUsuarioModificacion());
-                    rpm.setPersona(new Personas(ejPersona.getId()));
-                    
-                    rpm = referenciaManager.guardarReferencia(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
-                    
-                    rpm = referenciaManager.editarReferencia(rpm);
-                }                
-            }
-
-            Funcionarios model = new Funcionarios();
-            model.setAlias(usuario.getAlias());
-
-            object = this.getUsuario(model,"referencias,estudios");
+//            Funcionarios model = new Funcionarios();
+//            model.setAlias(usuario.getAlias());
+//
+//            object = this.getUsuario(model,"referencias,estudios");
         }
 
         return object;
@@ -339,7 +218,7 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             List<FuncionariosDepartamentos> funcionariosDepartamentos = funcionariosDepartamentosManager.list(ejUsuarioDepartamentos, true);
             List<DepartamentosSucursal> departamentos = new ArrayList<>();
             for (FuncionariosDepartamentos rpm : funcionariosDepartamentos) {
-                rpm.setDepartamento(rpm.getDepartamento());
+                departamentos.add(rpm.getDepartamento());
             }
             model.setDepartamentos(departamentos);
             

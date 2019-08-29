@@ -106,19 +106,7 @@ public class Funcionarios extends Base {
     private String entidad = "FUNCIONARIOS";
 
     @Transient
-    private List<DepartamentosSucursal> departamentos;
-    
-    @Transient
-    @JsonIgnore
-    private List<Vinculos> vinculos;
-    
-    @Transient
-    @JsonIgnore
-    private List<Estudios> estudios;
-    
-    @Transient
-    @JsonIgnore
-    private List<Referencias> referencias;
+    private List<DepartamentosSucursal> departamentos;    
 
     public Funcionarios() {
 
@@ -243,14 +231,6 @@ public class Funcionarios extends Base {
         this.sucursal = sucursal;
     }
 
-    public List<Vinculos> getVinculos() {
-        return vinculos;
-    }
-
-    public void setVinculos(List<Vinculos> vinculos) {
-        this.vinculos = vinculos;
-    }
-
     /**
      * @return the nroLegajo
      */
@@ -333,28 +313,6 @@ public class Funcionarios extends Base {
      */
     public void setTipoMotivoRetiro(TipoMotivosRetiro tipoMotivoRetiro) {
         this.tipoMotivoRetiro = tipoMotivoRetiro;
-    }
-
-    /**
-     * @return the estudios
-     */
-    public List<Estudios> getEstudios() {
-        return estudios;
-    }
-
-    /**
-     * @param estudios the estudios to set
-     */
-    public void setEstudios(List<Estudios> estudios) {
-        this.estudios = estudios;
-    }
-
-    public List<Referencias> getReferencias() {
-        return referencias;
-    }
-
-    public void setReferencias(List<Referencias> referencias) {
-        this.referencias = referencias;
     }
     
     /**

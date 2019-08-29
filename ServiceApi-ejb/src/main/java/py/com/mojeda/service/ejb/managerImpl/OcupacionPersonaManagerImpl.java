@@ -78,13 +78,7 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
                 this.save(ocupacionPersona);
             }
 
-            ejOcupacionPersona = new OcupacionPersona();
-            ejOcupacionPersona.setPersona(new Personas(ocupacionPersona.getPersona().getId()));
-            ejOcupacionPersona.setTipoOcupacion(new TipoOcupaciones(ocupacionPersona.getTipoOcupacion().getId()));
-            ejOcupacionPersona.setActivo("S");
-            ejOcupacionPersona.setEmpresa(ocupacionPersona.getEmpresa());
-
-            object = this.getOcupacion(ejOcupacionPersona);
+            object = this.getOcupacion(new OcupacionPersona(ocupacionPersona.getId() == null ? ejOcupacionPersona.getId() : ocupacionPersona.getId()));
 
         } catch (Exception e) {
             logger.error("Error al guardar ocupacion", e);
@@ -149,13 +143,7 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
                 this.update(ejOcupacionPersona);
             }
 
-            ejOcupacionPersona = new OcupacionPersona();
-            ejOcupacionPersona.setPersona(new Personas(ocupacionPersona.getPersona().getId()));
-            ejOcupacionPersona.setTipoOcupacion(new TipoOcupaciones(ocupacionPersona.getTipoOcupacion().getId()));
-            ejOcupacionPersona.setActivo("S");
-            ejOcupacionPersona.setEmpresa(ocupacionPersona.getEmpresa());
-
-            object = this.getOcupacion(ejOcupacionPersona);
+            object = this.getOcupacion(new OcupacionPersona(ocupacionPersona.getId() == null ? ejOcupacionPersona.getId() : ocupacionPersona.getId()));
 
         } catch (Exception e) {
             logger.error("Error al editar ocupacion", e);
@@ -172,10 +160,6 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
         Map<String, Object> ocupacion = this.getAtributos(ocupacionPersona, atributos.split(","));
 
         if (ocupacion != null) {
-            Map<String, Object> tipoOcupaciones = tipoOcupacionesManager.getAtributos(new TipoOcupaciones(Long.parseLong(ocupacion.get("tipoOcupacion.id").toString())),
-                    "id,nombre,descripcion,activo".split(","));
-            ocupacion.put("tipoOcupacion", tipoOcupaciones);
-            ocupacion.remove("tipoOcupacion.id");
             
             model = new OcupacionPersona();
             model.setTipoOcupacion(tipoOcupacionesManager.get(new TipoOcupaciones(Long.parseLong(ocupacion.get("tipoOcupacion.id").toString()))));

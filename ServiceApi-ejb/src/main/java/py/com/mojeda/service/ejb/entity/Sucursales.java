@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  * @author daniel
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "SUCURSALES" ,uniqueConstraints = @UniqueConstraint(name = "sucursal_cod_uq", columnNames = { "codigo_sucursal" }) )
 public class Sucursales extends Base {

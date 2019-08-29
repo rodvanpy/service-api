@@ -285,9 +285,9 @@ public class ClienteController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             
             
-            Clientes modelMap = clientesManager.guardar(model);
-            
-            response.setModel(modelMap);
+            model = clientesManager.guardar(model, userDetail.getIdSusursal());
+                        
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("Registro creado con exito");
         } catch (Exception e) {
@@ -349,17 +349,14 @@ public class ClienteController extends BaseController {
             }           
             
             clienteMaps = clientesManager.getLike(new Clientes(id), "sucursal.id".split(","));
-            
-            ejSucursales.setId(Long.parseLong(clienteMaps.get("sucursal.id").toString()));
-            
+                     
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setSucursal(ejSucursales);
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            ejCliente =clientesManager.editar(model);
+            model = clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()));
             
-            response.setModel(clienteMaps);
+            response.setModel(model);
             response.setStatus(200);
             response.setMessage("Registro modificado con exito");
         } catch (Exception e) {

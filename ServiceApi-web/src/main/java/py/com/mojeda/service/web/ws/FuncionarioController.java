@@ -261,9 +261,9 @@ public class FuncionarioController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            model = funcionarioManager.guardar(model);
+            funcionarioManager.guardar(model);
 
-            response.setModel(model);
+            response.setModel(funcionarioManager.getUsuario(ejUsuarios, "referencias,estudios"));
             response.setStatus(200);
             response.setMessage("Registro creado con exito");
         } catch (Exception e) {
@@ -347,9 +347,9 @@ public class FuncionarioController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            model = funcionarioManager.editar(model);
+            funcionarioManager.editar(model);
 
-            response.setModel(model);
+            response.setModel(funcionarioManager.getUsuario(ejUsuarios, "referencias,estudios"));
             response.setStatus(200);
             response.setMessage("Registro modificado con exito");
         } catch (Exception e) {

@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.Column;
@@ -26,6 +27,7 @@ import javax.validation.Valid;
  *
  * @author Miguel
  */
+
 @Entity
 @Table(name = "CLIENTES", uniqueConstraints = @UniqueConstraint(name = "clientes_persona_uq", columnNames = { "ID_PERSONA" }) )
 public class Clientes extends Base{
@@ -50,34 +52,7 @@ public class Clientes extends Base{
     
     @Column(name = "ENTIDAD")
     private String entidad = "CLIENTES";
-    
-    @Transient
-    @JsonIgnore
-    private List<Bienes> bienesInmuebles;
-    
-    @Transient
-    @JsonIgnore
-    private List<Bienes> bienesVehiculo;
-    
-    @Transient
-    @JsonIgnore
-    private List<Referencias> referencias;
-    
-    @Transient
-    @JsonIgnore
-    private List<IngresosEgresos> egresos;
-    
-    @Transient
-    @JsonIgnore
-    private List<IngresosEgresos> ingresos;
-    
-    @Transient
-    @JsonIgnore
-    private List<OcupacionPersona> ocupaciones;
-    
-    @Transient
-    @JsonIgnore
-    private List<Vinculos> vinculos;
+   
     
     public Clientes() {
 
@@ -143,98 +118,6 @@ public class Clientes extends Base{
      */
     public void setSucursal(Sucursales sucursal) {
         this.sucursal = sucursal;
-    }
-
-    /**
-     * @return the bienesInmuebles
-     */
-    public List<Bienes> getBienesInmuebles() {
-        return bienesInmuebles;
-    }
-
-    /**
-     * @param bienesInmuebles the bienesInmuebles to set
-     */
-    public void setBienesInmuebles(List<Bienes> bienesInmuebles) {
-        this.bienesInmuebles = bienesInmuebles;
-    }
-
-    /**
-     * @return the bienesVehiculo
-     */
-    public List<Bienes> getBienesVehiculo() {
-        return bienesVehiculo;
-    }
-
-    /**
-     * @param bienesVehiculo the bienesVehiculo to set
-     */
-    public void setBienesVehiculo(List<Bienes> bienesVehiculo) {
-        this.bienesVehiculo = bienesVehiculo;
-    }
-
-    /**
-     * @return the referencias
-     */
-    public List<Referencias> getReferencias() {
-        return referencias;
-    }
-
-    /**
-     * @param referencias the referencias to set
-     */
-    public void setReferencias(List<Referencias> referencias) {
-        this.referencias = referencias;
-    }
-
-    /**
-     * @return the egresos
-     */
-    public List<IngresosEgresos> getEgresos() {
-        return egresos;
-    }
-
-    /**
-     * @param egresos the egresos to set
-     */
-    public void setEgresos(List<IngresosEgresos> egresos) {
-        this.egresos = egresos;
-    }
-
-    /**
-     * @return the ingresos
-     */
-    public List<IngresosEgresos> getIngresos() {
-        return ingresos;
-    }
-
-    /**
-     * @param ingresos the ingresos to set
-     */
-    public void setIngresos(List<IngresosEgresos> ingresos) {
-        this.ingresos = ingresos;
-    }
-
-    /**
-     * @return the ocupaciones
-     */
-    public List<OcupacionPersona> getOcupaciones() {
-        return ocupaciones;
-    }
-
-    /**
-     * @param ocupaciones the ocupaciones to set
-     */
-    public void setOcupaciones(List<OcupacionPersona> ocupaciones) {
-        this.ocupaciones = ocupaciones;
-    }
-
-    public List<Vinculos> getVinculos() {
-        return vinculos;
-    }
-
-    public void setVinculos(List<Vinculos> vinculos) {
-        this.vinculos = vinculos;
     }
         
     /**

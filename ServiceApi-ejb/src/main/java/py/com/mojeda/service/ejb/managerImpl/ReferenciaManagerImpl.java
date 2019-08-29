@@ -60,21 +60,17 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
             } else {
 
                 ejReferencias = this.get(referencias.getId());
+                
                 ejReferencias.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejReferencias.setIdUsuarioModificacion(referencias.getIdUsuarioModificacion());
                 ejReferencias.setNombreContacto(referencias.getNombreContacto()  == null ? null : referencias.getNombreContacto().toUpperCase());
                 ejReferencias.setTelefono(referencias.getTelefono());
                 ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 
-                this.update(referencias);
+                this.update(ejReferencias);
             }
             
-            ejReferencias = new Referencias();
-            ejReferencias.setPersona(referencias.getPersona());
-            ejReferencias.setNombreContacto(referencias.getNombreContacto());
-            ejReferencias.setTipoReferencia(referencias.getTipoReferencia());
-            
-            object = this.getReferencia(ejReferencias);
+            object = this.getReferencia(new Referencias(referencias.getId() == null ? ejReferencias.getId() : referencias.getId()));
             
         } catch (Exception e) {
             logger.error("Error al guardar referencia", e);
@@ -113,7 +109,7 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
                 ejReferencias.setTelefono(referencias.getTelefono());
                 ejReferencias.setTelefonoCelular(referencias.getTelefonoCelular());
 
-                this.update(referencias);
+                this.update(ejReferencias);
             }
             
             ejReferencias = new Referencias();
@@ -121,7 +117,7 @@ public class ReferenciaManagerImpl extends GenericDaoImpl<Referencias, Long>
             ejReferencias.setNombreContacto(referencias.getNombreContacto());
             ejReferencias.setTipoReferencia(referencias.getTipoReferencia());
             
-            object = this.getReferencia(ejReferencias);
+            object = this.getReferencia(new Referencias(referencias.getId() == null ? ejReferencias.getId() : referencias.getId()));
             
         } catch (Exception e) {
             logger.error("Error al guardar referencia", e);

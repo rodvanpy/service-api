@@ -28,7 +28,7 @@ import py.com.mojeda.service.ejb.utils.Avatar;
  *
  * @author Miguel
  */
-@JsonInclude(Include.NON_NULL)
+//@JsonInclude(Include.NON_NULL)
 @Entity
 @Table(name = "PERSONAS")
 public class Personas extends Base {
@@ -154,6 +154,13 @@ public class Personas extends Base {
         
     @Transient
     private Avatar avatar;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Transient
+    private Personas conyuge;
+    
+    @Transient
+    private String nombre;
     
     @Transient
     private List<Bienes> bienesInmuebles;
@@ -734,7 +741,21 @@ public class Personas extends Base {
     public void setEstudios(List<Estudios> estudios) {
         this.estudios = estudios;
     }
-    
-    
+
+    public Personas getConyuge() {
+        return conyuge;
+    }
+
+    public void setConyuge(Personas conyuge) {
+        this.conyuge = conyuge;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }       
        
 }

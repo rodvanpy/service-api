@@ -37,8 +37,6 @@ public class Profesiones extends Base{
     @Column(name = "NOMBRE")
     private String nombre;
     
-    @Column(name = "ENTIDAD")
-    private String entidad = "PROFESIONES";
       
     
     public Profesiones() {
@@ -76,17 +74,4 @@ public class Profesiones extends Base{
         this.nombre = nombre;
     }
     
-    /**
-     * @return the entidad
-     */
-    public String getEntidad() {
-        return entidad;
-    }
-
-    /**
-     * @param entidad the entidad to set
-     */
-    public void setEntidad(String entidad) {
-        this.entidad = entidad;
-    }
 }

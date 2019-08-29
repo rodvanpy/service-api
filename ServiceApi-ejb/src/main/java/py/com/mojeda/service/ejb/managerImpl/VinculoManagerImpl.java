@@ -98,7 +98,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     this.save(vinculo);
                 }
 
-                object = this.getVinculo(vinculo);
+                object = this.getVinculo(new Vinculos(vinculo.getId() == null ? ejVinculo.getId() : vinculo.getId()));
 
                 return object;
 
@@ -140,7 +140,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
 
                 this.update(vinculo);
 
-                object = this.getVinculo(vinculo);
+                object = this.getVinculo(new Vinculos(vinculo.getId()));
 
                 return object;
             }
@@ -206,7 +206,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
                     this.save(vinculo);
                 }
 
-                object = this.getVinculo(vinculo);                
+                object = this.getVinculo(new Vinculos(vinculo.getId() == null ? ejVinculo.getId() : vinculo.getId()));                
 
                 return object;
 
@@ -248,7 +248,7 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
 
                 this.update(vinculo);
 
-                object = this.getVinculo(vinculo);
+                object = this.getVinculo(new Vinculos(vinculo.getId()));
 
                 return object;
             }

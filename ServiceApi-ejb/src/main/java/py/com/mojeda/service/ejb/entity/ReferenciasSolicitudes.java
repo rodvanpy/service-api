@@ -52,6 +52,7 @@ public class ReferenciasSolicitudes extends Base {
     @JoinColumn(name = "ID_TIPO_REFERENCIA", referencedColumnName = "id")
     private TipoReferencias tipoReferencia;
     
+    @JsonIgnore
     @JoinColumn(name = "ID_PROPUESTA_SOLICITUD", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private PropuestaSolicitud propuestaSolicitud;
