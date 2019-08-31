@@ -13,14 +13,10 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.Bienes;
-import py.com.mojeda.service.ejb.entity.Ciudades;
-import py.com.mojeda.service.ejb.entity.DepartamentosPais;
-import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.PaisesManager;
-import static py.com.mojeda.service.ejb.managerImpl.OcupacionPersonaManagerImpl.logger;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 
 /**

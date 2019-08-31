@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     protected Class<Personas> getEntityBeanType() {
         return Personas.class;
     }
+    
+    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/SucursalManagerImpl")
     private SucursalManager sucursalManager;
@@ -632,8 +636,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     }
 
     @Override
-    public Map<String, Object> getPersona(Personas personas) throws Exception {
-
+    public Personas getPersona(Personas personas) throws Exception {
+        Personas model = null;
         String atributos = "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,"
                 + "fechaNacimiento,tipoPersona,sexo,numeroHijos,numeroDependientes,estadoCivil,separacionBienes,"
                 + "email,telefonoParticular,telefonoSecundario,direccionParticular,direccionDetallada,activo,"
@@ -641,33 +645,46 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
         Map<String, Object> persona = this.getAtributos(personas, atributos.split(","));
         if (persona != null) {
-
-            Map<String, Object> profesion = profesionesManager.getAtributos(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString())), "id,nombre,activo".split(","));
-            persona.put("profesion", profesion);
-            persona.remove("profesion.id");
-
-            Map<String, Object> nacionalidad = nacionalidadesManager.getAtributos(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString())), "id,nombre,codigo,activo".split(","));
-            persona.put("nacionalidad", nacionalidad);
-            persona.remove("nacionalidad.id");
-
-            Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(persona.get("pais.id") == null ? "0" : persona.get("pais.id").toString())), "id,nombre,activo".split(","));
-            persona.put("pais", pais);
-            persona.remove("pais.id");
-
-            Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(persona.get("departamento.id") == null ? "0" : persona.get("departamento.id").toString())), "id,nombre,activo".split(","));
-            persona.put("departamento", departamento);
-            persona.remove("departamento.id");
-
-            Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(persona.get("ciudad.id") == null ? "0" : persona.get("ciudad.id").toString())), "id,nombre,activo".split(","));
-            persona.put("ciudad", ciudad);
-            persona.remove("ciudad.id");
-
-            Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(persona.get("barrio.id") == null ? "0" : persona.get("barrio.id").toString())), "id,nombre,activo".split(","));
-            persona.put("barrio", barrio);
-            persona.remove("barrio.id");
+            model = new Personas();
+            model.setActivo(persona.get("activo") == null ? "" : persona.get("activo").toString());
+            model.setDireccionDetallada(persona.get("direccionDetallada") == null ? "" : persona.get("direccionDetallada").toString());
+            model.setDireccionParticular(persona.get("direccionParticular") == null ? "" : persona.get("direccionParticular").toString());
+            model.setDocumento(persona.get("documento") == null ? "" : persona.get("documento").toString());
+            model.setEmail(persona.get("email") == null ? "" : persona.get("email").toString());
+            model.setEstadoCivil(persona.get("estadoCivil") == null ? "" : persona.get("estadoCivil").toString());
+            model.setFechaNacimiento(persona.get("fechaNacimiento") == null ? null : new Timestamp(dateFormat.parse(persona.get("fechaNacimiento").toString()).getTime()));
+            model.setId(persona.get("id") == null ? null : Long.parseLong(persona.get("id").toString()));
+            model.setImagePath(persona.get("imagePath") == null ? "" : persona.get("imagePath").toString());
+            model.setLatitud(persona.get("latitud") == null ? null : Double.parseDouble(persona.get("latitud").toString()));
+            model.setLongitud(persona.get("longitud") == null ? null : Double.parseDouble(persona.get("longitud").toString()));
+            model.setPrimerApellido(persona.get("primerApellido") == null ? "" : persona.get("primerApellido").toString());
+            model.setPrimerNombre(persona.get("primerNombre") == null ? "" : persona.get("primerNombre").toString());
+            model.setSegundoApellido(persona.get("segundoApellido") == null ? "" : persona.get("segundoApellido").toString());
+            model.setSegundoNombre(persona.get("segundoNombre") == null ? "" : persona.get("segundoNombre").toString());
+            model.setNombre(
+                (model.getPrimerNombre() == null ? "" : model.getPrimerNombre())
+                + " " + (model.getSegundoNombre() == null ? "" : model.getSegundoNombre())
+                + " " + (model.getPrimerApellido() == null ? "" : model.getPrimerApellido())
+                + " " + (model.getSegundoApellido() == null ? "" : model.getSegundoApellido())
+            );
+            model.setNumeroDependientes(persona.get("numeroDependientes") == null ? null : Integer.parseInt(persona.get("numeroDependientes").toString()));
+            model.setNumeroHijos(persona.get("numeroHijos") == null ? null : Integer.parseInt(persona.get("numeroHijos").toString()));
+            model.setObservacion(persona.get("observacion") == null ? "" : persona.get("observacion").toString());            
+            model.setRuc(persona.get("ruc") == null ? "" : persona.get("ruc").toString());           
+            model.setSeparacionBienes(persona.get("separacionBienes") == null ? null : Boolean.parseBoolean(persona.get("separacionBienes").toString()));
+            model.setSexo(persona.get("sexo") == null ? "" : persona.get("sexo").toString());
+            model.setTelefonoParticular(persona.get("telefonoParticular") == null ? "" : persona.get("telefonoParticular").toString());
+            model.setTelefonoSecundario(persona.get("telefonoSecundario") == null ? "" : persona.get("telefonoSecundario").toString());
+            model.setTipoPersona(persona.get("tipoPersona") == null ? "" : persona.get("tipoPersona").toString());
+            model.setProfesion(profesionesManager.get(new Profesiones(Long.parseLong(persona.get("profesion.id") == null ? "0" : persona.get("profesion.id").toString()))));
+            model.setNacionalidad(nacionalidadesManager.get(new Nacionalidades(Long.parseLong(persona.get("nacionalidad.id") == null ? "0" : persona.get("nacionalidad.id").toString()))));
+            model.setPais(paisesManager.get(new Paises(Long.parseLong(persona.get("pais.id") == null ? "0" : persona.get("pais.id").toString()))));
+            model.setDepartamento(departamentosPaisManager.get(new DepartamentosPais(Long.parseLong(persona.get("departamento.id") == null ? "0" : persona.get("departamento.id").toString()))));
+            model.setBarrio(barriosManager.get(new Barrios(Long.parseLong(persona.get("barrio.id") == null ? "0" : persona.get("barrio.id").toString()))));
+            model.setCiudad(ciudadesManager.get(new Ciudades(Long.parseLong(persona.get("ciudad.id") == null ? "0" : persona.get("ciudad.id").toString()))));
 
         }
-        return persona;
+        return model;
     }
 
     @Override
@@ -675,6 +692,9 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
         included = included == null ? "" : included;
 
         Personas personaMap = this.get(persona);
+        if(personaMap == null){
+            return null;
+        }
         personaMap.setNombre(
                 (personaMap.getPrimerNombre() == null ? "" : personaMap.getPrimerNombre())
                 + " " + (personaMap.getSegundoNombre() == null ? "" : personaMap.getSegundoNombre())

@@ -217,11 +217,11 @@ public class PersonaController extends BaseController {
             ejPersonas.setRuc(documento);
             ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
-            Map<String, Object> modelMaps = personaManager.getPersona(ejPersonas);            
+            ejPersonas = personaManager.getPersona(ejPersonas);            
             
-            response.setModel(modelMaps);
-            response.setStatus(modelMaps == null ? 404 : 200);
-            response.setMessage(modelMaps == null ? "Registro no encontrado" : "Registro encontrado");
+            response.setModel(ejPersonas);
+            response.setStatus(ejPersonas == null ? 404 : 200);
+            response.setMessage(ejPersonas == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);
@@ -567,7 +567,7 @@ public class PersonaController extends BaseController {
                 }                
             }
             
-            response.setModel(model.getPersona());            
+            response.setModel(personaManager.getPersona(new Personas(model.getPersona().getId()), "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));            
             response.setStatus(200);
             response.setMessage("Persona modificado/a con exito");
         } catch (Exception e) {

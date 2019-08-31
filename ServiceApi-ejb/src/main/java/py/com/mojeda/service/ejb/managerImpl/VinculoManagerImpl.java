@@ -263,12 +263,9 @@ public class VinculoManagerImpl extends GenericDaoImpl<Vinculos, Long>
 
         if (model != null) {
             //Map<String, Object> persona = personaManager.getPersona(new Personas(Long.parseLong(model.get("persona.id").toString())));
-
-            Map<String, Object> personaVinculo = personaManager.getPersona(new Personas(Long.parseLong(model.get("personaVinculo.id").toString())));
-
             //model.put("persona", persona);
             //model.remove("persona.id");
-            model.put("personaVinculo", personaVinculo);
+            model.put("personaVinculo", personaManager.getPersona(new Personas(Long.parseLong(model.get("personaVinculo.id").toString()))));
             model.remove("personaVinculo.id");
         }
         return model;

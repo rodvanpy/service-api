@@ -24,6 +24,7 @@ import py.com.mojeda.service.ejb.entity.Garantias;
 import py.com.mojeda.service.ejb.entity.IngresosEgresos;
 import py.com.mojeda.service.ejb.entity.IngresosEgresosSolicitudes;
 import py.com.mojeda.service.ejb.entity.Modalidades;
+import py.com.mojeda.service.ejb.entity.Monedas;
 import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.OcupacionSolicitudes;
 import py.com.mojeda.service.ejb.entity.Personas;
@@ -37,11 +38,13 @@ import py.com.mojeda.service.ejb.entity.TipoCalculos;
 import py.com.mojeda.service.ejb.entity.TipoDesembolsos;
 import py.com.mojeda.service.ejb.entity.TipoDestinos;
 import py.com.mojeda.service.ejb.entity.TipoGarantias;
+import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
 import py.com.mojeda.service.ejb.entity.TipoPagos;
 import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.BienesSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
+import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 import py.com.mojeda.service.ejb.manager.GarantiasManager;
 import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
@@ -78,6 +81,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     private static final ApplicationLogger logger = ApplicationLogger.getInstance();
     protected static final DateFormat dateFormatHHMM = new SimpleDateFormat("HH:mm");
+    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/ClientesManagerImpl")
     private ClientesManager clientesManager;
@@ -141,6 +145,9 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/VinculoManagerImpl")
     private VinculoManager vinculoManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/EstadosSolicitudManagerImpl")
+    private EstadosSolicitudManager estadosSolicitudManager;
 
     @Override
     public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception {
@@ -152,9 +159,27 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
             //Crear Cliente
             if (propuestaSolicitud.getCliente().getId() == null) {
-                Clientes cliente = clientesManager.guardar(propuestaSolicitud.getCliente(), idSucursal);
 
-                propuestaSolicitud.getCliente().setId(cliente.getId());
+                Clientes ejCliente = new Clientes();
+                ejCliente.setPersona(new Personas(propuestaSolicitud.getCliente().getPersona().getId()));
+                ejCliente.setSucursal(new Sucursales(idSucursal));
+
+                Map<String, Object> modelMaps = clientesManager.getAtributos(ejCliente, "id".split(","));
+
+                if (modelMaps != null) {
+                    propuestaSolicitud.getCliente().setId(Long.parseLong(modelMaps.get("id").toString()));
+                } else {
+                    ejCliente.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    ejCliente.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    ejCliente.setActivo("S");
+                    ejCliente.setIdUsuarioCreacion(propuestaSolicitud.getIdUsuarioCreacion());
+                    ejCliente.setIdUsuarioModificacion(propuestaSolicitud.getIdUsuarioCreacion());
+
+                    clientesManager.save(ejCliente);
+
+                    propuestaSolicitud.getCliente().setId(ejCliente.getId());
+                }
+
             }
 
             //Calcular descuentos
@@ -231,7 +256,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     ejVinculo.setTipoVinculo("CONYUGE");
                     ejVinculo.setActivo("S");
 
-                    Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id,personaVinculo.profesion.id,numeroHijos,numeroDependientes".split(","));
+                    Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id,personaVinculo.profesion.id,personaVinculo.numeroHijos,personaVinculo.numeroDependientes".split(","));
 
                     if (conyugeMap != null) {
                         ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
@@ -308,12 +333,12 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     ejSolicitantes.setIdPersona(new Personas(propuestaSolicitud.getCodeudor().getId()));
                     ejSolicitantes.setProfesiones(propuestaSolicitud.getCodeudor().getProfesion());
                     ejSolicitantes.setPropuestaSolicitud(new PropuestaSolicitud(propuestaSolicitud.getId()));
-                    ejSolicitantes.setTelefonoParticular(propuestaSolicitud.getCodeudor().getTelefonoParticular() + " / " + propuestaSolicitud.getCodeudor().getTelefonoSecundario());
+                    ejSolicitantes.setTelefonoParticular(propuestaSolicitud.getCodeudor().getTelefonoParticular() + " / " + (propuestaSolicitud.getCodeudor().getTelefonoSecundario() == null ? "" : propuestaSolicitud.getCodeudor().getTelefonoSecundario()));
                     ejSolicitantes.setTipoGarantias(propuestaSolicitud.getTipoGarantia());
                     ejSolicitantes.setTipoRelacion("CODEUDOR");
                     ejSolicitantes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     ejSolicitantes.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    
+
                     if (propuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
                             && propuestaSolicitud.getCodeudor().getSeparacionBienes()) {
 
@@ -322,7 +347,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                         ejVinculo.setTipoVinculo("CONYUGE");
                         ejVinculo.setActivo("S");
 
-                        Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id,personaVinculo.profesion.id,numeroHijos,numeroDependientes".split(","));
+                        Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id,personaVinculo.profesion.id,personaVinculo.numeroHijos,personaVinculo.numeroDependientes".split(","));
 
                         if (conyugeMap != null) {
                             ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
@@ -345,7 +370,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     ejGarantias.setPropuestaSolicitud(new PropuestaSolicitud(propuestaSolicitud.getId()));
                     ejGarantias.setRiesgoAsumido(propuestaSolicitud.getMontoSolicitado());
                     ejGarantias.setTipoGarantias(propuestaSolicitud.getTipoGarantia());
-                    ejGarantias.setTipoRelacion("CODEUDOR");                   
+                    ejGarantias.setTipoRelacion("CODEUDOR");
 
                     garantiasManager.save(ejGarantias);
 
@@ -389,9 +414,91 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @Override
     public PropuestaSolicitud getPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) throws Exception {
-
-        propuestaSolicitud = this.get(propuestaSolicitud);
-
+        
+        String atributos = "id,fechaPresentacion,horaPresentacion,estado.id,fechaEstado,puntaje,montoSolicitado,tipoCredito,tipoDescuento,tasaInteres,"
+                + "gastosAdministrativos,impuestos,comision,gastosVarios,seguros,vencimientoInteres,tipoDesembolso.id,tipoCalculoImporte.id,tipoGarantia.id,"
+                + "tipoPago.id,tipoDestino.id,tipoInteres,ordenCheque,formaPago,plazo,periodoGracia,periodoCapital,periodoInteres,plazoOperacion,idAhorroDebito,"
+                + "idAhorroDesembolso,fechaAnalisis,fechaAprobacion,fechaRechazo,observacionesDepartamento,fechaGeneracion,primerVencimiento,montoSolicitadoOriginal,"
+                + "horaEstado,observacionFormalizador,importeCuota,importeEntregar,detalleDestino,beneficiarioCheque,tipoEnvioSolicitud,moneda.id,modalidad.id,"
+                + "cliente.id,cliente.persona.id,codeudor.id,funcionario.id,";
+        
+        if(propuestaSolicitud == null
+                || (propuestaSolicitud != null && propuestaSolicitud.getId() == null)){
+            return null;
+        }
+        
+        Map<String, Object> modelMaps = this.getAtributos(propuestaSolicitud, atributos.split(","));
+        
+        if(modelMaps == null){
+            return null;
+        }
+        
+        propuestaSolicitud = new PropuestaSolicitud();
+        propuestaSolicitud.setActivo(atributos);
+        propuestaSolicitud.setBeneficiarioCheque(atributos);
+        
+        if(modelMaps.get("cliente.id") == null){
+            return null;
+        }
+        
+        Clientes ejCliente = new Clientes();
+        ejCliente.setPersona(personaManager.getPersona(new Personas(Long.parseLong(modelMaps.get("cliente.persona.id").toString()))));        
+        propuestaSolicitud.setCliente(ejCliente);
+        
+        if(modelMaps.get("codeudor.id") != null){
+            propuestaSolicitud.setCodeudor(personaManager.getPersona(new Personas(Long.parseLong(modelMaps.get("codeudor.id").toString()))));
+        }
+        
+        propuestaSolicitud.setComision(modelMaps.get("comision") == null ? null:  Long.parseLong(modelMaps.get("comision").toString()));
+        propuestaSolicitud.setDetalleDestino(modelMaps.get("detalleDestino") == null ? "" : modelMaps.get("detalleDestino").toString());
+        propuestaSolicitud.setEstado(modelMaps.get("estado.id") == null ? null:  estadosSolicitudManager.get(Long.parseLong(modelMaps.get("estado.id").toString())));
+        propuestaSolicitud.setFechaAnalisis(modelMaps.get("fechaAnalisis") == null ? null : dateFormat.parse(modelMaps.get("fechaAnalisis").toString()));
+        propuestaSolicitud.setFechaAprobacion(modelMaps.get("fechaAprobacion") == null ? null : dateFormat.parse(modelMaps.get("fechaAprobacion").toString()));
+        propuestaSolicitud.setFechaEstado(modelMaps.get("fechaEstado") == null ? null : dateFormat.parse(modelMaps.get("fechaEstado").toString()));
+        propuestaSolicitud.setFechaGeneracion(modelMaps.get("fechaGeneracion") == null ? null : dateFormat.parse(modelMaps.get("fechaGeneracion").toString()));
+        propuestaSolicitud.setFechaPresentacion(modelMaps.get("fechaPresentacion") == null ? null : dateFormat.parse(modelMaps.get("fechaPresentacion").toString()));
+        propuestaSolicitud.setFechaRechazo(modelMaps.get("fechaRechazo") == null ? null : dateFormat.parse(modelMaps.get("fechaRechazo").toString()));   
+        propuestaSolicitud.setFormaPago(modelMaps.get("formaPago") == null ? "" : modelMaps.get("formaPago").toString());
+        if(modelMaps.get("funcionario.id") != null){
+            propuestaSolicitud.setFuncionario(funcionariosManager.getUsuario(new Funcionarios(Long.parseLong(modelMaps.get("funcionario.id").toString())),null));
+        }        
+        propuestaSolicitud.setGastosAdministrativos(modelMaps.get("gastosAdministrativos") == null ? null : new BigDecimal(modelMaps.get("gastosAdministrativos").toString()));
+        propuestaSolicitud.setGastosVarios(modelMaps.get("gastosVarios") == null ? null:  Long.parseLong(modelMaps.get("gastosVarios").toString()));
+        propuestaSolicitud.setHoraEstado(modelMaps.get("horaEstado") == null ? "" : modelMaps.get("horaEstado").toString());
+        propuestaSolicitud.setHoraPresentacion(modelMaps.get("horaPresentacion") == null ? "" : modelMaps.get("horaPresentacion").toString());
+        propuestaSolicitud.setId(modelMaps.get("id") == null ? null:  Long.parseLong(modelMaps.get("id").toString()));
+        propuestaSolicitud.setImporteCuota(modelMaps.get("importeCuota") == null ? null:  Long.parseLong(modelMaps.get("importeCuota").toString()));
+        propuestaSolicitud.setImporteEntregar(modelMaps.get("importeEntregar") == null ? null:  Long.parseLong(modelMaps.get("importeEntregar").toString()));
+        propuestaSolicitud.setImpuestos(modelMaps.get("impuestos") == null ? null:  Long.parseLong(modelMaps.get("impuestos").toString()));
+        propuestaSolicitud.setModalidad(modelMaps.get("modalidad.id") == null ? null:  modalidadesManager.get(new Modalidades(Long.parseLong(modelMaps.get("modalidad.id").toString()))));
+        propuestaSolicitud.setMoneda(modelMaps.get("moneda.id") == null ? null:  new Monedas(Long.parseLong(modelMaps.get("moneda.id").toString())));
+        propuestaSolicitud.setMontoSolicitado(modelMaps.get("montoSolicitado") == null ? null : new BigDecimal(modelMaps.get("montoSolicitado").toString()));
+        propuestaSolicitud.setMontoSolicitadoOriginal(modelMaps.get("montoSolicitadoOriginal") == null ? null : new BigDecimal(modelMaps.get("montoSolicitadoOriginal").toString()));
+        //propuestaSolicitud.setNumeroLegajoAdm(modelMaps.get("pais.id") == null ? null:  Long.parseLong(modelMaps.get("pais.id").toString()));
+        //propuestaSolicitud.setObservacionFormalizador(modelMaps.get("numeroFinca") == null ? "" : modelMaps.get("numeroFinca").toString());
+        //propuestaSolicitud.setObservacionesComite(modelMaps.get("numeroFinca") == null ? "" : modelMaps.get("numeroFinca").toString());
+        propuestaSolicitud.setObservacionesDepartamento(modelMaps.get("observacionesDepartamento") == null ? "" : modelMaps.get("observacionesDepartamento").toString());
+        propuestaSolicitud.setOrdenCheque(modelMaps.get("ordenCheque") == null ? "" : modelMaps.get("ordenCheque").toString());
+        propuestaSolicitud.setPeriodoCapital(modelMaps.get("periodoCapital") == null ? null:  Short.parseShort(modelMaps.get("periodoCapital").toString()));
+        propuestaSolicitud.setPeriodoGracia(modelMaps.get("periodoGracia") == null ? null:  Short.parseShort(modelMaps.get("periodoGracia").toString()));
+        propuestaSolicitud.setPeriodoInteres(modelMaps.get("periodoInteres") == null ? null:  Short.parseShort(modelMaps.get("periodoInteres").toString()));
+        propuestaSolicitud.setPlazo(modelMaps.get("plazo") == null ? null:  Long.parseLong(modelMaps.get("plazo").toString()));
+        propuestaSolicitud.setPlazoOperacion(modelMaps.get("plazoOperacion") == null ? null:  Short.parseShort(modelMaps.get("plazoOperacion").toString()));
+        propuestaSolicitud.setPrimerVencimiento(modelMaps.get("primerVencimiento") == null ? null : dateFormat.parse(modelMaps.get("primerVencimiento").toString()));
+        propuestaSolicitud.setPuntaje(modelMaps.get("puntaje") == null ? null:  Short.parseShort(modelMaps.get("puntaje").toString()));
+        propuestaSolicitud.setSeguros(modelMaps.get("seguros") == null ? null:  Long.parseLong(modelMaps.get("seguros").toString()));
+        propuestaSolicitud.setTasaInteres(modelMaps.get("tasaInteres") == null ? null : new BigDecimal(modelMaps.get("tasaInteres").toString()));
+        propuestaSolicitud.setTipoCalculoImporte(modelMaps.get("tipoCalculoImporte.id") == null ? null:  tipoCalculosManager.get(Long.parseLong(modelMaps.get("tipoCalculoImporte.id").toString())));
+        propuestaSolicitud.setTipoCredito(modelMaps.get("tipoCredito") == null ? null:  modelMaps.get("tipoCredito").toString());
+        propuestaSolicitud.setTipoDescuento(modelMaps.get("tipoDescuento") == null ? null:  modelMaps.get("tipoDescuento").toString());
+        propuestaSolicitud.setTipoDesembolso(modelMaps.get("tipoDesembolso.id") == null ? null: tipoDesembolsosManager.get(Long.parseLong(modelMaps.get("tipoDesembolso.id").toString())) );
+        propuestaSolicitud.setTipoDestino(modelMaps.get("tipoDestino.id") == null ? null:  tipoDestinosManager.get(Long.parseLong(modelMaps.get("tipoDestino.id").toString())));
+        propuestaSolicitud.setTipoEnvioSolicitud(modelMaps.get("tipoEnvioSolicitud") == null ? null:  modelMaps.get("tipoEnvioSolicitud").toString());
+        propuestaSolicitud.setTipoGarantia(modelMaps.get("tipoGarantia.id") == null ? null:  tipoGarantiasManager.get(Long.parseLong(modelMaps.get("tipoGarantia.id").toString())));
+        propuestaSolicitud.setTipoInteres(modelMaps.get("tipoInteres") == null ? null:  modelMaps.get("tipoInteres").toString());
+        propuestaSolicitud.setTipoPago(modelMaps.get("tipoPago.id") == null ? null:  tipoPagosManager.get(Long.parseLong(modelMaps.get("tipoPago.id").toString())));
+        propuestaSolicitud.setVencimientoInteres(modelMaps.get("vencimientoInteres") == null ? null:  Long.parseLong(modelMaps.get("vencimientoInteres").toString()));
+        
         return propuestaSolicitud;
     }
 
@@ -671,6 +778,240 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             bienesSolicitudesManager.guardarBienesSolicitud(ejBienesSolicitudes);
         }
 
+    }
+
+    @Override
+    public Personas getPersonaSolicitud(Long idSolicitud, Long idPersona) throws Exception {
+        String included = "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones";
+
+        Personas personaMap = personaManager.get(new Personas(idPersona));
+
+        if (personaMap == null) {
+            return null;
+        }
+        personaMap.setNombre(
+                (personaMap.getPrimerNombre() == null ? "" : personaMap.getPrimerNombre())
+                + " " + (personaMap.getSegundoNombre() == null ? "" : personaMap.getSegundoNombre())
+                + " " + (personaMap.getPrimerApellido() == null ? "" : personaMap.getPrimerApellido())
+                + " " + (personaMap.getSegundoApellido() == null ? "" : personaMap.getSegundoApellido())
+        );
+
+        Solicitantes ejSolicitantes = new Solicitantes();
+        ejSolicitantes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+        ejSolicitantes.setIdPersona(new Personas(idPersona));
+
+        ejSolicitantes = solicitantesManager.get(ejSolicitantes);
+
+        if (ejSolicitantes == null) {
+            return null;
+        }
+
+        personaMap.setBarrio(ejSolicitantes.getBarrio());
+        personaMap.setCiudad(ejSolicitantes.getCiudad());
+        personaMap.setDepartamento(ejSolicitantes.getDepartamento());
+        personaMap.setPais(ejSolicitantes.getPais());
+        personaMap.setDireccionParticular(ejSolicitantes.getDireccionParticular());
+        personaMap.setLatitud(ejSolicitantes.getLatitud());
+        personaMap.setLongitud(ejSolicitantes.getLongitud());
+        personaMap.setNumeroHijos(ejSolicitantes.getCantHijos());
+        personaMap.setNumeroDependientes(ejSolicitantes.getCantPersonasACargo());
+        personaMap.setEstadoCivil(ejSolicitantes.getEstadoCivil());
+        personaMap.setFechaNacimiento(new Timestamp(ejSolicitantes.getFechaNacimiento().getTime()));
+        personaMap.setProfesion(ejSolicitantes.getProfesiones());
+        personaMap.setTelefonoParticular(ejSolicitantes.getTelefonoParticular());
+        personaMap.setConyuge(ejSolicitantes.getIdPersonaConyuge());
+
+        if (included.contains("inmuebles")) {
+            BienesSolicitudes ejBienes = new BienesSolicitudes();
+            ejBienes.setPersona(new Personas(personaMap.getId()));
+            ejBienes.setActivo("S");
+            ejBienes.setTipoBien("INMUEBLE");
+            ejBienes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+            List<BienesSolicitudes> listBienes = bienesSolicitudesManager.getListBienesSolicitud(ejBienes);
+            List<Bienes> bienes = new ArrayList();
+            Bienes bienPersona;
+            for (BienesSolicitudes rpm : listBienes) {
+                bienPersona = new Bienes();
+                bienPersona.setActivo(rpm.getActivo());
+                bienPersona.setBarrio(rpm.getBarrio());
+                bienPersona.setCiudad(rpm.getCiudad());
+                bienPersona.setCuentaCatastral(rpm.getCuentaCatastral());
+                bienPersona.setDepartamento(rpm.getDepartamento());
+                bienPersona.setDireccion(rpm.getDireccion());
+                bienPersona.setDistrito(rpm.getDistrito());
+                bienPersona.setEdificado(rpm.getEdificado());
+                bienPersona.setEscriturado(rpm.getEscriturado());
+                bienPersona.setFechaDeclaracion(rpm.getFechaDeclaracion());
+                bienPersona.setFechaHipoteca(rpm.getFechaHipoteca());
+                bienPersona.setFechaVenta(rpm.getFechaVenta());
+                bienPersona.setHipotecado(rpm.getHipotecado());
+                bienPersona.setLugarHipoteca(rpm.getLugarHipoteca());
+                bienPersona.setNumeroFinca(rpm.getNumeroFinca());
+                bienPersona.setPais(rpm.getPais());
+                bienPersona.setSaldo(rpm.getSaldo());
+                bienPersona.setTipoBien(rpm.getTipoBien());
+                bienPersona.setValorActual(rpm.getValorActual());
+                bienPersona.setVencimientoHipoteca(rpm.getVencimientoHipoteca());
+                bienPersona.setSaldo(rpm.getSaldo());
+                bienPersona.setCuotaMensual(rpm.getCuotaMensual());
+                bienPersona.setMarca(rpm.getMarca());
+                bienPersona.setModeloAnio(rpm.getModeloAnio());
+
+                bienes.add(bienPersona);
+            }
+            personaMap.setBienesInmuebles(bienes);
+        }
+
+        if (included.contains("vehiculos")) {
+            BienesSolicitudes ejBienes = new BienesSolicitudes();
+            ejBienes.setPersona(new Personas(personaMap.getId()));
+            ejBienes.setActivo("S");
+            ejBienes.setTipoBien("VEHICULO");
+            ejBienes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+            List<BienesSolicitudes> listBienes = bienesSolicitudesManager.getListBienesSolicitud(ejBienes);
+            List<Bienes> bienes = new ArrayList();
+            Bienes bienPersona;
+            for (BienesSolicitudes rpm : listBienes) {
+                bienPersona = new Bienes();
+                bienPersona.setActivo(rpm.getActivo());
+                bienPersona.setBarrio(rpm.getBarrio());
+                bienPersona.setCiudad(rpm.getCiudad());
+                bienPersona.setCuentaCatastral(rpm.getCuentaCatastral());
+                bienPersona.setDepartamento(rpm.getDepartamento());
+                bienPersona.setDireccion(rpm.getDireccion());
+                bienPersona.setDistrito(rpm.getDistrito());
+                bienPersona.setEdificado(rpm.getEdificado());
+                bienPersona.setEscriturado(rpm.getEscriturado());
+                bienPersona.setFechaDeclaracion(rpm.getFechaDeclaracion());
+                bienPersona.setFechaHipoteca(rpm.getFechaHipoteca());
+                bienPersona.setFechaVenta(rpm.getFechaVenta());
+                bienPersona.setHipotecado(rpm.getHipotecado());
+                bienPersona.setLugarHipoteca(rpm.getLugarHipoteca());
+                bienPersona.setNumeroFinca(rpm.getNumeroFinca());
+                bienPersona.setPais(rpm.getPais());
+                bienPersona.setSaldo(rpm.getSaldo());
+                bienPersona.setTipoBien(rpm.getTipoBien());
+                bienPersona.setValorActual(rpm.getValorActual());
+                bienPersona.setVencimientoHipoteca(rpm.getVencimientoHipoteca());
+                bienPersona.setSaldo(rpm.getSaldo());
+                bienPersona.setCuotaMensual(rpm.getCuotaMensual());
+                bienPersona.setMarca(rpm.getMarca());
+                bienPersona.setModeloAnio(rpm.getModeloAnio());
+
+                bienes.add(bienPersona);
+            }
+
+            personaMap.setBienesVehiculo(bienes);
+        }
+
+        if (included.contains("referencias")) {
+            ReferenciasSolicitudes ejReferenciasSolicitudes = new ReferenciasSolicitudes();
+            ejReferenciasSolicitudes.setPersona(new Personas(personaMap.getId()));
+            ejReferenciasSolicitudes.setActivo("S");
+            ejReferenciasSolicitudes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+            List<ReferenciasSolicitudes> listReferencias = referenciaSolicitudesManager.getListReferenciaSolicitud(ejReferenciasSolicitudes);
+            List<Referencias> referencias = new ArrayList();
+            Referencias ejReferencia;
+            for (ReferenciasSolicitudes rpm : listReferencias) {
+                ejReferencia = new Referencias();
+                ejReferencia.setActivo(rpm.getActivo());
+                ejReferencia.setPersona(rpm.getPersona());
+                ejReferencia.setNombreContacto(rpm.getNombreContacto());
+                ejReferencia.setTelefono(rpm.getTelefono());
+                ejReferencia.setTelefonoCelular(rpm.getTelefonoCelular());
+                ejReferencia.setTipoReferencia(rpm.getTipoReferencia());
+
+                referencias.add(ejReferencia);
+            }
+
+            personaMap.setReferencias(referencias);
+        }
+
+        if (included.contains("ingresos")) {
+            TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
+            ejTipoIngresosEgresos.setTipo("I");
+
+            IngresosEgresosSolicitudes ejIngresosEgresosSolicitudes = new IngresosEgresosSolicitudes();
+            ejIngresosEgresosSolicitudes.setPersona(new Personas(personaMap.getId()));
+            ejIngresosEgresosSolicitudes.setActivo("S");
+            ejIngresosEgresosSolicitudes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+            ejIngresosEgresosSolicitudes.setTipoIngresosEgresos(ejTipoIngresosEgresos);
+
+            List<IngresosEgresosSolicitudes> listIngresosEgresos = ingresosEgresosSolicitudesManager.getListIngresosEgresos(ejIngresosEgresosSolicitudes);
+            List<IngresosEgresos> ingresosEgresos = new ArrayList();
+            IngresosEgresos ejIngresosEgresos;
+            for (IngresosEgresosSolicitudes rpm : listIngresosEgresos) {
+                ejIngresosEgresos = new IngresosEgresos();
+                ejIngresosEgresos.setActivo(rpm.getActivo());
+                ejIngresosEgresos.setTipoIngresosEgresos(rpm.getTipoIngresosEgresos());
+                ejIngresosEgresos.setMonto(rpm.getMonto());
+
+                ingresosEgresos.add(ejIngresosEgresos);
+            }
+
+            personaMap.setIngresos(ingresosEgresos);
+        }
+
+        if (included.contains("egresos")) {
+            TipoIngresosEgresos ejTipoIngresosEgresos = new TipoIngresosEgresos();
+            ejTipoIngresosEgresos.setTipo("E");
+
+            IngresosEgresosSolicitudes ejIngresosEgresosSolicitudes = new IngresosEgresosSolicitudes();
+            ejIngresosEgresosSolicitudes.setPersona(new Personas(personaMap.getId()));
+            ejIngresosEgresosSolicitudes.setActivo("S");
+            ejIngresosEgresosSolicitudes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+            ejIngresosEgresosSolicitudes.setTipoIngresosEgresos(ejTipoIngresosEgresos);
+
+            List<IngresosEgresosSolicitudes> listIngresosEgresos = ingresosEgresosSolicitudesManager.getListIngresosEgresos(ejIngresosEgresosSolicitudes);
+            List<IngresosEgresos> ingresosEgresos = new ArrayList();
+            IngresosEgresos ejIngresosEgresos;
+            for (IngresosEgresosSolicitudes rpm : listIngresosEgresos) {
+                ejIngresosEgresos = new IngresosEgresos();
+                ejIngresosEgresos.setActivo(rpm.getActivo());
+                ejIngresosEgresos.setTipoIngresosEgresos(rpm.getTipoIngresosEgresos());
+                ejIngresosEgresos.setMonto(rpm.getMonto());
+
+                ingresosEgresos.add(ejIngresosEgresos);
+            }
+
+            personaMap.setEgresos(ingresosEgresos);
+        }
+
+        if (included.contains("ocupaciones")) {
+            OcupacionSolicitudes ejOcupacionSolicitudes = new OcupacionSolicitudes();
+            ejOcupacionSolicitudes.setPersona(new Personas(personaMap.getId()));
+            ejOcupacionSolicitudes.setActivo("S");
+            ejOcupacionSolicitudes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+            List<OcupacionSolicitudes> listOcupacionSolicitudes = ocupacionSolicitudesManager.getListOcupacionSolicitudes(ejOcupacionSolicitudes);
+            List<OcupacionPersona> ocupacionPersona = new ArrayList();
+            OcupacionPersona ejOcupacionPersona;
+            for (OcupacionSolicitudes rpm : listOcupacionSolicitudes) {
+                ejOcupacionPersona = new OcupacionPersona();
+                ejOcupacionPersona.setActivo("S");
+                ejOcupacionPersona.setCargo(rpm.getCargo());
+                ejOcupacionPersona.setDireccion(rpm.getDireccion());
+                ejOcupacionPersona.setEmpresa(rpm.getEmpresa());
+                ejOcupacionPersona.setFechaIngreso(rpm.getFechaIngreso());
+                ejOcupacionPersona.setFechaSalida(rpm.getFechaSalida());
+                ejOcupacionPersona.setIdUsuarioModificacion(rpm.getIdUsuarioModificacion());
+                ejOcupacionPersona.setIngresosMensuales(rpm.getIngresosMensuales());
+                ejOcupacionPersona.setInterno(rpm.getInterno());
+                ejOcupacionPersona.setTelefonoPrincipal(rpm.getTelefonoPrincipal());
+                ejOcupacionPersona.setTelefonoSecundario(rpm.getTelefonoSecundario());
+                ejOcupacionPersona.setTipoTrabajo(rpm.getTipoTrabajo());
+                ejOcupacionPersona.setTipoOcupacion(rpm.getTipoOcupacion());
+                
+                ocupacionPersona.add(ejOcupacionPersona);
+            }
+
+            personaMap.setOcupaciones(ocupacionPersona);
+        }
+
+        return personaMap;
     }
 
 }

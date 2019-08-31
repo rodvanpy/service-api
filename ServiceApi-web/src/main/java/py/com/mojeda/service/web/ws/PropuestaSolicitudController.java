@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Clientes;
-import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
 import py.com.mojeda.service.ejb.entity.Personas;
@@ -35,8 +34,6 @@ import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
-import py.com.mojeda.service.web.utils.Propuesta;
-import py.com.mojeda.service.web.utils.Password;
 import py.com.mojeda.service.web.utils.ReglaDTO;
 import static py.com.mojeda.service.web.ws.BaseController.logger;
 
@@ -63,9 +60,9 @@ public class PropuestaSolicitudController extends BaseController {
 
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        
-        if(!userDetail.tienePermiso("ROLE_SOLICITUDE.LISTALL")){
-            
+
+        if (!userDetail.tienePermiso("ROLE_SOLICITUDE.LISTALL")) {
+
         }
         //Buscar usuario por empresa
         Sucursales ejSucursales = new Sucursales();
@@ -123,9 +120,9 @@ public class PropuestaSolicitudController extends BaseController {
                     null, null, null, null, null, null, null, null, true);
 
             for (Map<String, Object> rpm : listMapGrupos) {
-                
-                Clientes cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString()))
-                        ,null);
+
+                Clientes cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString())),
+                         null);
 
                 Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
                         "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
@@ -175,7 +172,38 @@ public class PropuestaSolicitudController extends BaseController {
         try {
             inicializarPropuestaSolicitudManager();
 
-            Map<String, Object> model = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(id),"".split(","));
+            PropuestaSolicitud model = propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(id));
+
+            response.setModel(model);
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+
+    /**
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
+     *
+     * @param idSolicitud
+     * @param idPersona
+     * @return
+     */
+    @GetMapping("/persona/{idSolicitud}/{idPersona}")
+    public @ResponseBody
+    ResponseDTO getPersonaSolicitud(
+            @ModelAttribute("idSolicitud") Long idSolicitud,
+            @ModelAttribute("idPersona") Long idPersona) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarPropuestaSolicitudManager();
+
+            Personas model =  propuestaSolicitudManager.getPersonaSolicitud(idSolicitud, idPersona);
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -199,7 +227,7 @@ public class PropuestaSolicitudController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid  PropuestaSolicitud model,
+            @RequestBody @Valid PropuestaSolicitud model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -223,29 +251,29 @@ public class PropuestaSolicitudController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             model.setFuncionario(new Funcionarios(userDetail.getId()));
-            
+
             //Buscar cliente con estado pendiente
             Personas ejPersonas = new Personas();
             ejPersonas.setDocumento(model.getCliente().getPersona().getDocumento());
-            
+
             Clientes ejCliente = new Clientes();
             ejCliente.setPersona(ejPersonas);
-            
+
             PropuestaSolicitud ejPropuestaSolicitud = new PropuestaSolicitud();
             ejPropuestaSolicitud.setCliente(ejCliente);
             ejPropuestaSolicitud.setEstado(new EstadosSolicitud(1L));
-            
-            if(propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0){
+
+            if (propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0) {
                 response.setStatus(205);
                 response.setMessage("El cliente cuenta con una solicitud en estado pendiente.");
                 return response;
             }
-            
+
             logger.info(gson.toJson(model));
-            
-            model = propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
-            
-            response.setModel(model);
+
+            propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
+
+            response.setModel(propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(model.getId())));
             response.setStatus(200);
             response.setMessage("Solicitud creada con exito");
         } catch (Exception e) {

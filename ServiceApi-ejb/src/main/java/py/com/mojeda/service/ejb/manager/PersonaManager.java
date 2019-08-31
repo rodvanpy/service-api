@@ -27,7 +27,7 @@ public interface PersonaManager extends GenericDao<Personas, Long>{
     
     public Personas editar(Personas persona) throws Exception;
         
-    public Map<String, Object> getPersona(Personas persona) throws Exception;
+    public Personas getPersona(Personas persona) throws Exception;
     
     public Personas getPersona(Personas persona, String include) throws Exception;
     

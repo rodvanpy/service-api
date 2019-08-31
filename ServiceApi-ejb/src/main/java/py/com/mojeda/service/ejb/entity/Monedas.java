@@ -44,12 +44,9 @@ public class Monedas extends Base{
 
     public Monedas() {
     }
-
-    /**
-     * @return the SECUENCIA
-     */
-    public static String getSECUENCIA() {
-        return SECUENCIA;
+    
+    public Monedas(Long id) {
+        this.setId(id);
     }
 
     /**

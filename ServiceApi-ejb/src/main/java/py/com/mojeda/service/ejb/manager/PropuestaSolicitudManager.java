@@ -8,6 +8,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
+import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 
 
@@ -23,5 +24,7 @@ public interface PropuestaSolicitudManager extends GenericDao<PropuestaSolicitud
     public PropuestaSolicitud editar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception;
     
     public PropuestaSolicitud getPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) throws Exception;
+    
+    public Personas getPersonaSolicitud(Long idSolicitud, Long idPersona) throws Exception;
     
 }
