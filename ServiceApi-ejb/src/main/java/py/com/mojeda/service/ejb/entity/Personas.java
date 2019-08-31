@@ -155,6 +155,9 @@ public class Personas extends Base {
     @Transient
     private Avatar avatar;
     
+    @Transient
+    private boolean personaSolicitud;
+    
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient
     private Personas conyuge;
@@ -757,5 +760,13 @@ public class Personas extends Base {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }       
+
+    public boolean isPersonaSolicitud() {
+        return personaSolicitud;
+    }
+
+    public void setPersonaSolicitud(boolean personaSolicitud) {
+        this.personaSolicitud = personaSolicitud;
+    }
        
 }

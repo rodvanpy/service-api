@@ -784,11 +784,15 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
     public Personas getPersonaSolicitud(Long idSolicitud, Long idPersona) throws Exception {
         String included = "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones";
 
-        Personas personaMap = personaManager.get(new Personas(idPersona));
+        Personas personaMap = personaManager.getPersona(new Personas(idPersona));
 
         if (personaMap == null) {
             return null;
         }
+        
+        //ES ENTIDAD DE LA SOLICITUD
+        personaMap.setPersonaSolicitud(true);
+        //MAPEAR CON SOLICITANTES
         personaMap.setNombre(
                 (personaMap.getPrimerNombre() == null ? "" : personaMap.getPrimerNombre())
                 + " " + (personaMap.getSegundoNombre() == null ? "" : personaMap.getSegundoNombre())
@@ -1012,6 +1016,16 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         }
 
         return personaMap;
+    }
+
+    @Override
+    public Personas guardarPersona(Personas persona, Long idSolicitud, Long idEmpresa) throws Exception {
+        try {
+            
+        } catch (Exception e) {
+            
+        }
+        return null;
     }
 
 }

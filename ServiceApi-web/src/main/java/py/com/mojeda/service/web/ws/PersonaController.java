@@ -424,7 +424,7 @@ public class PersonaController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid PersonasDTO model,
+            @RequestBody @Valid Personas model,
             Errors errors) {
         
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -447,127 +447,13 @@ public class PersonaController extends BaseController {
                 return response;
             } 
             
-            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.getPersona().setIdUsuarioModificacion(userDetail.getId());
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioModificacion(userDetail.getId());
             
-            model.setPersona(personaManager.editar(model.getPersona()));
+            personaManager.editar(model);            
             
-            for (Bienes rpm : (model.getBienesInmuebles() == null ? new ArrayList<Bienes> (): model.getBienesInmuebles())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = bienesManager.guardarBienes(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = bienesManager.editarBienes(rpm);
-                }                
-            }
-            
-            for (Bienes rpm : (model.getBienesVehiculo()  == null ? new ArrayList<Bienes> (): model.getBienesVehiculo())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = bienesManager.guardarBienes(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = bienesManager.editarBienes(rpm);
-                }                
-            }
-            
-            for (IngresosEgresos rpm : (model.getEgresos() == null ? new ArrayList<IngresosEgresos> (): model.getEgresos())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }                
-            }
-            
-            for (IngresosEgresos rpm : (model.getIngresos() == null ? new ArrayList<IngresosEgresos> (): model.getIngresos())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }                
-            }
-            
-            for (OcupacionPersona rpm : (model.getOcupaciones() == null ? new ArrayList<OcupacionPersona> (): model.getOcupaciones())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = ocupacionPersonaManager.guardarOcupacion(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = ocupacionPersonaManager.editarOcupacion(rpm);
-                }                
-            }
-            
-            for (Referencias rpm : (model.getReferencias() == null ? new ArrayList<Referencias> (): model.getReferencias())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = referenciaManager.guardarReferencia(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = referenciaManager.editarReferencia(rpm);
-                }                
-            }
-            
-            response.setModel(personaManager.getPersona(new Personas(model.getPersona().getId()), "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));            
+            response.setModel(personaManager.getPersona(new Personas(model.getId()), "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));            
             response.setStatus(200);
             response.setMessage("Persona modificado/a con exito");
         } catch (Exception e) {

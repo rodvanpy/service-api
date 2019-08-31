@@ -200,9 +200,13 @@ public class PropuestaSolicitudController extends BaseController {
             @ModelAttribute("idPersona") Long idPersona) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        Gson gson = new Gson();
         try {
             inicializarPropuestaSolicitudManager();
-
+            inicializarPersonaManager();
+            
+            Personas modelPersona = personaManager.getPersona(new Personas(idPersona));
+            logger.info("PERSONA MODEL" + gson.toJson(modelPersona));
             Personas model =  propuestaSolicitudManager.getPersonaSolicitud(idSolicitud, idPersona);
 
             response.setModel(model);
