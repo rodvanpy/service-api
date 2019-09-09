@@ -20,17 +20,17 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 
-
 /**
  *
  * @author Miguel
  */
 @Entity
-public class Documentos extends Base implements Serializable{ 
+public class Documentos extends Base implements Serializable {
+
     /**
-    * 
-    */
-   private static final long serialVersionUID = 79861856088L;
+     *
+     */
+    private static final long serialVersionUID = 79861856088L;
     private static final String SECUENCIA = "seq_documentos_id";
 
     @Id
@@ -39,52 +39,52 @@ public class Documentos extends Base implements Serializable{
     @Column(name = "id")
     private Long id;
 
-   @Lob
-   @Column(name = "DOCUMENTO")
-   private byte[] documento;
-   
-   @Column(name = "TIPO_ARCHIVO")
-   private String tipoArchivo;
+    @Lob
+    @Column(name = "DOCUMENTO")
+    private byte[] documento;
 
-   @Column(name = "NOMBRE_DOCUMENTO")
-   private String nombreDocumento;  
+    @Column(name = "TIPO_ARCHIVO")
+    private String tipoArchivo;
 
-   @Column(name = "ENTIDAD")
-   private String entidad;
-   
-   @Column(name = "PATH")
-   private String path;
+    @Column(name = "NOMBRE_DOCUMENTO")
+    private String nombreDocumento;
 
-   @Column(name = "ID_ENTIDAD")
-   private Long idEntidad;
-   
-   @ManyToOne
-   @JoinColumn(name = "ID_TIPO_DOCUMENTO")
-   private TipoDocumentos tipoDocumento;
+    @Column(name = "ENTIDAD")
+    private String entidad;
 
-   @JsonIgnore
-   @ManyToOne
-   @JoinColumn(name = "EMPRESA")
-   private Empresas empresa;
-   
+    @Column(name = "PATH")
+    private String path;
+
+    @Column(name = "ID_ENTIDAD")
+    private Long idEntidad;
+
+    @ManyToOne
+    @JoinColumn(name = "ID_TIPO_DOCUMENTO")
+    private TipoDocumentos tipoDocumento;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "EMPRESA")
+    private Empresas empresa;
+
+    @Column(name = "SIZE")
+    private Long size;
+
 //   @JsonDeserialize(as = MultipartFile.class)
 //   @JsonIgnoreProperties(ignoreUnknown = true)
+    /**
+     * Constructor vacío
+     */
+    public Documentos() {
 
+    }
 
-   /**
-    * Constructor vacío
-    */
-   public Documentos() {
-
-   }
-
-   /**
-    * @param id
-    *            el id de Imagen
-    */
-   public Documentos(Long id) {
-           this.setId(id);
-   }
+    /**
+     * @param id el id de Imagen
+     */
+    public Documentos(Long id) {
+        this.setId(id);
+    }
 
     /**
      * @return the id
@@ -98,7 +98,7 @@ public class Documentos extends Base implements Serializable{
      */
     public void setId(Long id) {
         this.id = id;
-    }   
+    }
 
     /**
      * @return the path
@@ -206,6 +206,14 @@ public class Documentos extends Base implements Serializable{
         this.entidad = entidad;
     }
 
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
     
-   
+    
+
 }

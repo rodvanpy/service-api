@@ -169,7 +169,7 @@ public class OcupacionSolicitudesManagerImpl extends GenericDaoImpl<OcupacionSol
     @Override
     public OcupacionSolicitudes getOcupacionSolicitud(OcupacionSolicitudes ocupacionPersona) throws Exception {
         OcupacionSolicitudes model = null;
-        String atributos = "id,cargo,empresa,tipoTrabajo,direccion,telefonoPrincipal,"
+        String atributos = "id,cargo,empresa,tipoTrabajo,direccion,telefonoPrincipal,idOcupacion,"
                 + "telefonoSecundario,fechaIngreso,fechaSalida,interno,ingresosMensuales,tipoOcupacion.id";
 
         Map<String, Object> ocupacion = this.getAtributos(ocupacionPersona, atributos.split(","));
@@ -179,6 +179,7 @@ public class OcupacionSolicitudesManagerImpl extends GenericDaoImpl<OcupacionSol
             model = new OcupacionSolicitudes();
             model.setTipoOcupacion(tipoOcupacionesManager.get(new TipoOcupaciones(Long.parseLong(ocupacion.get("tipoOcupacion.id").toString()))));
             model.setId(Long.parseLong(ocupacion.get("id").toString()));
+            model.setIdOcupacion(ocupacion.get("idOcupacion") == null ? null : Long.parseLong(ocupacion.get("idOcupacion").toString()));
             model.setIngresosMensuales(ocupacion.get("ingresosMensuales") == null ? null : new BigDecimal(ocupacion.get("ingresosMensuales").toString()));
             model.setCargo(ocupacion.get("cargo") == null ? "" : ocupacion.get("cargo").toString());
             model.setDireccion(ocupacion.get("direccion") == null ? "" : ocupacion.get("direccion").toString());

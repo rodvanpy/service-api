@@ -10,6 +10,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import py.com.mojeda.service.ejb.manager.BarriosManager;
 import py.com.mojeda.service.ejb.manager.BienesManager;
+import py.com.mojeda.service.ejb.manager.BienesSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
@@ -46,6 +47,8 @@ import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
 import py.com.mojeda.service.ejb.manager.VinculoManager;
 import py.com.mojeda.service.ejb.manager.FuncionarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
+import py.com.mojeda.service.ejb.manager.OcupacionSolicitudesManager;
+import py.com.mojeda.service.ejb.manager.ReferenciaSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.TipoCargosManager;
 import py.com.mojeda.service.ejb.manager.TipoEstudiosManager;
 import py.com.mojeda.service.ejb.manager.TipoFuncionariosManager;
@@ -83,6 +86,8 @@ public class BaseController {
     protected FuncionarioDepartamentosManager usuarioDepartamentosManager;
     
     protected ReferenciaManager referenciaManager;
+    
+    protected ReferenciaSolicitudesManager referenciaSolicitudesManager;
     
     protected TipoReferenciaManager tipoReferenciaManager;
     
@@ -146,9 +151,46 @@ public class BaseController {
     
     protected EstadosSolicitudManager estadosSolicitudManager;
     
+    protected OcupacionSolicitudesManager ocupacionSolicitudesManager;
+    
+    protected BienesSolicitudesManager bienesSolicitudesManager;
+    
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     
+    protected void inicializarBienesSolicitudesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (bienesSolicitudesManager == null) {
+            try {
+                bienesSolicitudesManager = (BienesSolicitudesManager) context.lookup("java:app/ServiceApi-ejb/BienesSolicitudesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarOcupacionSolicitudesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (ocupacionSolicitudesManager == null) {
+            try {
+                ocupacionSolicitudesManager = (OcupacionSolicitudesManager) context.lookup("java:app/ServiceApi-ejb/OcupacionSolicitudesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarEstadosSolicitudManager() throws Exception {
         if (context == null) {
@@ -161,6 +203,23 @@ public class BaseController {
         if (estadosSolicitudManager == null) {
             try {
                 estadosSolicitudManager = (EstadosSolicitudManager) context.lookup("java:app/ServiceApi-ejb/EstadosSolicitudManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarReferenciaSolicitudesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (referenciaSolicitudesManager == null) {
+            try {
+                referenciaSolicitudesManager = (ReferenciaSolicitudesManager) context.lookup("java:app/ServiceApi-ejb/ReferenciaSolicitudesManagerImpl");
             } catch (NamingException ne) {
                 throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
             }

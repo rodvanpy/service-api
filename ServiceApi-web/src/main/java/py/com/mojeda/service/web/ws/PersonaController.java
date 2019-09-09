@@ -45,10 +45,10 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @Controller
 @RequestMapping(value = "/personas")
 public class PersonaController extends BaseController {
-    
+
     String atributos = "id,primerNombre,segundoNombre,primerApellido,segundoApellido,documento,ruc,fechaNacimiento,tipoPersona,sexo"
             + ",numeroHijos,numeroDependientes,estadoCivil,email,activo";
-    
+
     @GetMapping
     public @ResponseBody
     ResponseListDTO listar(@ModelAttribute("_search") boolean filtrar,
@@ -67,7 +67,7 @@ public class PersonaController extends BaseController {
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarPersonaManager();
-            
+
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -107,13 +107,11 @@ public class PersonaController extends BaseController {
             listMapGrupos = personaManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
-            
+
             if (todos) {
                 total = Long.parseLong(listMapGrupos.size() + "");
             }
-            
-            
+
             Integer totalPaginas = Integer.parseInt(total.toString()) / cantidad;
 
             retorno.setRecords(total);
@@ -122,16 +120,16 @@ public class PersonaController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             retorno.setStatus(500);
             retorno.setMessage("Error interno del servidor.");
         }
 
         return retorno;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Persona)
      *
@@ -143,26 +141,26 @@ public class PersonaController extends BaseController {
     public @ResponseBody
     ResponseDTO getObject(
             @ModelAttribute("id") Long id,
-            @ModelAttribute("included") String included) {        
+            @ModelAttribute("included") String included) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarPersonaManager();
-            
-            Personas model = personaManager.getPersona(new Personas(id), included);            
-            
+
+            Personas model = personaManager.getPersona(new Personas(id), included);
+
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Persona)
      *
@@ -174,30 +172,30 @@ public class PersonaController extends BaseController {
     public @ResponseBody
     ResponseDTO getObjectCi(
             @ModelAttribute("documento") String documento,
-            @ModelAttribute("included") String included) {        
+            @ModelAttribute("included") String included) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarPersonaManager();
-            
+
             Personas ejPersonas = new Personas();
             ejPersonas.setDocumento(documento);
             ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
-            ejPersonas = personaManager.getPersona(ejPersonas, included);            
-            
+
+            ejPersonas = personaManager.getPersona(ejPersonas, included);
+
             response.setModel(ejPersonas);
             response.setStatus(ejPersonas == null ? 404 : 200);
             response.setMessage(ejPersonas == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Persona)
      *
@@ -207,23 +205,23 @@ public class PersonaController extends BaseController {
     @GetMapping("/ruc/{documento}")
     public @ResponseBody
     ResponseDTO getObjectRuc(
-            @ModelAttribute("documento") String documento) {        
+            @ModelAttribute("documento") String documento) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarPersonaManager();
-            
+
             Personas ejPersonas = new Personas();
             ejPersonas.setRuc(documento);
             ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
-            ejPersonas = personaManager.getPersona(ejPersonas);            
-            
+
+            ejPersonas = personaManager.getPersona(ejPersonas);
+
             response.setModel(ejPersonas);
             response.setStatus(ejPersonas == null ? 404 : 200);
             response.setMessage(ejPersonas == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
@@ -241,9 +239,9 @@ public class PersonaController extends BaseController {
     @PostMapping
     public @ResponseBody
     ResponseDTO create(
-            @RequestBody @Valid PersonasDTO model,
+            @RequestBody @Valid Personas model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         Funcionarios ejUsuario = new Funcionarios();
@@ -254,164 +252,50 @@ public class PersonaController extends BaseController {
             inicializarIngresosEgresosManager();
             inicializarOcupacionPersonaManager();
             inicializarReferenciaManager();
-            
-            if(errors.hasErrors()){
-                
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
 
             Personas ejPersona = new Personas();
-            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));        
-            ejPersona.setDocumento(model.getPersona().getDocumento());
-            
-            Map<String, Object> personaMaps = personaManager.getLike(ejPersona,"id".split(","));
-            
-            if(personaMaps != null){
+            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            ejPersona.setDocumento(model.getDocumento());
+
+            Map<String, Object> personaMaps = personaManager.getLike(ejPersona, "id".split(","));
+
+            if (personaMaps != null) {
                 response.setStatus(205);
-                response.setMessage("Ya existe una persona con el mismo documento.");                          
+                response.setMessage("Ya existe una persona con el mismo documento.");
                 return response;
             }
-            
-            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.getPersona().setActivo("S");
-            model.getPersona().setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-            model.getPersona().setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.getPersona().setIdUsuarioCreacion(userDetail.getId());
-            model.getPersona().setIdUsuarioModificacion(userDetail.getId());
-            
-            model.setPersona(personaManager.guardar(model.getPersona()));
-            
-            for (Bienes rpm : (model.getBienesInmuebles() == null ? new ArrayList<Bienes> (): model.getBienesInmuebles())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = bienesManager.guardarBienes(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = bienesManager.editarBienes(rpm);
-                }                
-            }
-            
-            for (Bienes rpm : (model.getBienesVehiculo()  == null ? new ArrayList<Bienes> (): model.getBienesVehiculo())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = bienesManager.guardarBienes(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = bienesManager.editarBienes(rpm);
-                }                
-            }
-            
-            for (IngresosEgresos rpm : (model.getEgresos() == null ? new ArrayList<IngresosEgresos> (): model.getEgresos())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }                
-            }
-            
-            for (IngresosEgresos rpm : (model.getIngresos() == null ? new ArrayList<IngresosEgresos> (): model.getIngresos())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = ingresosEgresosManager.guardarIngresosEgresos(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = ingresosEgresosManager.editarIngresosEgresos(rpm);
-                }                
-            }
-            
-            for (OcupacionPersona rpm : (model.getOcupaciones() == null ? new ArrayList<OcupacionPersona> (): model.getOcupaciones())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = ocupacionPersonaManager.guardarOcupacion(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = ocupacionPersonaManager.editarOcupacion(rpm);
-                }                
-            }
-            
-            for (Referencias rpm : (model.getReferencias() == null ? new ArrayList<Referencias> (): model.getReferencias())) {
-                if(rpm.getId() == null){
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    rpm.setIdUsuarioCreacion(userDetail.getId());
-                    rpm.setPersona(new Personas(model.getPersona().getId()));
-                    
-                    rpm = referenciaManager.guardarReferencia(rpm);
-                }else{
-                    rpm.setActivo("S");
-                    rpm.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    rpm.setIdUsuarioModificacion(userDetail.getId());
-                    
-                    rpm = referenciaManager.editarReferencia(rpm);
-                }                
-            }
-            
+
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setActivo("S");
+            model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioCreacion(userDetail.getId());
+            model.setIdUsuarioModificacion(userDetail.getId());
+
+            personaManager.guardar(model);
+
             response.setModel(personaManager.getPersona(ejPersona, "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
             response.setStatus(200);
             response.setMessage("Persona creado/a con exito");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo PUT de la vista actualizar.(actualizar Persona)
      *
@@ -426,45 +310,72 @@ public class PersonaController extends BaseController {
             @ModelAttribute("id") Long id,
             @RequestBody @Valid Personas model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         try {
             inicializarPersonaManager();
-            inicializarBienesManager();
-            inicializarIngresosEgresosManager();
-            inicializarOcupacionPersonaManager();
-            inicializarReferenciaManager();
-            
-            if(errors.hasErrors()){
-                
+            inicializarPropuestaSolicitudManager();
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
-            } 
-            
+            }
+
+            Personas ejPersona = new Personas();
+            if (model.getDocumento() != null
+                    && model.getDocumento().trim().compareToIgnoreCase("") != 0) {
+
+                ejPersona.setDocumento(model.getDocumento());
+                ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+
+                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                if (clienteMaps != null
+                        && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                    response.setStatus(205);
+                    response.setMessage("Ya existe una persona con el mismo documento.");
+                    return response;
+                }
+            }
+
+            if (model.getRuc() != null
+                    && model.getRuc().trim().compareToIgnoreCase("") != 0) {
+
+                ejPersona = new Personas();
+                ejPersona.setRuc(model.getRuc());
+                ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+
+                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                if (clienteMaps != null
+                        && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                    response.setStatus(205);
+                    response.setMessage("Ya existe una persona con el mismo ruc.");
+                    return response;
+                }
+            }
+
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
+
+            personaManager.editar(model);
             
-            personaManager.editar(model);            
-            
-            response.setModel(personaManager.getPersona(new Personas(model.getId()), "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));            
+            response.setModel(personaManager.getPersona(new Personas(model.getId()), "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
             response.setStatus(200);
             response.setMessage("Persona modificado/a con exito");
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
-    
-    
-    
+
 }

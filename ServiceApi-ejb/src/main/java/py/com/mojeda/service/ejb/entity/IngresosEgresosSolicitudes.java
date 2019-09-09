@@ -36,6 +36,9 @@ public class IngresosEgresosSolicitudes extends Base {
     @Column(name = "id")
     private Long id;
     
+    @Column(name = "ID_INGRESOS_EGRESOS_PADRE")
+    private Long idIngresoEgreso;
+    
     @Basic(optional = false)
     @Column(name = "MONTO")
     private Double monto;
@@ -128,6 +131,14 @@ public class IngresosEgresosSolicitudes extends Base {
      */
     public void setPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) {
         this.propuestaSolicitud = propuestaSolicitud;
+    }
+
+    public Long getIdIngresoEgreso() {
+        return idIngresoEgreso;
+    }
+
+    public void setIdIngresoEgreso(Long idIngresoEgreso) {
+        this.idIngresoEgreso = idIngresoEgreso;
     }
 
     

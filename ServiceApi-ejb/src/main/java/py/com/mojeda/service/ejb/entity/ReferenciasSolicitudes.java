@@ -29,13 +29,16 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class ReferenciasSolicitudes extends Base {
 
     private static final long serialVersionUID = -9149680520407250259L;
-    private static final String SECUENCIA = "seq_referencia_solicitud_id";
+    private static final String SECUENCIA = "seq_referencia_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
+    
+    @Column(name = "ID_REFERENCIA_PADRE")
+    private Long idReferencia;
     
     @NotEmpty(message = "Ingrese Nombre Contacto")
     @Column(name = "NOMBRE_CONTACTO")
@@ -170,6 +173,20 @@ public class ReferenciasSolicitudes extends Base {
      */
     public void setPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) {
         this.propuestaSolicitud = propuestaSolicitud;
+    }
+
+    /**
+     * @return the idReferencia
+     */
+    public Long getIdReferencia() {
+        return idReferencia;
+    }
+
+    /**
+     * @param idReferencia the idReferencia to set
+     */
+    public void setIdReferencia(Long idReferencia) {
+        this.idReferencia = idReferencia;
     }
     
     

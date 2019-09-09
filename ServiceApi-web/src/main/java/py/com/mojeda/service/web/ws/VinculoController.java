@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Bienes;
+import py.com.mojeda.service.ejb.entity.BienesSolicitudes;
 import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.Referencias;
@@ -278,15 +279,42 @@ public class VinculoController extends BaseController {
             @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        Bienes model = null;
+        BienesSolicitudes bienes = null;
         try {
             inicializarVinculoManager();
+            inicializarBienesSolicitudesManager();
+            
+            //Se verifica si el id pertenece a la referencia de una solicitud
+            bienes = bienesSolicitudesManager.get(id);
+            if (bienes == null) {
+                
+                model = bienesManager.get(id);
 
-            Vinculos model = vinculoManager.get(id);
-            model.setActivo("N");
-            model.setIdUsuarioEliminacion(userDetail.getId());
-            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setActivo("N");
+                model.setIdUsuarioEliminacion(userDetail.getId());
+                model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                bienesManager.update(model);
+                
+            } else {
+                bienes.setActivo("N");
+                bienes.setIdUsuarioEliminacion(userDetail.getId());
+                bienes.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                bienes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                bienesSolicitudesManager.update(bienes);
+                
+                model = bienesManager.get(bienes.getIdBien());
 
-            vinculoManager.update(model);
+                model.setActivo("N");
+                model.setIdUsuarioEliminacion(userDetail.getId());
+                model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                bienesManager.update(model);
+            }
 
             response.setModel(model);
             response.setStatus(200);

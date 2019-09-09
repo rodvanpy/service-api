@@ -9,7 +9,6 @@ package py.com.mojeda.service.ejb.manager;
 
 import java.util.List;
 import javax.ejb.Local;
-import py.com.mojeda.service.ejb.entity.OcupacionPersona;
 import py.com.mojeda.service.ejb.entity.OcupacionSolicitudes;
 
 /**

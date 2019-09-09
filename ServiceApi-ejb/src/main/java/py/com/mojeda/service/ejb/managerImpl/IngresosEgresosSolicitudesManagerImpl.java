@@ -132,7 +132,7 @@ public class IngresosEgresosSolicitudesManagerImpl extends GenericDaoImpl<Ingres
     @Override
     public IngresosEgresosSolicitudes getIngresosEgresos(IngresosEgresosSolicitudes ingresosEgresos) throws Exception {
         IngresosEgresosSolicitudes model = null;
-        String atributos = "id,monto,activo,tipoIngresosEgresos.id";
+        String atributos = "id,monto,activo,tipoIngresosEgresos.id,idIngresoEgreso";
 
         Map<String, Object> ingresosEgresosMap = this.getAtributos(ingresosEgresos, atributos.split(","));
 
@@ -140,6 +140,7 @@ public class IngresosEgresosSolicitudesManagerImpl extends GenericDaoImpl<Ingres
             model = new IngresosEgresosSolicitudes();
             model.setTipoIngresosEgresos(tipoIngresosEgresosManager.get(new TipoIngresosEgresos(Long.parseLong(ingresosEgresosMap.get("tipoIngresosEgresos.id").toString()))));
             model.setId(Long.parseLong(ingresosEgresosMap.get("id").toString()));
+            model.setIdIngresoEgreso(ingresosEgresosMap.get("idIngresoEgreso") == null ? null : Long.parseLong(ingresosEgresosMap.get("idIngresoEgreso").toString()));
             model.setMonto(ingresosEgresosMap.get("monto") == null ? 0.0 : Double.parseDouble(ingresosEgresosMap.get("monto").toString()));
             model.setActivo(ingresosEgresosMap.get("activo") == null ? "" : ingresosEgresosMap.get("activo").toString());
         }

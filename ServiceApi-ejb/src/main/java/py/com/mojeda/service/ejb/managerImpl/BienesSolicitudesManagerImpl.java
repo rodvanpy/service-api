@@ -126,7 +126,7 @@ public class BienesSolicitudesManagerImpl extends GenericDaoImpl<BienesSolicitud
         BienesSolicitudes model = null;
         String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,"
                 + "lugarHipoteca,fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,"
-                + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,latitud,longitud,activo";
+                + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,latitud,longitud,activo,idBien";
 
         Map<String, Object> bienesMap = this.getAtributos(bienes, atributos.split(","));
 
@@ -134,6 +134,7 @@ public class BienesSolicitudesManagerImpl extends GenericDaoImpl<BienesSolicitud
                         
             model = new BienesSolicitudes();
             model.setId(Long.parseLong(bienesMap.get("id").toString()));
+            model.setIdBien(bienesMap.get("idBien") == null ? null : Long.parseLong(bienesMap.get("idBien").toString()));
             model.setNumeroFinca(bienesMap.get("numeroFinca") == null ? "" : bienesMap.get("numeroFinca").toString());
             model.setCuentaCatastral(bienesMap.get("cuentaCatastral") == null ? "" : bienesMap.get("cuentaCatastral").toString());
             model.setDistrito(bienesMap.get("distrito") == null ? "" : bienesMap.get("distrito").toString());

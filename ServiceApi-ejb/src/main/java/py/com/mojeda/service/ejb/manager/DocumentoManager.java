@@ -7,6 +7,7 @@ package py.com.mojeda.service.ejb.manager;
 
 
 import javax.ejb.Local;
+import org.springframework.web.multipart.MultipartFile;
 import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.utils.Avatar;
 
@@ -17,7 +18,7 @@ import py.com.mojeda.service.ejb.utils.Avatar;
 @Local
 public interface DocumentoManager extends GenericDao<Documentos, Long> {
          
-    public Documentos guardar(Documentos documento) throws Exception;
+    public Documentos guardar(Documentos documento, MultipartFile file) throws Exception;
     
-    public Documentos editar(Documentos documento) throws Exception;
+    public Documentos editar(Documentos documento, MultipartFile file) throws Exception;
 }

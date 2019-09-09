@@ -30,6 +30,7 @@ import py.com.mojeda.service.ejb.entity.Referencias;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.OcupacionSolicitudes;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -302,15 +303,42 @@ public class OcupacionPersonaController extends BaseController {
             @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        OcupacionPersona model = null;
+        OcupacionSolicitudes ocu = null;
         try {
             inicializarOcupacionPersonaManager();
+            inicializarOcupacionSolicitudesManager();
+            
+            ocu = ocupacionSolicitudesManager.get(id);
+            if (ocu == null) {
+                
+                model = ocupacionPersonaManager.get(id);
 
-            OcupacionPersona model = ocupacionPersonaManager.get(id);
-            model.setActivo("N");
-            model.setIdUsuarioEliminacion(userDetail.getId());
-            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setActivo("N");
+                model.setIdUsuarioEliminacion(userDetail.getId());
+                model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
 
-            ocupacionPersonaManager.update(model);
+                ocupacionPersonaManager.update(model);
+                
+            } else {
+                ocu.setActivo("N");
+                ocu.setIdUsuarioEliminacion(userDetail.getId());
+                ocu.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                ocu.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                ocupacionSolicitudesManager.update(ocu);
+                
+                model = ocupacionPersonaManager.get(ocu.getIdOcupacion());
+
+                model.setActivo("N");
+                model.setIdUsuarioEliminacion(userDetail.getId());
+                model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                ocupacionPersonaManager.update(model);
+            }
+
 
             response.setModel(model);
             response.setStatus(200);

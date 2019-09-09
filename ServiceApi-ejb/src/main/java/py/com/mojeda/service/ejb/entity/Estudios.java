@@ -62,10 +62,7 @@ public class Estudios extends Base {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
-    private Personas persona;
-    
-    @Column(name = "ENTIDAD")
-    private String entidad = "ESTUDIOS";
+    private Personas persona;  
     
     public Estudios() {
     }
@@ -188,20 +185,6 @@ public class Estudios extends Base {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    /**
-     * @return the entidad
-     */
-    public String getEntidad() {
-        return entidad;
-    }
-
-    /**
-     * @param entidad the entidad to set
-     */
-    public void setEntidad(String entidad) {
-        this.entidad = entidad;
     }
     
 }

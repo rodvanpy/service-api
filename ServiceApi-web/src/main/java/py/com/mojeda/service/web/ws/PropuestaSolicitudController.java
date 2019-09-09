@@ -61,9 +61,6 @@ public class PropuestaSolicitudController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        if (!userDetail.tienePermiso("ROLE_SOLICITUDE.LISTALL")) {
-
-        }
         //Buscar usuario por empresa
         Sucursales ejSucursales = new Sucursales();
         ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
@@ -71,7 +68,10 @@ public class PropuestaSolicitudController extends BaseController {
         PropuestaSolicitud model = new PropuestaSolicitud();
         model.setActivo("S");
         model.setSucursal(ejSucursales);
-
+        //Listar solo las propuestas del funcionario
+        if (!userDetail.tienePermiso("ROLE_SOLICITUDE.LISTALL")) {
+            model.setFuncionario(new Funcionarios(userDetail.getId()));
+        }
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarPropuestaSolicitudManager();
@@ -122,7 +122,7 @@ public class PropuestaSolicitudController extends BaseController {
             for (Map<String, Object> rpm : listMapGrupos) {
 
                 Clientes cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString())),
-                         null);
+                        null);
 
                 Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
                         "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
@@ -191,23 +191,25 @@ public class PropuestaSolicitudController extends BaseController {
      *
      * @param idSolicitud
      * @param idPersona
+     * @param included
      * @return
      */
     @GetMapping("/persona/{idSolicitud}/{idPersona}")
     public @ResponseBody
     ResponseDTO getPersonaSolicitud(
             @ModelAttribute("idSolicitud") Long idSolicitud,
-            @ModelAttribute("idPersona") Long idPersona) {
+            @ModelAttribute("idPersona") Long idPersona,
+            @ModelAttribute("included") String included) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         Gson gson = new Gson();
         try {
             inicializarPropuestaSolicitudManager();
             inicializarPersonaManager();
-            
-            Personas modelPersona = personaManager.getPersona(new Personas(idPersona));
-            logger.info("PERSONA MODEL" + gson.toJson(modelPersona));
-            Personas model =  propuestaSolicitudManager.getPersonaSolicitud(idSolicitud, idPersona);
+
+            //Personas modelPersona = personaManager.getPersona(new Personas(idPersona),included);
+
+            Personas model = propuestaSolicitudManager.getPersonaSolicitud(idSolicitud, idPersona);
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -273,8 +275,6 @@ public class PropuestaSolicitudController extends BaseController {
                 return response;
             }
 
-            logger.info(gson.toJson(model));
-
             propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
 
             response.setModel(propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(model.getId())));
@@ -290,10 +290,11 @@ public class PropuestaSolicitudController extends BaseController {
     }
 
     /**
-     * Mapping para el metodo PUT de la vista actualizar.(actualizar Usuario)
+     * Mapping para el metodo PUT de la vista actualizar.(actualizar
+     * PropuestaSolicitud)
      *
      * @param id de la entidad
-     * @param model entidad Usuario recibida de la vista
+     * @param model entidad PropuestaSolicitud recibida de la vista
      * @param errors
      * @return
      */
@@ -301,7 +302,7 @@ public class PropuestaSolicitudController extends BaseController {
     public @ResponseBody
     ResponseDTO update(
             @ModelAttribute("id") Long id,
-            @RequestBody @Valid Funcionarios model,
+            @RequestBody @Valid PropuestaSolicitud model,
             Errors errors) {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
@@ -321,51 +322,96 @@ public class PropuestaSolicitudController extends BaseController {
             }
 
             //Buscar usuario por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setIdUsuarioCreacion(userDetail.getId());
+            model.setIdUsuarioModificacion(userDetail.getId());
 
-            Funcionarios ejUsuarios = new Funcionarios();
-            ejUsuarios.setAlias(model.getAlias());
-            ejUsuarios.setSucursal(ejSucursales);
+            propuestaSolicitudManager.editar(model, userDetail.getIdSusursal());
 
-            Map<String, Object> usuarioMaps = funcionarioManager.getLike(ejUsuarios, "id".split(","));
-            if (usuarioMaps != null
-                    && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
-                response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo alias.");
+            response.setModel(propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(model.getId())));
+            response.setStatus(200);
+            response.setMessage("Solicitud modificada con exito");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+
+    /**
+     * Mapping para el metodo PUT de la vista actualizar.(actualizar Persona)
+     *
+     * @param id de la entidad
+     * @param model entidad Persona recibida de la vista
+     * @param errors
+     * @return
+     */
+    @PutMapping("/personas/{id}")
+    public @ResponseBody
+    ResponseDTO updatePersonaSolicitud(
+            @ModelAttribute("id") Long id,
+            @RequestBody @Valid Personas model,
+            Errors errors) {
+
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        try {
+            inicializarPersonaManager();
+            inicializarPropuestaSolicitudManager();
+
+            if (errors.hasErrors()) {
+
+                response.setStatus(400);
+                response.setMessage(errors.getAllErrors()
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
             }
 
             Personas ejPersona = new Personas();
-            ejPersona.setDocumento(model.getPersona().getDocumento());
-            ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            if (model.getDocumento() != null
+                    && model.getDocumento().trim().compareToIgnoreCase("") != 0) {
 
-            ejUsuarios = new Funcionarios();
-            ejUsuarios.setPersona(ejPersona);
+                ejPersona.setDocumento(model.getDocumento());
+                ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "id".split(","));
-            if (usuarioMaps != null
-                    && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
-                response.setStatus(205);
-                response.setMessage("Ya existe un usuario con el mismo documento.");
-                return response;
+                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                if (clienteMaps != null
+                        && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                    response.setStatus(205);
+                    response.setMessage("Ya existe una persona con el mismo documento.");
+                    return response;
+                }
             }
 
-            usuarioMaps = funcionarioManager.getLike(new Funcionarios(id), "claveAcceso".split(","));
+            if (model.getRuc() != null
+                    && model.getRuc().trim().compareToIgnoreCase("") != 0) {
 
-            if (usuarioMaps.get("claveAcceso").toString().compareToIgnoreCase(model.getClaveAcceso()) != 0) {
-                model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
+                ejPersona = new Personas();
+                ejPersona.setRuc(model.getRuc());
+                ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+
+                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                if (clienteMaps != null
+                        && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                    response.setStatus(205);
+                    response.setMessage("Ya existe una persona con el mismo ruc.");
+                    return response;
+                }
             }
 
-            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            model = funcionarioManager.editar(model);
-
-            response.setModel(model);
+            //VERIFICAR SI LA PERSONA PERTENECE A LA SOLICITUD
+            propuestaSolicitudManager.editarPersonaSolicitud(model, id, userDetail.getId());
+            response.setModel(propuestaSolicitudManager.getPersonaSolicitud(id, model.getId()));
             response.setStatus(200);
-            response.setMessage("Usuario modificado con exito");
+            response.setMessage("Persona modificado/a con exito");
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);

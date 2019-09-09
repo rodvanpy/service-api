@@ -314,7 +314,7 @@ public class RolController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
-            model.setEmpresa(new Empresas(userDetail.getId()));
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
             model = rolManager.guardar(model);
             

@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import py.com.mojeda.service.ejb.entity.RolPermiso;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.Rol;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 
@@ -44,20 +45,27 @@ public class UserDetailService implements UserDetailsService {
         }
         User user = new User();
         List<GrantedAuthority> autoridades = new ArrayList<>();
-        
-        Funcionarios ejObjeto = funcionarioManager.get(Long.parseLong(idUser));
-        if (ejObjeto != null) {
-            user.setId(ejObjeto.getId());
-            user.setApellido(ejObjeto.getPersona().getPrimerApellido() + " " + ejObjeto.getPersona().getSegundoApellido() == null ? "" : ejObjeto.getPersona().getSegundoApellido());
-            user.setNombre(ejObjeto.getPersona().getPrimerNombre() + " " + ejObjeto.getPersona().getSegundoNombre() == null ? "" : ejObjeto.getPersona().getSegundoNombre());
-            user.setIdEmpresa(ejObjeto.getSucursal().getEmpresa().getId());
-            user.setIdSusursal(ejObjeto.getSucursal().getId());
-            user.setNombreRol(ejObjeto.getRol().getNombre());
-            user.setUsername(ejObjeto.getAlias());
-            user.setImagePath(ejObjeto.getPersona().getImagePath());
+
+        Map<String, Object> objetoMap = funcionarioManager.getAtributos(new Funcionarios(Long.parseLong(idUser)), "id,alias,claveAcceso,nroLegajo,persona.id,persona.primerNombre,persona.segundoNombre,persona.primerApellido,persona.segundoApellido,persona.imagePath,sucursal.id,sucursal.empresa.id,rol.id,rol.nombre".split(","));
+        if (objetoMap != null) {
+            user.setId(Long.parseLong(objetoMap.get("id").toString()));
+
+            String nombre = (objetoMap.get("persona.primerNombre") == null ? "" : objetoMap.get("persona.primerNombre"))
+                    + " " + (objetoMap.get("persona.segundoNombre") == null ? "" : objetoMap.get("persona.segundoNombre"));
+
+            String apellido = (objetoMap.get("persona.primerApellido") == null ? "" : objetoMap.get("persona.primerApellido"))
+                    + " " + (objetoMap.get("persona.segundoApellido") == null ? "" : objetoMap.get("persona.segundoApellido"));
+
+            user.setApellido(apellido);
+            user.setNombre(nombre);
+            user.setIdEmpresa(Long.parseLong(objetoMap.get("sucursal.empresa.id").toString()));
+            user.setIdSusursal(Long.parseLong(objetoMap.get("sucursal.id").toString()));
+            user.setNombreRol(objetoMap.get("rol.nombre").toString());
+            user.setUsername(objetoMap.get("alias").toString());
+            user.setImagePath(objetoMap.get("persona.imagePath") + "");
 
             RolPermiso ejRolPermiso = new RolPermiso();
-            ejRolPermiso.setRol(ejObjeto.getRol());
+            ejRolPermiso.setRol(new Rol(Long.parseLong(objetoMap.get("rol.id").toString())));
 
             List<Map<String, Object>> listMapRol = rolPermisoManager.listAtributos(ejRolPermiso, "permiso.nombre".split(","));
 
@@ -65,7 +73,7 @@ public class UserDetailService implements UserDetailsService {
                 autoridades.add(new SimpleGrantedAuthority(rpm.get("permiso.nombre").toString()));
             }
             user.setAuthorities(autoridades);
-            
+
         } else {
             throw new UsernameNotFoundException("User not found");
         }

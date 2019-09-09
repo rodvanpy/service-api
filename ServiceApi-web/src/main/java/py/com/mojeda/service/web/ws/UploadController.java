@@ -8,6 +8,7 @@ package py.com.mojeda.service.web.ws;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,7 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
  *
  * @author miguel.ojeda
  */
+@Controller
 public class UploadController {
 
     @RequestMapping(method = RequestMethod.POST, headers = "content-type=multipart/form-data", value = "/uploader")

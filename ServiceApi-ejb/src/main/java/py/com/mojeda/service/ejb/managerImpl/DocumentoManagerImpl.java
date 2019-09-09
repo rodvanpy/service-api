@@ -5,12 +5,12 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
 import javax.ejb.Stateless;
+import org.springframework.web.multipart.MultipartFile;
 import py.com.mojeda.service.ejb.entity.Documentos;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
@@ -31,28 +31,32 @@ public class DocumentoManagerImpl extends GenericDaoImpl<Documentos, Long> imple
     private static final ApplicationLogger logger = ApplicationLogger.getInstance();
 
     @Override
-    public Documentos guardar(Documentos documento) throws Exception {
+    public Documentos guardar(Documentos documento, MultipartFile file) throws Exception {
         Documentos retorno = null;
-        if (documento != null) {
+        if (documento != null
+                && file != null) {
+            
+            documento.setTipoArchivo(file.getContentType());
+            
             Files.createDirectories(Paths.get(CONTENT_PATH + documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
-            String path = documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();
-            FileOutputStream fos = new FileOutputStream(CONTENT_PATH + path);
-            fos.write(documento.getDocumento());
-            fos.close();
+            String path = documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + file.getOriginalFilename();
+            
+            File fos = new File(CONTENT_PATH + path);
+            file.transferTo(fos);
 
             documento.setDocumento(null);
             documento.setPath(CONTENT_PATH + path);
 
             this.save(documento);
 
-            retorno = this.get(documento);
+            return retorno;
         }
 
         return retorno;
     }
 
     @Override
-    public Documentos editar(Documentos documento) throws Exception {
+    public Documentos editar(Documentos documento, MultipartFile file) throws Exception {
         Documentos retorno = null;
         if (documento != null) {
 

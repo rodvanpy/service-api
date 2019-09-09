@@ -65,7 +65,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     protected Class<Personas> getEntityBeanType() {
         return Personas.class;
     }
-    
+
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
     protected static final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
@@ -373,7 +373,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     @Override
     public Personas editar(Personas persona) throws Exception {
         Personas ejPersona = new Personas();
-        try {            
+        try {
             if (persona.getDocumento() != null
                     && persona.getDocumento().compareToIgnoreCase("") != 0) {
                 ejPersona.setDocumento(persona.getDocumento());
@@ -639,12 +639,12 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             this.update(ejPersona);
 
         } catch (Exception e) {
-            logger.error("ERROR",e);
-        }finally{
+            logger.error("ERROR", e);
+        } finally {
             try {
                 this.finalize();
             } catch (Throwable ex) {
-                logger.error("ERROR",ex);
+                logger.error("ERROR", ex);
             }
         }
         return ejPersona;
@@ -697,6 +697,31 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             model.setDepartamento(departamentosPaisManager.get(new DepartamentosPais(Long.parseLong(persona.get("departamento.id") == null ? "0" : persona.get("departamento.id").toString()))));
             model.setBarrio(barriosManager.get(new Barrios(Long.parseLong(persona.get("barrio.id") == null ? "0" : persona.get("barrio.id").toString()))));
             model.setCiudad(ciudadesManager.get(new Ciudades(Long.parseLong(persona.get("ciudad.id") == null ? "0" : persona.get("ciudad.id").toString()))));
+
+            if (model.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
+                Vinculos ejVinculo = new Vinculos();
+                ejVinculo.setActivo("S");
+                ejVinculo.setPersona(new Personas(model.getId()));
+                ejVinculo.setTipoVinculo("CONYUGE");
+
+                Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id".split(","));
+                if (conyugeMap != null) {
+                    Personas conyuge = this.get(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
+                    if (conyuge != null) {
+                        conyuge.setNombre(
+                                (conyuge.getPrimerNombre() == null ? "" : conyuge.getPrimerNombre())
+                                + " " + (conyuge.getSegundoNombre() == null ? "" : conyuge.getSegundoNombre())
+                                + " " + (conyuge.getPrimerApellido() == null ? "" : conyuge.getPrimerApellido())
+                                + " " + (conyuge.getSegundoNombre() == null ? "" : conyuge.getSegundoNombre())
+                        );
+                        model.setConyuge(conyuge);
+                    }
+                } else {
+                    model.setConyuge(new Personas());
+                }
+            }else{
+                model.setConyuge(new Personas());
+            }
 
         }
         return model;
@@ -793,24 +818,31 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
                 personaMap.setVinculos(vinculoManager.list(ejVinculos, true, "tipoVinculo", notIn, "NOT_IN"));
             }
+            
+            if (personaMap.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
+                
+                Vinculos ejVinculo = new Vinculos();
+                ejVinculo.setActivo("S");
+                ejVinculo.setPersona(new Personas(personaMap.getId()));
+                ejVinculo.setTipoVinculo("CONYUGE");
 
-            Vinculos ejVinculo = new Vinculos();
-            ejVinculo.setActivo("S");
-            ejVinculo.setPersona(new Personas(personaMap.getId()));
-            ejVinculo.setTipoVinculo("CONYUGE");
-
-            Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id".split(","));
-            if (conyugeMap != null) {
-                Personas conyuge = this.get(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
-                if (conyuge != null) {
-                    conyuge.setNombre(
-                            (conyuge.getPrimerNombre() == null ? "" : conyuge.getPrimerNombre())
-                            + " " + (conyuge.getSegundoNombre() == null ? "" : conyuge.getSegundoNombre())
-                            + " " + (conyuge.getPrimerApellido() == null ? "" : conyuge.getPrimerApellido())
-                            + " " + (conyuge.getSegundoNombre() == null ? "" : conyuge.getSegundoNombre())
-                    );
-                    personaMap.setConyuge(conyuge);
+                Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id".split(","));
+                if (conyugeMap != null) {
+                    Personas conyuge = this.get(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
+                    if (conyuge != null) {
+                        conyuge.setNombre(
+                                (conyuge.getPrimerNombre() == null ? "" : conyuge.getPrimerNombre())
+                                + " " + (conyuge.getSegundoNombre() == null ? "" : conyuge.getSegundoNombre())
+                                + " " + (conyuge.getPrimerApellido() == null ? "" : conyuge.getPrimerApellido())
+                                + " " + (conyuge.getSegundoNombre() == null ? "" : conyuge.getSegundoNombre())
+                        );
+                        personaMap.setConyuge(conyuge);
+                    }
+                } else {
+                    personaMap.setConyuge(new Personas());
                 }
+            }else{
+                personaMap.setConyuge(new Personas());
             }
 
         }

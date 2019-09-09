@@ -253,8 +253,7 @@ public class FuncionarioController extends BaseController {
             }
 
             model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
-            model.setActivo("S");
-            model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
+            model.setActivo("S");           
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioCreacion(userDetail.getId());

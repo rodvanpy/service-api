@@ -29,13 +29,16 @@ import javax.persistence.TemporalType;
 public class BienesSolicitudes extends Base {
 
     private static final long serialVersionUID = 1L;
-    private static final String SECUENCIA = "seq_bienes_solicitud_id";
+    private static final String SECUENCIA = "seq_bienes_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
+    
+    @Column(name = "ID_BIEN_PADRE")
+    private Long idBien;
 
     @Column(name = "NUMERO_FINCA")
     private String numeroFinca;
@@ -119,7 +122,7 @@ public class BienesSolicitudes extends Base {
     
     @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")
     @ManyToOne
-    private PropuestaSolicitud propuestaSolicitud;
+    private PropuestaSolicitud propuestaSolicitud;    
     
     @Column(name = "LATITUD")
     private Double latitud;
@@ -507,6 +510,20 @@ public class BienesSolicitudes extends Base {
 
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
+    }
+
+    /**
+     * @return the idBien
+     */
+    public Long getIdBien() {
+        return idBien;
+    }
+
+    /**
+     * @param idBien the idBien to set
+     */
+    public void setIdBien(Long idBien) {
+        this.idBien = idBien;
     }
     
     

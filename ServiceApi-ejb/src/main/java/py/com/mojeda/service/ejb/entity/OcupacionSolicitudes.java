@@ -31,13 +31,16 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class OcupacionSolicitudes extends Base {
 
     private static final long serialVersionUID = -9168880520407250259L;
-    private static final String SECUENCIA = "seq_ocupacion_solicitud_id";
+    private static final String SECUENCIA = "seq_ocupacion_cliente_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)
     @SequenceGenerator(name = SECUENCIA, sequenceName = SECUENCIA, allocationSize = 1)
     @Column(name = "id")
     private Long id;
+    
+    @Column(name = "ID_OCUPACION_PADRE")
+    private Long idOcupacion;
 
     @NotEmpty(message = "Ingrese Cargo")
     @Column(name = "CARGO")
@@ -294,6 +297,20 @@ public class OcupacionSolicitudes extends Base {
      */
     public void setPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) {
         this.propuestaSolicitud = propuestaSolicitud;
+    }
+
+    /**
+     * @return the idOcupacion
+     */
+    public Long getIdOcupacion() {
+        return idOcupacion;
+    }
+
+    /**
+     * @param idOcupacion the idOcupacion to set
+     */
+    public void setIdOcupacion(Long idOcupacion) {
+        this.idOcupacion = idOcupacion;
     }
 
     
