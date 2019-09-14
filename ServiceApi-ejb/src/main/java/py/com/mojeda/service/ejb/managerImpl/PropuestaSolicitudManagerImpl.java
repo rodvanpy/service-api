@@ -25,8 +25,11 @@ import py.com.mojeda.service.ejb.entity.Ciudades;
 import py.com.mojeda.service.ejb.entity.Clientes;
 import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.Empresas;
+import py.com.mojeda.service.ejb.entity.EstadosAnalisis;
 import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
 import py.com.mojeda.service.ejb.entity.Estudios;
+import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
+import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesDetalles;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.Garantias;
 import py.com.mojeda.service.ejb.entity.IngresosEgresos;
@@ -55,6 +58,8 @@ import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.BienesSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
+import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
+import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesDetallesManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 import py.com.mojeda.service.ejb.manager.GarantiasManager;
 import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
@@ -163,6 +168,12 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
     @EJB(mappedName = "java:app/ServiceApi-ejb/EstadosSolicitudManagerImpl")
     private EstadosSolicitudManager estadosSolicitudManager;
 
+    @EJB(mappedName = "java:app/ServiceApi-ejb/EvaluacionSolicitudesCabeceraManagerImpl")
+    private EvaluacionSolicitudesCabeceraManager evaluacionSolicitudesCabeceraManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/EvaluacionSolicitudesDetallesManagerImpl")
+    private EvaluacionSolicitudesDetallesManager evaluacionSolicitudesDetallesManager;
+
     @Override
     public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception {
 
@@ -261,7 +272,8 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 ejSolicitantes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejSolicitantes.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
                 ejSolicitantes.setTipoRelacion("DEUDOR");
-
+                ejSolicitantes.setConsiderarConyuge(false);
+                
                 if (deudor.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
                         && deudor.getSeparacionBienes()) {
 
@@ -347,12 +359,13 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     ejSolicitantes.setIdPersona(new Personas(propuestaSolicitud.getCodeudor().getId()));
                     ejSolicitantes.setProfesiones(propuestaSolicitud.getCodeudor().getProfesion());
                     ejSolicitantes.setPropuestaSolicitud(new PropuestaSolicitud(propuestaSolicitud.getId()));
-                    ejSolicitantes.setTelefonoParticular(propuestaSolicitud.getCodeudor().getTelefonoParticular()  + (propuestaSolicitud.getCodeudor().getTelefonoSecundario() == null ? "" : " / " +propuestaSolicitud.getCodeudor().getTelefonoSecundario()));
+                    ejSolicitantes.setTelefonoParticular(propuestaSolicitud.getCodeudor().getTelefonoParticular() + (propuestaSolicitud.getCodeudor().getTelefonoSecundario() == null ? "" : " / " + propuestaSolicitud.getCodeudor().getTelefonoSecundario()));
                     ejSolicitantes.setTipoGarantias(propuestaSolicitud.getTipoGarantia());
                     ejSolicitantes.setTipoRelacion("CODEUDOR");
                     ejSolicitantes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     ejSolicitantes.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-
+                    ejSolicitantes.setConsiderarConyuge(false);
+                    
                     if (propuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
                             && propuestaSolicitud.getCodeudor().getSeparacionBienes()) {
 
@@ -534,7 +547,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     ejSolicitantes.setFechaNacimiento(ejPropuestaSolicitud.getCodeudor().getFechaNacimiento());
                     ejSolicitantes.setIdPersona(new Personas(ejPropuestaSolicitud.getCodeudor().getId()));
                     ejSolicitantes.setProfesiones(ejPropuestaSolicitud.getCodeudor().getProfesion());
-                    ejSolicitantes.setTelefonoParticular(ejPropuestaSolicitud.getCodeudor().getTelefonoParticular()  + (ejPropuestaSolicitud.getCodeudor().getTelefonoSecundario() == null ? "" : " / " + ejPropuestaSolicitud.getCodeudor().getTelefonoSecundario()));
+                    ejSolicitantes.setTelefonoParticular(ejPropuestaSolicitud.getCodeudor().getTelefonoParticular() + (ejPropuestaSolicitud.getCodeudor().getTelefonoSecundario() == null ? "" : " / " + ejPropuestaSolicitud.getCodeudor().getTelefonoSecundario()));
                     ejSolicitantes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
 
                     if (ejPropuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
@@ -633,7 +646,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 + "tipoPago.id,tipoDestino.id,tipoInteres,ordenCheque,formaPago,plazo,periodoGracia,periodoCapital,periodoInteres,plazoOperacion,idAhorroDebito,"
                 + "idAhorroDesembolso,fechaAnalisis,fechaAprobacion,fechaRechazo,observacionesDepartamento,fechaGeneracion,primerVencimiento,montoSolicitadoOriginal,"
                 + "horaEstado,observacionFormalizador,importeCuota,importeEntregar,detalleDestino,beneficiarioCheque,tipoEnvioSolicitud,moneda.id,modalidad.id,"
-                + "cliente.id,cliente.persona.id,codeudor.id,funcionario.id,activo";
+                + "cliente.id,cliente.persona.id,codeudor.id,funcionario.id,sucursal.id,activo";
 
         if (propuestaSolicitud == null
                 || (propuestaSolicitud != null && propuestaSolicitud.getId() == null)) {
@@ -660,7 +673,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
         if (modelMaps.get("codeudor.id") != null) {
             propuestaSolicitud.setCodeudor(personaManager.getPersona(new Personas(Long.parseLong(modelMaps.get("codeudor.id").toString()))));
-        }else{
+        } else {
             propuestaSolicitud.setCodeudor(new Personas());
         }
 
@@ -713,7 +726,27 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         propuestaSolicitud.setTipoInteres(modelMaps.get("tipoInteres") == null ? null : modelMaps.get("tipoInteres").toString());
         propuestaSolicitud.setTipoPago(modelMaps.get("tipoPago.id") == null ? null : tipoPagosManager.get(Long.parseLong(modelMaps.get("tipoPago.id").toString())));
         propuestaSolicitud.setVencimientoInteres(modelMaps.get("vencimientoInteres") == null ? null : Long.parseLong(modelMaps.get("vencimientoInteres").toString()));
-
+        
+        Map<String, Object> sucursalMap = sucursalManager.getAtributos(new Sucursales(Long.parseLong(modelMaps.get("sucursal.id").toString())),
+                        "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
+        
+        Sucursales sucursales = new Sucursales();
+        sucursales.setId(sucursalMap.get("id") == null ? null : Long.parseLong(sucursalMap.get("id").toString()));
+        sucursales.setNombre(sucursalMap.get("nombre") == null ? "" : sucursalMap.get("nombre").toString());
+        sucursales.setCodigoSucursal(sucursalMap.get("codigoSucursal") == null ? "" : sucursalMap.get("codigoSucursal").toString());
+        sucursales.setDescripcion(sucursalMap.get("descripcion") == null ? "" : sucursalMap.get("descripcion").toString());
+        sucursales.setDireccion(sucursalMap.get("direccion") == null ? "" : sucursalMap.get("direccion").toString());
+        sucursales.setTelefono(sucursalMap.get("telefono") == null ? "" : sucursalMap.get("telefono").toString());
+        sucursales.setFax(sucursalMap.get("fax") == null ? "" : sucursalMap.get("fax").toString());
+        sucursales.setTelefonoMovil(sucursalMap.get("telefonoMovil") == null ? "" : sucursalMap.get("telefonoMovil").toString());
+        sucursales.setEmail(sucursalMap.get("email") == null ? "" : sucursalMap.get("email").toString());
+        sucursales.setObservacion(sucursalMap.get("observacion") == null ? "" : sucursalMap.get("observacion").toString());
+        sucursales.setActivo(sucursalMap.get("activo") == null ? "" : sucursalMap.get("activo").toString());
+        sucursales.setLatitud(sucursalMap.get("latitud") == null ? null : Double.parseDouble(sucursalMap.get("latitud").toString()));
+        sucursales.setLongitud(sucursalMap.get("longitud") == null ? null : Double.parseDouble(sucursalMap.get("longitud").toString()));
+        
+        propuestaSolicitud.setSucursal(sucursales);
+        
         return propuestaSolicitud;
     }
 
@@ -760,7 +793,6 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         personaMap.setProfesion(ejSolicitantes.getProfesiones());
         personaMap.setTelefonoParticular(ejSolicitantes.getTelefonoParticular());
         personaMap.setConyuge(ejSolicitantes.getIdPersonaConyuge() == null ? new Personas() : ejSolicitantes.getIdPersonaConyuge());
-       
 
         if (included.contains("inmuebles")) {
             BienesSolicitudes ejBienes = new BienesSolicitudes();
@@ -1055,8 +1087,8 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         ejSolicitantes.setEstadoCivil(ejPersona.getEstadoCivil());
         ejSolicitantes.setFechaNacimiento(ejPersona.getFechaNacimiento());
         ejSolicitantes.setProfesiones(ejPersona.getProfesion());
-        ejSolicitantes.setTelefonoParticular(ejPersona.getTelefonoParticular()  
-                + ((ejPersona.getTelefonoSecundario() == null || ejPersona.getTelefonoSecundario().compareToIgnoreCase("") == 0) ? "" :  " / " + ejPersona.getTelefonoSecundario()));
+        ejSolicitantes.setTelefonoParticular(ejPersona.getTelefonoParticular()
+                + ((ejPersona.getTelefonoSecundario() == null || ejPersona.getTelefonoSecundario().compareToIgnoreCase("") == 0) ? "" : " / " + ejPersona.getTelefonoSecundario()));
 
         if (ejPersona.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
                 && ejPersona.getSeparacionBienes()) {
@@ -1133,6 +1165,109 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         personaManager.update(ejPersona);
 
         return ejPersona;
+    }
+
+    @Override
+    public void tranferirPropuesta(Long idSolicitud, Long idPersona) throws Exception {
+        PropuestaSolicitud ejPropuestaSolicitud = this.get(idSolicitud);
+        //Cambiar estado solicitud
+        ejPropuestaSolicitud.setEstado(new EstadosSolicitud(2L));
+        this.update(ejPropuestaSolicitud);
+
+        //Cargar cabera de la evaluacion
+        EvaluacionSolicitudesCabecera evaluacionCabecera = new EvaluacionSolicitudesCabecera();
+        evaluacionCabecera.setActivo("S");
+        evaluacionCabecera.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+        evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+        evaluacionCabecera.setIdUsuarioCreacion(idPersona);
+        evaluacionCabecera.setIdUsuarioModificacion(idPersona);
+        evaluacionCabecera.setEstado(new EstadosAnalisis(1L));
+        evaluacionCabecera.setMontoSolicitado(ejPropuestaSolicitud.getMontoSolicitadoOriginal().longValue());
+        evaluacionCabecera.setMontoCuota(ejPropuestaSolicitud.getImporteCuota());
+        evaluacionCabecera.setTipoGarantia(ejPropuestaSolicitud.getTipoGarantia());
+        evaluacionCabecera.setTipoDestino(ejPropuestaSolicitud.getTipoDestino());
+        evaluacionCabecera.setDescripcionDestino(ejPropuestaSolicitud.getDetalleDestino());
+        evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+        evaluacionSolicitudesCabeceraManager.save(evaluacionCabecera);
+
+        Solicitantes solicitantes = new Solicitantes();
+        solicitantes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+        List<Solicitantes> solicitantesCredito = solicitantesManager.list(solicitantes);
+        EvaluacionSolicitudesDetalles detalle;
+        TipoIngresosEgresos tipoIngresosEgresos;
+        IngresosEgresos ingresosEgresos;
+        for (Solicitantes rpc : solicitantesCredito) {
+            //Cargar detalles de la evaluacion 
+
+            tipoIngresosEgresos = new TipoIngresosEgresos();
+            tipoIngresosEgresos.setTipo("E");
+
+            ingresosEgresos = new IngresosEgresos();
+            ingresosEgresos.setPersona(new Personas(rpc.getIdPersona().getId()));
+            ingresosEgresos.setTipoIngresosEgresos(tipoIngresosEgresos);
+
+            List<IngresosEgresos> egresos = ingresosEgresosManager.list(ingresosEgresos);
+            Long totalEgresos = 0L;
+            for (IngresosEgresos egr : egresos) {
+                totalEgresos = totalEgresos + egr.getMonto().longValue();
+            }
+
+            detalle = new EvaluacionSolicitudesDetalles();
+            detalle.setActivo("S");
+            detalle.setEgresosTotal(totalEgresos);
+            detalle.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            detalle.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            detalle.setIdUsuarioCreacion(idPersona);
+            detalle.setIdUsuarioModificacion(idPersona);
+            //detalle.setDescripcionProfesion(CONTENT_PATH);
+            detalle.setEdad(new Timestamp(System.currentTimeMillis()).getHours() - rpc.getIdPersona().getFechaNacimiento().getHours());
+            detalle.setEstadoCivil(rpc.getEstadoCivil());
+            detalle.setPersona(new Personas(rpc.getIdPersona().getId()));
+            detalle.setProfesion(rpc.getProfesiones());
+            detalle.setCantidadHijos(rpc.getCantHijos() == null ? null : rpc.getCantHijos().shortValue());
+            detalle.setSeparacionBienes(rpc.getConsiderarConyuge() ? "S" : "N");
+            detalle.setTipoRelacion(rpc.getTipoRelacion());
+            detalle.setEvaluacionSolicitudCabecera(new EvaluacionSolicitudesCabecera(evaluacionCabecera.getId()));
+
+            evaluacionSolicitudesDetallesManager.save(detalle);
+
+            if (rpc.getConsiderarConyuge()) {
+                tipoIngresosEgresos = new TipoIngresosEgresos();
+                tipoIngresosEgresos.setTipo("E");
+
+                ingresosEgresos = new IngresosEgresos();
+                ingresosEgresos.setPersona(new Personas(rpc.getIdPersonaConyuge().getId()));
+                ingresosEgresos.setTipoIngresosEgresos(tipoIngresosEgresos);
+
+                egresos = ingresosEgresosManager.list(ingresosEgresos);
+                totalEgresos = 0L;
+                for (IngresosEgresos egr : egresos) {
+                    totalEgresos = totalEgresos + egr.getMonto().longValue();
+                }
+
+                detalle = new EvaluacionSolicitudesDetalles();
+                detalle.setActivo("S");
+                detalle.setEgresosTotal(totalEgresos);
+                detalle.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                detalle.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                detalle.setIdUsuarioCreacion(idPersona);
+                detalle.setIdUsuarioModificacion(idPersona);
+                detalle.setCantidadHijos(rpc.getCantHijosCony() == null ? null : rpc.getCantHijosCony().shortValue());
+                //detalle.setDescripcionProfesion(CONTENT_PATH);
+                detalle.setEdad(new Timestamp(System.currentTimeMillis()).getHours() - rpc.getIdPersonaConyuge().getFechaNacimiento().getHours());
+                detalle.setEstadoCivil(rpc.getEstadoCivil());
+                detalle.setPersona(new Personas(rpc.getIdPersonaConyuge().getId()));
+                detalle.setProfesion(rpc.getProfesionesCony());
+                detalle.setSeparacionBienes(rpc.getConsiderarConyuge() ? "S" : "N");
+                detalle.setTipoRelacion("CONY_" + rpc.getTipoRelacion());
+                detalle.setEvaluacionSolicitudCabecera(new EvaluacionSolicitudesCabecera(evaluacionCabecera.getId()));
+
+                evaluacionSolicitudesDetallesManager.save(detalle);
+            }
+
+        }
     }
 
     public Long calcularCuota(Double modalidad, Double plazo, Long periodoCapital, Long vencimientoInteres,
@@ -1688,4 +1823,5 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         }
 
     }
+
 }

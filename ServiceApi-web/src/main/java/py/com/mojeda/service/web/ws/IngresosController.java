@@ -31,6 +31,7 @@ import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.TipoIngresosEgresos;
 import py.com.mojeda.service.ejb.entity.TipoOcupaciones;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.IngresosEgresosSolicitudes;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -303,15 +304,41 @@ public class IngresosController extends BaseController {
             @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        IngresosEgresos model = null;
+        IngresosEgresosSolicitudes ingre = null;
         try {
             inicializarIngresosEgresosManager();
+            inicializarIngresosEgresosSolicitudesManager();
+            //Se verifica si el id pertenece a la referencia de una solicitud
+            ingre = ingresosEgresosSolicitudesManager.get(id);
+            if (ingre == null) {
+                
+                model = ingresosEgresosManager.get(id);
 
-            IngresosEgresos model = ingresosEgresosManager.get(id);
-            model.setActivo("N");
-            model.setIdUsuarioEliminacion(userDetail.getId());
-            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setActivo("N");
+                model.setIdUsuarioEliminacion(userDetail.getId());
+                model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                ingresosEgresosManager.update(model);
+                
+            } else {
+                ingre.setActivo("N");
+                ingre.setIdUsuarioEliminacion(userDetail.getId());
+                ingre.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                ingre.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                ingresosEgresosSolicitudesManager.update(ingre);
+                
+                model = ingresosEgresosManager.get(ingre.getIdIngresoEgreso());
 
-            ingresosEgresosManager.update(model);
+                model.setActivo("N");
+                model.setIdUsuarioEliminacion(userDetail.getId());
+                model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+                model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                
+                ingresosEgresosManager.update(model);
+            }
 
             response.setModel(model);
             response.setStatus(200);

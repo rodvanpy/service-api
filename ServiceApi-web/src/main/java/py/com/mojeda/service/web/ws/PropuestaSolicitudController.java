@@ -185,6 +185,34 @@ public class PropuestaSolicitudController extends BaseController {
 
         return response;
     }
+    
+    /**
+     * Mapping para el metodo GET de la vista transferir.(transferir propuesta)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @PutMapping("/transferir/{id}")
+    public @ResponseBody
+    ResponseDTO transferir(
+            @ModelAttribute("id") Long id) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarPropuestaSolicitudManager();
+
+            propuestaSolicitudManager.tranferirPropuesta(id,userDetail.getId());
+
+            response.setStatus(200);
+            response.setMessage("Propuesta tranferida para analisis");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
 
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
