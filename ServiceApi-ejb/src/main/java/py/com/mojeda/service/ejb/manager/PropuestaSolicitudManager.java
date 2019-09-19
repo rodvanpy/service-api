@@ -25,7 +25,7 @@ public interface PropuestaSolicitudManager extends GenericDao<PropuestaSolicitud
     
     public PropuestaSolicitud getPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) throws Exception;
     
-    public Personas getPersonaSolicitud(Long idSolicitud, Long idPersona) throws Exception;   
+    public Personas getPersonaSolicitud(Long idSolicitud, Long idPersona, String tipo) throws Exception;   
     
     public Personas editarPersonaSolicitud(Personas persona, Long idSolicitud, Long idEmpresa) throws Exception;
     

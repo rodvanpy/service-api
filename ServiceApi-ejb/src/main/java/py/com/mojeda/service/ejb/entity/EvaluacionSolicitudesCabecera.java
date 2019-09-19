@@ -21,6 +21,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  *
@@ -65,25 +66,6 @@ public class EvaluacionSolicitudesCabecera extends Base {
     @JoinColumn(name = "ID_ESTADO_ANALISIS", referencedColumnName = "id")
     private EstadosAnalisis estado;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_TIPO_DESTINO", referencedColumnName = "id")
-    private TipoDestinos tipoDestino;
-    
-    @Column(name = "DESCRIPCION_DESTINO")
-    private String descripcionDestino;
-    
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_TIPO_GARANTIA", referencedColumnName = "id")
-    private TipoGarantias tipoGarantia;
-
-    @Basic(optional = false)
-    @Column(name = "MONTO_SOLICITADO")
-    private Long montoSolicitado;
-    
-    @Basic(optional = false)
-    @Column(name = "MONTO_TOTAL_CUOTA")
-    private Long montoCuota;
-
     @Column(name = "MONTO_APROBADO")
     private Long montoAprobado;
 
@@ -95,12 +77,21 @@ public class EvaluacionSolicitudesCabecera extends Base {
     @ManyToOne(optional = true)
     private Funcionarios funcionarioVerificador;
 
+    @Column(name = "OBSERVACION")
+    private String observacion;
+
+    @Column(name = "OBSERVACION_RECOMENDACION")
+    private String observacionRecomendacion;
+
     @Column(name = "OBS_APRO")
     private String obsApro;
 
     @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")
     @ManyToOne
     private PropuestaSolicitud propuestaSolicitud;
+
+    @Transient
+    private List<EvaluacionSolicitudesDetalles> detalles;
 
     public EvaluacionSolicitudesCabecera() {
 
@@ -209,34 +200,6 @@ public class EvaluacionSolicitudesCabecera extends Base {
     }
 
     /**
-     * @return the tipoDestino
-     */
-    public TipoDestinos getTipoDestino() {
-        return tipoDestino;
-    }
-
-    /**
-     * @param tipoDestino the tipoDestino to set
-     */
-    public void setTipoDestino(TipoDestinos tipoDestino) {
-        this.tipoDestino = tipoDestino;
-    }
-
-    /**
-     * @return the montoSolicitado
-     */
-    public Long getMontoSolicitado() {
-        return montoSolicitado;
-    }
-
-    /**
-     * @param montoSolicitado the montoSolicitado to set
-     */
-    public void setMontoSolicitado(Long montoSolicitado) {
-        this.montoSolicitado = montoSolicitado;
-    }
-
-    /**
      * @return the montoAprobado
      */
     public Long getMontoAprobado() {
@@ -262,6 +225,34 @@ public class EvaluacionSolicitudesCabecera extends Base {
      */
     public void setFuncionarioAnalisis(Funcionarios funcionarioAnalisis) {
         this.funcionarioAnalisis = funcionarioAnalisis;
+    }
+    
+    /**
+     * @return the observacion
+     */
+    public String getObservacion() {
+        return observacion;
+    }
+
+    /**
+     * @param observacion the observacion to set
+     */
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
+    }
+
+    /**
+     * @return the observacionRecomendacion
+     */
+    public String getObservacionRecomendacion() {
+        return observacionRecomendacion;
+    }
+
+    /**
+     * @param observacionRecomendacion the observacionRecomendacion to set
+     */
+    public void setObservacionRecomendacion(String observacionRecomendacion) {
+        this.observacionRecomendacion = observacionRecomendacion;
     }
 
     /**
@@ -307,47 +298,17 @@ public class EvaluacionSolicitudesCabecera extends Base {
     }
 
     /**
-     * @return the montoCuota
+     * @return the detalles
      */
-    public Long getMontoCuota() {
-        return montoCuota;
+    public List<EvaluacionSolicitudesDetalles> getDetalles() {
+        return detalles;
     }
 
     /**
-     * @param montoCuota the montoCuota to set
+     * @param detalles the detalles to set
      */
-    public void setMontoCuota(Long montoCuota) {
-        this.montoCuota = montoCuota;
+    public void setDetalles(List<EvaluacionSolicitudesDetalles> detalles) {
+        this.detalles = detalles;
     }
-
-    /**
-     * @return the descripcionDestino
-     */
-    public String getDescripcionDestino() {
-        return descripcionDestino;
-    }
-
-    /**
-     * @param descripcionDestino the descripcionDestino to set
-     */
-    public void setDescripcionDestino(String descripcionDestino) {
-        this.descripcionDestino = descripcionDestino;
-    }
-
-    /**
-     * @return the tipoGarantia
-     */
-    public TipoGarantias getTipoGarantia() {
-        return tipoGarantia;
-    }
-
-    /**
-     * @param tipoGarantia the tipoGarantia to set
-     */
-    public void setTipoGarantia(TipoGarantias tipoGarantia) {
-        this.tipoGarantia = tipoGarantia;
-    }
-
-    
 
 }

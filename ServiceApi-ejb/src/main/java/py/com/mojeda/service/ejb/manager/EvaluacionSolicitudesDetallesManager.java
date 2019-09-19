@@ -7,6 +7,7 @@
 package py.com.mojeda.service.ejb.manager;
 
 
+import java.util.List;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesDetalles;
 
@@ -18,4 +19,8 @@ import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesDetalles;
 @Local
 public interface EvaluacionSolicitudesDetallesManager extends GenericDao<EvaluacionSolicitudesDetalles, Long>{
     
+//    public List<EvaluacionSolicitudesDetalles> getListEvaluacionDetalles(EvaluacionSolicitudesDetalles evaluacion) throws Exception;
+//    
+//    public EvaluacionSolicitudesDetalles getEvaluacionDetalle(EvaluacionSolicitudesDetalles evaluacion) throws Exception;
+//    
 }

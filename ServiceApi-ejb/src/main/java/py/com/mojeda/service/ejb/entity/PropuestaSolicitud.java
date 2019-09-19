@@ -232,7 +232,11 @@ public class PropuestaSolicitud extends Base{
     
     @Column(name = "ENTIDAD")
     private String entidad = "PROPUESTA_SOLICITUD";
-       
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_TIPO_SOLICITUD", referencedColumnName = "id")
+    private TipoSolicitudes tipoSolicitud;
+    
     
     public PropuestaSolicitud() {
 
@@ -999,6 +1003,13 @@ public class PropuestaSolicitud extends Base{
     public void setCodeudor(Personas codeudor) {
         this.codeudor = codeudor;
     }
-    
+
+    public TipoSolicitudes getTipoSolicitud() {
+        return tipoSolicitud;
+    }
+
+    public void setTipoSolicitud(TipoSolicitudes tipoSolicitud) {
+        this.tipoSolicitud = tipoSolicitud;
+    }    
     
 }

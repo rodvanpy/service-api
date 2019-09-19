@@ -30,6 +30,7 @@ import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.TipoSolicitudes;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -43,7 +44,7 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
  */
 @Controller
 @RequestMapping(value = "/solicitud_creditos")
-public class PropuestaSolicitudController extends BaseController {
+public class PropuestaSolicitudCreditoController extends BaseController {
 
     String atributos = "id,fechaPresentacion,horaPresentacion,estado,fechaEstado,puntaje,montoSolicitado,tipoCredito,tasaInteres,tipoDesembolso.id,cliente.id,entidad,"
             + "tipoCalculoImporte.id,tipoInteres,ordenCheque,formaPago,plazo,montoSolicitadoOriginal,sucursal.id,sucursal.empresa.id,estado.id,activo";
@@ -68,6 +69,7 @@ public class PropuestaSolicitudController extends BaseController {
         PropuestaSolicitud model = new PropuestaSolicitud();
         model.setActivo("S");
         model.setSucursal(ejSucursales);
+        model.setTipoSolicitud(new TipoSolicitudes(1L));
         //Listar solo las propuestas del funcionario
         if (!userDetail.tienePermiso("ROLE_SOLICITUDE.LISTALL")) {
             model.setFuncionario(new Funcionarios(userDetail.getId()));
@@ -219,14 +221,16 @@ public class PropuestaSolicitudController extends BaseController {
      *
      * @param idSolicitud
      * @param idPersona
+     * @param tipoRelacion
      * @param included
      * @return
      */
-    @GetMapping("/persona/{idSolicitud}/{idPersona}")
+    @GetMapping("/persona-solicitud")
     public @ResponseBody
     ResponseDTO getPersonaSolicitud(
             @ModelAttribute("idSolicitud") Long idSolicitud,
             @ModelAttribute("idPersona") Long idPersona,
+            @ModelAttribute("tipoRelacion") String tipoRelacion,
             @ModelAttribute("included") String included) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
@@ -236,8 +240,8 @@ public class PropuestaSolicitudController extends BaseController {
             inicializarPersonaManager();
 
             //Personas modelPersona = personaManager.getPersona(new Personas(idPersona),included);
-
-            Personas model = propuestaSolicitudManager.getPersonaSolicitud(idSolicitud, idPersona);
+            logger.info(idPersona +" " + idSolicitud +" " + tipoRelacion);
+            Personas model = propuestaSolicitudManager.getPersonaSolicitud(idSolicitud, idPersona, tipoRelacion);
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -437,7 +441,7 @@ public class PropuestaSolicitudController extends BaseController {
 
             //VERIFICAR SI LA PERSONA PERTENECE A LA SOLICITUD
             propuestaSolicitudManager.editarPersonaSolicitud(model, id, userDetail.getId());
-            response.setModel(propuestaSolicitudManager.getPersonaSolicitud(id, model.getId()));
+            response.setModel(propuestaSolicitudManager.getPersonaSolicitud(id, model.getId(),"D"));
             response.setStatus(200);
             response.setMessage("Persona modificado/a con exito");
         } catch (Exception e) {

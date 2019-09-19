@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -44,27 +46,70 @@ public class EvaluacionSolicitudesDetalles extends Base {
     @Column(name = "TIPO_RELACION")
     private String tipoRelacion;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "ID")
     @ManyToOne(optional = true)
     private Personas persona;
+    
+    @Column(name = "ID_CONYUGE")
+    private Long idConyuge;
+    
+    @Column(name = "NOMBRE_CONYUGE")
+    private String nombreConyuge;
+       
+    @Column(name = "MONTO_DEUDA")
+    private Long montoDeuda;
+    
+    @Column(name = "MONTO_DEUDA_CUOTAS")
+    private Long montoDeudaCuotas;
+    
+    @Column(name = "MONTO_DEUDA_TARJETA")
+    private Long montoDeudaTarjeta;
 
-    @Column(name = "SALDO_TOTAL")
-    private Long saldoTotal;
+    @Column(name = "MONTO_DEUDA_TARJETA_MINIMO")
+    private Long montoDeudaTarjetaMinimo;
+    
+    @Column(name = "MONTO_DEUDA_CONY")
+    private Long montoDeudaConyuge;
+    
+    @Column(name = "MONTO_DEUDA_CUOTAS_CONY")
+    private Long montoDeudaCuotasConyuge;
+    
+    @Column(name = "MONTO_DEUDA_TARJETA_CONY")
+    private Long montoDeudaTarjetaConyuge;
 
-    @Column(name = "MONTO_TOTAL_CUOTAS")
-    private Long montoTotalCuotas;
+    @Column(name = "MONTO_DEUDA_TARJETA_MINIMO_CONY")
+    private Long montoDeudaTarjetaMinimoConyuge;
+    
+    @Column(name = "MONTO_DEUDA_TOTAL")
+    private Long montoDeudaTotal;
+    
+    @Column(name = "MONTO_DEUDA_TOTAL_CUOTA")
+    private Long montoDeudaTotalCuota;
+    
+    @Column(name = "MONTO_DEUDA_DESCUENTO_SOL")
+    private Long montoDeudaDescuento;
+    
+    @Column(name = "MONTO_DEUDA_DESCUENTO_CUOTAS_SOL")
+    private Long montoDeudaDescuentoCuotas;
+    
+    @Column(name = "MONTO_DEUDA_DESCUENTO_SOL_TOTAL")
+    private Long montoDeudaDescuentoTotal;
+    
+    @Column(name = "MONTO_DEUDA_SOL")
+    private Long montoDeudaSolicitud;
+    
+    @Column(name = "MONTO_DEUDA_SOL_CUOTAS")
+    private Long montoDeudaSolicitudCuotas;
+    
+    @Column(name = "MONTO_SOLI_TOTAL")
+    private Long montoDeudaSolicitudTotal;
+    
+    @Column(name = "MONTO_SOLI_CUOTAS_TOTAL")
+    private Long montoDeudaSolicitudCuotaTotal;   
 
-    @Column(name = "TOTAL_TARJETA")
-    private Long totalTarjeta;
-
-    @Column(name = "TOTAL_TARJETA_MINIMO")
-    private Long totalTarjetaMinimo;
-
-    @Column(name = "MONTO_TOTAL_A_CANCELAR")
-    private Long montoTotalACancelar;
-
-    @Column(name = "MONTO_CUOTA_A_CANCELAR")
-    private Long montoCuotaACancelar;
+    @Column(name = "SALDO_TOTAL_SOLICITUD")
+    private Long saldoTotalSolicitud;    
 
     @Column(name = "INGRESO_TOTAL")
     private Long ingresoTotal;
@@ -80,6 +125,12 @@ public class EvaluacionSolicitudesDetalles extends Base {
 
     @Column(name = "INGRESOS_OTROS")
     private Long ingresosOtros;
+    
+    @Column(name = "MONTO_TOTAL_ING")
+    private Long montoTotalIngresos;
+    
+    @Column(name = "MONTO_TOTAL_ING_PORCENTAJE")
+    private Long montoTotalIngresosPorcentaje;
 
     @Column(name = "PORCENTAJE_CAPACIDAD_OTROS")
     private Long porcentajeCapacidadOtros;
@@ -111,12 +162,9 @@ public class EvaluacionSolicitudesDetalles extends Base {
 
     @Column(name = "ESTADO_CIVIL")
     private String estadoCivil;
-
-    @Column(name = "OBSERVACION")
-    private String observacion;
-
-    @Column(name = "OBSERVACION_RECOMENDACION")
-    private String observacionRecomendacion;
+    
+    @Column(name = "DATOS_RELEVANTES")
+    private String datosRelevantes;
 
     @Column(name = "FECHA_REUNION")
     @Temporal(TemporalType.TIMESTAMP)
@@ -166,8 +214,9 @@ public class EvaluacionSolicitudesDetalles extends Base {
     private BigInteger limiteTarjeta;
 
     @Column(name = "FAJA_INFORMCONF")
-    private String fajaInformconf;
-
+    private String fajaInformconf;   
+    
+    @JsonIgnore
     @NotNull()
     @ManyToOne
     @JoinColumn(name = "ID_CABECERA", referencedColumnName = "id")
@@ -221,92 +270,7 @@ public class EvaluacionSolicitudesDetalles extends Base {
      */
     public void setPersona(Personas persona) {
         this.persona = persona;
-    }   
-
-    /**
-     * @return the saldoTotal
-     */
-    public Long getSaldoTotal() {
-        return saldoTotal;
-    }
-
-    /**
-     * @param saldoTotal the saldoTotal to set
-     */
-    public void setSaldoTotal(Long saldoTotal) {
-        this.saldoTotal = saldoTotal;
-    }
-
-    /**
-     * @return the montoTotalCuotas
-     */
-    public Long getMontoTotalCuotas() {
-        return montoTotalCuotas;
-    }
-
-    /**
-     * @param montoTotalCuotas the montoTotalCuotas to set
-     */
-    public void setMontoTotalCuotas(Long montoTotalCuotas) {
-        this.montoTotalCuotas = montoTotalCuotas;
-    }
-
-    /**
-     * @return the totalTarjeta
-     */
-    public Long getTotalTarjeta() {
-        return totalTarjeta;
-    }
-
-    /**
-     * @param totalTarjeta the totalTarjeta to set
-     */
-    public void setTotalTarjeta(Long totalTarjeta) {
-        this.totalTarjeta = totalTarjeta;
-    }
-
-    /**
-     * @return the totalTarjetaMinimo
-     */
-    public Long getTotalTarjetaMinimo() {
-        return totalTarjetaMinimo;
-    }
-
-    /**
-     * @param totalTarjetaMinimo the totalTarjetaMinimo to set
-     */
-    public void setTotalTarjetaMinimo(Long totalTarjetaMinimo) {
-        this.totalTarjetaMinimo = totalTarjetaMinimo;
-    }
-    
-
-    /**
-     * @return the montoTotalACancelar
-     */
-    public Long getMontoTotalACancelar() {
-        return montoTotalACancelar;
-    }
-
-    /**
-     * @param montoTotalACancelar the montoTotalACancelar to set
-     */
-    public void setMontoTotalACancelar(Long montoTotalACancelar) {
-        this.montoTotalACancelar = montoTotalACancelar;
-    }
-
-    /**
-     * @return the montoCuotaACancelar
-     */
-    public Long getMontoCuotaACancelar() {
-        return montoCuotaACancelar;
-    }
-
-    /**
-     * @param montoCuotaACancelar the montoCuotaACancelar to set
-     */
-    public void setMontoCuotaACancelar(Long montoCuotaACancelar) {
-        this.montoCuotaACancelar = montoCuotaACancelar;
-    }
+    }       
 
     /**
      * @return the ingresoTotal
@@ -502,35 +466,7 @@ public class EvaluacionSolicitudesDetalles extends Base {
      */
     public void setEstadoCivil(String estadoCivil) {
         this.estadoCivil = estadoCivil;
-    }
-
-    /**
-     * @return the observacion
-     */
-    public String getObservacion() {
-        return observacion;
-    }
-
-    /**
-     * @param observacion the observacion to set
-     */
-    public void setObservacion(String observacion) {
-        this.observacion = observacion;
-    }
-
-    /**
-     * @return the observacionRecomendacion
-     */
-    public String getObservacionRecomendacion() {
-        return observacionRecomendacion;
-    }
-
-    /**
-     * @param observacionRecomendacion the observacionRecomendacion to set
-     */
-    public void setObservacionRecomendacion(String observacionRecomendacion) {
-        this.observacionRecomendacion = observacionRecomendacion;
-    }
+    }   
 
     /**
      * @return the fechaReunion
@@ -784,7 +720,317 @@ public class EvaluacionSolicitudesDetalles extends Base {
     public void setEgresosTotal(Long egresosTotal) {
         this.egresosTotal = egresosTotal;
     }
-    
-    
 
+    public Long getIdConyuge() {
+        return idConyuge;
+    }
+
+    public void setIdConyuge(Long idConyuge) {
+        this.idConyuge = idConyuge;
+    }
+          
+
+    public String getNombreConyuge() {
+        return nombreConyuge;
+    }
+
+    public void setNombreConyuge(String nombreConyuge) {
+        this.nombreConyuge = nombreConyuge;
+    }    
+
+    /**
+     * @return the montoDeuda
+     */
+    public Long getMontoDeuda() {
+        return montoDeuda;
+    }
+
+    /**
+     * @param montoDeuda the montoDeuda to set
+     */
+    public void setMontoDeuda(Long montoDeuda) {
+        this.montoDeuda = montoDeuda;
+    }
+
+    /**
+     * @return the montoDeudaCuotas
+     */
+    public Long getMontoDeudaCuotas() {
+        return montoDeudaCuotas;
+    }
+
+    /**
+     * @param montoDeudaCuotas the montoDeudaCuotas to set
+     */
+    public void setMontoDeudaCuotas(Long montoDeudaCuotas) {
+        this.montoDeudaCuotas = montoDeudaCuotas;
+    }
+
+    /**
+     * @return the montoDeudaTarjeta
+     */
+    public Long getMontoDeudaTarjeta() {
+        return montoDeudaTarjeta;
+    }
+
+    /**
+     * @param montoDeudaTarjeta the montoDeudaTarjeta to set
+     */
+    public void setMontoDeudaTarjeta(Long montoDeudaTarjeta) {
+        this.montoDeudaTarjeta = montoDeudaTarjeta;
+    }
+
+    /**
+     * @return the montoDeudaTarjetaMinimo
+     */
+    public Long getMontoDeudaTarjetaMinimo() {
+        return montoDeudaTarjetaMinimo;
+    }
+
+    /**
+     * @param montoDeudaTarjetaMinimo the montoDeudaTarjetaMinimo to set
+     */
+    public void setMontoDeudaTarjetaMinimo(Long montoDeudaTarjetaMinimo) {
+        this.montoDeudaTarjetaMinimo = montoDeudaTarjetaMinimo;
+    }
+
+    /**
+     * @return the montoDeudaConyuge
+     */
+    public Long getMontoDeudaConyuge() {
+        return montoDeudaConyuge;
+    }
+
+    /**
+     * @param montoDeudaConyuge the montoDeudaConyuge to set
+     */
+    public void setMontoDeudaConyuge(Long montoDeudaConyuge) {
+        this.montoDeudaConyuge = montoDeudaConyuge;
+    }
+
+    /**
+     * @return the montoDeudaCuotasConyuge
+     */
+    public Long getMontoDeudaCuotasConyuge() {
+        return montoDeudaCuotasConyuge;
+    }
+
+    /**
+     * @param montoDeudaCuotasConyuge the montoDeudaCuotasConyuge to set
+     */
+    public void setMontoDeudaCuotasConyuge(Long montoDeudaCuotasConyuge) {
+        this.montoDeudaCuotasConyuge = montoDeudaCuotasConyuge;
+    }
+
+    /**
+     * @return the montoDeudaTarjetaConyuge
+     */
+    public Long getMontoDeudaTarjetaConyuge() {
+        return montoDeudaTarjetaConyuge;
+    }
+
+    /**
+     * @param montoDeudaTarjetaConyuge the montoDeudaTarjetaConyuge to set
+     */
+    public void setMontoDeudaTarjetaConyuge(Long montoDeudaTarjetaConyuge) {
+        this.montoDeudaTarjetaConyuge = montoDeudaTarjetaConyuge;
+    }
+
+    /**
+     * @return the montoDeudaTarjetaMinimoConyuge
+     */
+    public Long getMontoDeudaTarjetaMinimoConyuge() {
+        return montoDeudaTarjetaMinimoConyuge;
+    }
+
+    /**
+     * @param montoDeudaTarjetaMinimoConyuge the montoDeudaTarjetaMinimoConyuge to set
+     */
+    public void setMontoDeudaTarjetaMinimoConyuge(Long montoDeudaTarjetaMinimoConyuge) {
+        this.montoDeudaTarjetaMinimoConyuge = montoDeudaTarjetaMinimoConyuge;
+    }
+
+    /**
+     * @return the montoDeudaTotal
+     */
+    public Long getMontoDeudaTotal() {
+        return montoDeudaTotal;
+    }
+
+    /**
+     * @param montoDeudaTotal the montoDeudaTotal to set
+     */
+    public void setMontoDeudaTotal(Long montoDeudaTotal) {
+        this.montoDeudaTotal = montoDeudaTotal;
+    }
+
+    /**
+     * @return the montoDeudaTotalCuota
+     */
+    public Long getMontoDeudaTotalCuota() {
+        return montoDeudaTotalCuota;
+    }
+
+    /**
+     * @param montoDeudaTotalCuota the montoDeudaTotalCuota to set
+     */
+    public void setMontoDeudaTotalCuota(Long montoDeudaTotalCuota) {
+        this.montoDeudaTotalCuota = montoDeudaTotalCuota;
+    }
+
+    /**
+     * @return the montoDeudaDescuento
+     */
+    public Long getMontoDeudaDescuento() {
+        return montoDeudaDescuento;
+    }
+
+    /**
+     * @param montoDeudaDescuento the montoDeudaDescuento to set
+     */
+    public void setMontoDeudaDescuento(Long montoDeudaDescuento) {
+        this.montoDeudaDescuento = montoDeudaDescuento;
+    }
+
+    /**
+     * @return the montoDeudaDescuentoCuotas
+     */
+    public Long getMontoDeudaDescuentoCuotas() {
+        return montoDeudaDescuentoCuotas;
+    }
+
+    /**
+     * @param montoDeudaDescuentoCuotas the montoDeudaDescuentoCuotas to set
+     */
+    public void setMontoDeudaDescuentoCuotas(Long montoDeudaDescuentoCuotas) {
+        this.montoDeudaDescuentoCuotas = montoDeudaDescuentoCuotas;
+    }
+
+    /**
+     * @return the montoDeudaDescuentoTotal
+     */
+    public Long getMontoDeudaDescuentoTotal() {
+        return montoDeudaDescuentoTotal;
+    }
+
+    /**
+     * @param montoDeudaDescuentoTotal the montoDeudaDescuentoTotal to set
+     */
+    public void setMontoDeudaDescuentoTotal(Long montoDeudaDescuentoTotal) {
+        this.montoDeudaDescuentoTotal = montoDeudaDescuentoTotal;
+    }
+
+    /**
+     * @return the montoDeudaSolicitud
+     */
+    public Long getMontoDeudaSolicitud() {
+        return montoDeudaSolicitud;
+    }
+
+    /**
+     * @param montoDeudaSolicitud the montoDeudaSolicitud to set
+     */
+    public void setMontoDeudaSolicitud(Long montoDeudaSolicitud) {
+        this.montoDeudaSolicitud = montoDeudaSolicitud;
+    }
+
+    /**
+     * @return the montoDeudaSolicitudCuotas
+     */
+    public Long getMontoDeudaSolicitudCuotas() {
+        return montoDeudaSolicitudCuotas;
+    }
+
+    /**
+     * @param montoDeudaSolicitudCuotas the montoDeudaSolicitudCuotas to set
+     */
+    public void setMontoDeudaSolicitudCuotas(Long montoDeudaSolicitudCuotas) {
+        this.montoDeudaSolicitudCuotas = montoDeudaSolicitudCuotas;
+    }
+
+    /**
+     * @return the montoDeudaSolicitudTotal
+     */
+    public Long getMontoDeudaSolicitudTotal() {
+        return montoDeudaSolicitudTotal;
+    }
+
+    /**
+     * @param montoDeudaSolicitudTotal the montoDeudaSolicitudTotal to set
+     */
+    public void setMontoDeudaSolicitudTotal(Long montoDeudaSolicitudTotal) {
+        this.montoDeudaSolicitudTotal = montoDeudaSolicitudTotal;
+    }
+
+    /**
+     * @return the montoDeudaSolicitudCuotaTotal
+     */
+    public Long getMontoDeudaSolicitudCuotaTotal() {
+        return montoDeudaSolicitudCuotaTotal;
+    }
+
+    /**
+     * @param montoDeudaSolicitudCuotaTotal the montoDeudaSolicitudCuotaTotal to set
+     */
+    public void setMontoDeudaSolicitudCuotaTotal(Long montoDeudaSolicitudCuotaTotal) {
+        this.montoDeudaSolicitudCuotaTotal = montoDeudaSolicitudCuotaTotal;
+    }
+
+    /**
+     * @return the saldoTotalSolicitud
+     */
+    public Long getSaldoTotalSolicitud() {
+        return saldoTotalSolicitud;
+    }
+
+    /**
+     * @param saldoTotalSolicitud the saldoTotalSolicitud to set
+     */
+    public void setSaldoTotalSolicitud(Long saldoTotalSolicitud) {
+        this.saldoTotalSolicitud = saldoTotalSolicitud;
+    }
+
+    /**
+     * @return the datosRelevantes
+     */
+    public String getDatosRelevantes() {
+        return datosRelevantes;
+    }
+
+    /**
+     * @param datosRelevantes the datosRelevantes to set
+     */
+    public void setDatosRelevantes(String datosRelevantes) {
+        this.datosRelevantes = datosRelevantes;
+    }
+
+    /**
+     * @return the montoTotalIngresos
+     */
+    public Long getMontoTotalIngresos() {
+        return montoTotalIngresos;
+    }
+
+    /**
+     * @param montoTotalIngresos the montoTotalIngresos to set
+     */
+    public void setMontoTotalIngresos(Long montoTotalIngresos) {
+        this.montoTotalIngresos = montoTotalIngresos;
+    }
+
+    /**
+     * @return the montoTotalIngresosPorcentaje
+     */
+    public Long getMontoTotalIngresosPorcentaje() {
+        return montoTotalIngresosPorcentaje;
+    }
+
+    /**
+     * @param montoTotalIngresosPorcentaje the montoTotalIngresosPorcentaje to set
+     */
+    public void setMontoTotalIngresosPorcentaje(Long montoTotalIngresosPorcentaje) {
+        this.montoTotalIngresosPorcentaje = montoTotalIngresosPorcentaje;
+    }
+    
+    
 }

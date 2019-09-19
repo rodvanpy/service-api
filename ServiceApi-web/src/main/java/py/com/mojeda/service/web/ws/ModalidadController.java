@@ -55,6 +55,7 @@ public class ModalidadController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         Modalidades model = new Modalidades();
+        model.setActivo("S");
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarModalidadesManager();
