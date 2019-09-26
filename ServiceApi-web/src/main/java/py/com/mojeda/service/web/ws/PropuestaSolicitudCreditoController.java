@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Clientes;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
+import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.entity.Sucursales;
@@ -80,7 +81,8 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             inicializarClientesManager();
             inicializarSucursalManager();
             inicializarEstadosSolicitudManager();
-
+            inicializarEvaluacionSolicitudesCabeceraManager();
+            
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -128,10 +130,17 @@ public class PropuestaSolicitudCreditoController extends BaseController {
 
                 Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
                         "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
+                
+                EvaluacionSolicitudesCabecera evaluacion = new EvaluacionSolicitudesCabecera();
+                evaluacion.setPropuestaSolicitud(new PropuestaSolicitud(Long.parseLong(rpm.get("id").toString())));
+                
+                Map<String, Object> analisisCabecera = evaluacionSolicitudesCabeceraManager.getAtributos(evaluacion,
+                        "id,estado.id".split(","));
 
                 rpm.put("sucursal", sucursal);
                 rpm.put("cliente", cliente);
                 rpm.put("estado", estadosSolicitudManager.get(new EstadosSolicitud(Long.parseLong(rpm.get("estado.id").toString()))));
+                rpm.put("estadoAnalisis", analisisCabecera == null ? new EstadosSolicitud() : estadosSolicitudManager.get(new EstadosSolicitud(Long.parseLong(analisisCabecera.get("estado.id").toString()))));
                 rpm.remove("estado.id");
                 rpm.remove("cliente.id");
                 rpm.remove("sucursal.id");
@@ -307,11 +316,12 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                 return response;
             }
 
-            propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
-
-            response.setModel(propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(model.getId())));
-            response.setStatus(200);
-            response.setMessage("Solicitud creada con exito");
+            model = propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
+            
+            response.setModel(model);
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Error al crear registro" : "Registro creado con exito");
+            
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);
@@ -352,16 +362,30 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                         .collect(Collectors.joining(",")));
                 return response;
             }
+            
+            Map<String, Object> modelMaps = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(id), "estado.id".split(","));
+
+            if (modelMaps != null
+                    && modelMaps.get("estado.id") != null
+                    && modelMaps.get("estado.id").toString().compareToIgnoreCase("1") != 0 
+                    && modelMaps.get("estado.id").toString().compareToIgnoreCase("5") != 0) {
+                response.setModel(null);
+                response.setStatus(404);
+                response.setMessage("La propuesta ya no puede ser modificada.");
+                
+                return response;
+            }
 
             //Buscar usuario por empresa
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            propuestaSolicitudManager.editar(model, userDetail.getIdSusursal());
+            model = propuestaSolicitudManager.editar(model, userDetail.getIdSusursal());
 
-            response.setModel(propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(model.getId())));
-            response.setStatus(200);
-            response.setMessage("Solicitud modificada con exito");
+            response.setModel(model);
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Error al modificar registro" : "Registro modificado con exito");
+            
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);

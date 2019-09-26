@@ -143,6 +143,9 @@ public class EvaluacionSolicitudesDetalles extends Base {
 
     @Column(name = "GARANTIAS_VIGENTE")
     private String garantiasVigente;
+    
+    @Column(name = "CREDITO_VIGENTE")
+    private String creditoVigente;
 
     @Column(name = "INFORMCONF")
     private String informconf;
@@ -204,8 +207,23 @@ public class EvaluacionSolicitudesDetalles extends Base {
     @Column(name = "TIPO_CANC_TARJETA")
     private String tipoCancTarjeta;
 
-    @Column(name = "SALDO_TOTAL_CTRAL_RGO")
-    private Long saldoTotalCtralRgo;
+    @Column(name = "DEUDA_TOTAL_CTRAL_RGO")
+    private Long deudaTotalCtralRgo;
+    
+    @Column(name = "DEUDA_CUOTA_CTRAL_RGO")
+    private Long deudaCuotaCtralRgo;
+    
+    @Column(name = "DEUDA_TOTAL_REFERENCIA")
+    private Long deudaTotalReferencia;
+    
+    @Column(name = "DEUDA_CUOTA_REFERENCIA")
+    private Long deudaCuotaReferencia;
+    
+    @Column(name = "TOTAL_DEUDA_CUOTA_EXTERIOR")
+    private Long totalDeudaCuotaExterior;
+    
+    @Column(name = "TOTAL_DEUDA_EXTERIOR")
+    private Long totalDeudaExterior;
 
     @Column(name = "GENERA_TARJETA")
     private String generaTarjeta;
@@ -635,21 +653,7 @@ public class EvaluacionSolicitudesDetalles extends Base {
      */
     public void setTipoCancTarjeta(String tipoCancTarjeta) {
         this.tipoCancTarjeta = tipoCancTarjeta;
-    }
-
-    /**
-     * @return the saldoTotalCtralRgo
-     */
-    public Long getSaldoTotalCtralRgo() {
-        return saldoTotalCtralRgo;
-    }
-
-    /**
-     * @param saldoTotalCtralRgo the saldoTotalCtralRgo to set
-     */
-    public void setSaldoTotalCtralRgo(Long saldoTotalCtralRgo) {
-        this.saldoTotalCtralRgo = saldoTotalCtralRgo;
-    }
+    }    
 
     /**
      * @return the generaTarjeta
@@ -1031,6 +1035,97 @@ public class EvaluacionSolicitudesDetalles extends Base {
     public void setMontoTotalIngresosPorcentaje(Long montoTotalIngresosPorcentaje) {
         this.montoTotalIngresosPorcentaje = montoTotalIngresosPorcentaje;
     }
-    
-    
+
+    /**
+     * @return the deudaTotalCtralRgo
+     */
+    public Long getDeudaTotalCtralRgo() {
+        return deudaTotalCtralRgo;
+    }
+
+    /**
+     * @param deudaTotalCtralRgo the deudaTotalCtralRgo to set
+     */
+    public void setDeudaTotalCtralRgo(Long deudaTotalCtralRgo) {
+        this.deudaTotalCtralRgo = deudaTotalCtralRgo;
+    }
+
+    /**
+     * @return the deudaCuotaCtralRgo
+     */
+    public Long getDeudaCuotaCtralRgo() {
+        return deudaCuotaCtralRgo;
+    }
+
+    /**
+     * @param deudaCuotaCtralRgo the deudaCuotaCtralRgo to set
+     */
+    public void setDeudaCuotaCtralRgo(Long deudaCuotaCtralRgo) {
+        this.deudaCuotaCtralRgo = deudaCuotaCtralRgo;
+    }
+
+    /**
+     * @return the deudaTotalReferencia
+     */
+    public Long getDeudaTotalReferencia() {
+        return deudaTotalReferencia;
+    }
+
+    /**
+     * @param deudaTotalReferencia the deudaTotalReferencia to set
+     */
+    public void setDeudaTotalReferencia(Long deudaTotalReferencia) {
+        this.deudaTotalReferencia = deudaTotalReferencia;
+    }
+
+    /**
+     * @return the deudaCuotaReferencia
+     */
+    public Long getDeudaCuotaReferencia() {
+        return deudaCuotaReferencia;
+    }
+
+    /**
+     * @param deudaCuotaReferencia the deudaCuotaReferencia to set
+     */
+    public void setDeudaCuotaReferencia(Long deudaCuotaReferencia) {
+        this.deudaCuotaReferencia = deudaCuotaReferencia;
+    }
+
+    /**
+     * @return the totalDeudaCuotaExterior
+     */
+    public Long getTotalDeudaCuotaExterior() {
+        return totalDeudaCuotaExterior;
+    }
+
+    /**
+     * @param totalDeudaCuotaExterior the totalDeudaCuotaExterior to set
+     */
+    public void setTotalDeudaCuotaExterior(Long totalDeudaCuotaExterior) {
+        this.totalDeudaCuotaExterior = totalDeudaCuotaExterior;
+    }
+
+    /**
+     * @return the totalDeudaExterior
+     */
+    public Long getTotalDeudaExterior() {
+        return totalDeudaExterior;
+    }
+
+    /**
+     * @param totalDeudaExterior the totalDeudaExterior to set
+     */
+    public void setTotalDeudaExterior(Long totalDeudaExterior) {
+        this.totalDeudaExterior = totalDeudaExterior;
+    }
+
+    public String getCreditoVigente() {
+        return creditoVigente;
+    }
+
+    public void setCreditoVigente(String creditoVigente) {
+        this.creditoVigente = creditoVigente;
+    }
+        
 }

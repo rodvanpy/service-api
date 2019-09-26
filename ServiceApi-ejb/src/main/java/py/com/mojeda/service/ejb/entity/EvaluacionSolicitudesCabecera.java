@@ -64,7 +64,7 @@ public class EvaluacionSolicitudesCabecera extends Base {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_ESTADO_ANALISIS", referencedColumnName = "id")
-    private EstadosAnalisis estado;
+    private EstadosSolicitud estado;
 
     @Column(name = "MONTO_APROBADO")
     private Long montoAprobado;
@@ -82,6 +82,9 @@ public class EvaluacionSolicitudesCabecera extends Base {
 
     @Column(name = "OBSERVACION_RECOMENDACION")
     private String observacionRecomendacion;
+    
+    @Column(name = "OBSERVACION_RETRANSFERENCIA")
+    private String observacionRetransferencia;
 
     @Column(name = "OBS_APRO")
     private String obsApro;
@@ -188,14 +191,14 @@ public class EvaluacionSolicitudesCabecera extends Base {
     /**
      * @return the estado
      */
-    public EstadosAnalisis getEstado() {
+    public EstadosSolicitud getEstado() {
         return estado;
     }
 
     /**
      * @param estado the estado to set
      */
-    public void setEstado(EstadosAnalisis estado) {
+    public void setEstado(EstadosSolicitud estado) {
         this.estado = estado;
     }
 
@@ -310,5 +313,15 @@ public class EvaluacionSolicitudesCabecera extends Base {
     public void setDetalles(List<EvaluacionSolicitudesDetalles> detalles) {
         this.detalles = detalles;
     }
+
+    public String getObservacionRetransferencia() {
+        return observacionRetransferencia;
+    }
+
+    public void setObservacionRetransferencia(String observacionRetransferencia) {
+        this.observacionRetransferencia = observacionRetransferencia;
+    }
+    
+    
 
 }

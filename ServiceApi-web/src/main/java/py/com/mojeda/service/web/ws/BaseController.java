@@ -32,7 +32,6 @@ import py.com.mojeda.service.ejb.manager.PermisoManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
-import py.com.mojeda.service.ejb.manager.EstadosAnalisisManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
 import py.com.mojeda.service.ejb.manager.EstudiosManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
@@ -153,9 +152,7 @@ public class BaseController {
     
     protected VinculoManager vinculoManager;
     
-    protected EstadosSolicitudManager estadosSolicitudManager;
-    
-    protected EstadosAnalisisManager estadosAnalisisManager;
+    protected EstadosSolicitudManager estadosSolicitudManager;    
     
     protected OcupacionSolicitudesManager ocupacionSolicitudesManager;
     
@@ -169,23 +166,6 @@ public class BaseController {
     
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    
-    protected void inicializarEstadosAnalisisManager() throws Exception {
-        if (context == null) {
-            try {
-                context = new InitialContext();
-            } catch (NamingException e1) {
-                throw new RuntimeException("No se puede inicializar el contexto", e1);
-            }
-        }
-        if (estadosAnalisisManager == null) {
-            try {
-                estadosAnalisisManager = (EstadosAnalisisManager) context.lookup("java:app/ServiceApi-ejb/EstadosAnalisisManagerImpl");
-            } catch (NamingException ne) {
-                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
-            }
-        }
-    }
     
     protected void inicializarEvaluacionSolicitudesCabeceraManager() throws Exception {
         if (context == null) {

@@ -20,6 +20,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  *
@@ -237,6 +238,8 @@ public class PropuestaSolicitud extends Base{
     @JoinColumn(name = "ID_TIPO_SOLICITUD", referencedColumnName = "id")
     private TipoSolicitudes tipoSolicitud;
     
+    @Transient
+    private EvaluacionSolicitudesCabecera evaluacion;
     
     public PropuestaSolicitud() {
 
@@ -1010,6 +1013,14 @@ public class PropuestaSolicitud extends Base{
 
     public void setTipoSolicitud(TipoSolicitudes tipoSolicitud) {
         this.tipoSolicitud = tipoSolicitud;
+    }  
+
+    public EvaluacionSolicitudesCabecera getEvaluacion() {
+        return evaluacion;
+    }
+
+    public void setEvaluacion(EvaluacionSolicitudesCabecera evaluacion) {
+        this.evaluacion = evaluacion;
     }    
     
 }

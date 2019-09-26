@@ -669,7 +669,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             model.setEstadoCivil(persona.get("estadoCivil") == null ? "" : persona.get("estadoCivil").toString());
             model.setFechaNacimiento(persona.get("fechaNacimiento") == null ? null : new Timestamp(dateFormat.parse(persona.get("fechaNacimiento").toString()).getTime()));
             model.setId(persona.get("id") == null ? null : Long.parseLong(persona.get("id").toString()));
-            model.setImagePath(persona.get("imagePath") == null ? "" : persona.get("imagePath").toString());
+            model.setImagePath(persona.get("imagePath") == null ? null : persona.get("imagePath").toString());
             model.setLatitud(persona.get("latitud") == null ? null : Double.parseDouble(persona.get("latitud").toString()));
             model.setLongitud(persona.get("longitud") == null ? null : Double.parseDouble(persona.get("longitud").toString()));
             model.setPrimerApellido(persona.get("primerApellido") == null ? "" : persona.get("primerApellido").toString());
