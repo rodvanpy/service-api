@@ -234,6 +234,13 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "ENTIDAD")
     private String entidad = "PROPUESTA_SOLICITUD";
     
+    @Column(name = "DESEMBOLSADO")
+    private String desembolsado;
+    
+    @Column(name = "FECHA_DESEMBOLSO")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaDesembolso;
+    
     @ManyToOne
     @JoinColumn(name = "ID_TIPO_SOLICITUD", referencedColumnName = "id")
     private TipoSolicitudes tipoSolicitud;
@@ -1022,5 +1029,34 @@ public class PropuestaSolicitud extends Base{
     public void setEvaluacion(EvaluacionSolicitudesCabecera evaluacion) {
         this.evaluacion = evaluacion;
     }    
+
+    /**
+     * @return the desembolsado
+     */
+    public String getDesembolsado() {
+        return desembolsado;
+    }
+
+    /**
+     * @param desembolsado the desembolsado to set
+     */
+    public void setDesembolsado(String desembolsado) {
+        this.desembolsado = desembolsado;
+    }
+
+    /**
+     * @return the fechaDesembolso
+     */
+    public Date getFechaDesembolso() {
+        return fechaDesembolso;
+    }
+
+    /**
+     * @param fechaDesembolso the fechaDesembolso to set
+     */
+    public void setFechaDesembolso(Date fechaDesembolso) {
+        this.fechaDesembolso = fechaDesembolso;
+    }
+    
     
 }

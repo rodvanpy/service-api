@@ -267,6 +267,7 @@ public class ClienteController extends BaseController {
             Clientes ejCliente = new Clientes();
             ejCliente.setSucursal(ejSucursales);
             ejCliente.setPersona(ejPersona);
+            ejCliente.setActivo("S");
             
             Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente,"id".split(","));
             
@@ -339,6 +340,7 @@ public class ClienteController extends BaseController {
             Clientes ejCliente = new Clientes();
             ejCliente.setPersona(ejPersona);
             ejCliente.setSucursal(ejSucursales);
+            ejCliente.setActivo("S");
             
             Map<String,Object> clienteMaps = clientesManager.getLike(ejCliente, "id".split(","));
             if (clienteMaps != null

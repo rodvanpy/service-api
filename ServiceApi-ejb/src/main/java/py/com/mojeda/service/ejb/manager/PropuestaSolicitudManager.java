@@ -10,6 +10,7 @@ package py.com.mojeda.service.ejb.manager;
 import javax.ejb.Local;
 import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
+import py.com.mojeda.service.ejb.entity.TipoCalculos;
 
 
 /**
@@ -30,5 +31,14 @@ public interface PropuestaSolicitudManager extends GenericDao<PropuestaSolicitud
     public Personas editarPersonaSolicitud(Personas persona, Long idSolicitud, Long idEmpresa) throws Exception;
     
     public void tranferirPropuesta(Long idSolicitud, Long idPersona) throws Exception;
+       
+    public Double periodoInteresCompuesto(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres);
     
+    public Double periodoInteresSimple(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres);
+    
+    public Long calcularCuota(Double modalidad, Double plazo, Long periodoCapital, Long vencimientoInteres,
+            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos);
+    
+    public Long calcularMontoInteres(Double plazo, Long periodoCapital, Long vencimientoInteres,
+            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos);
 }

@@ -13,6 +13,7 @@ import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.BienesSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
+import py.com.mojeda.service.ejb.manager.CuotasManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.ModalidadesManager;
@@ -164,8 +165,27 @@ public class BaseController {
     
     protected EvaluacionSolicitudesDetallesManager evaluacionSolicitudesDetallesManager;
     
+    protected CuotasManager cuotasManager;
+    
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
+    
+    protected void inicializarCuotasManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (cuotasManager == null) {
+            try {
+                cuotasManager = (CuotasManager) context.lookup("java:app/ServiceApi-ejb/CuotasManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarEvaluacionSolicitudesCabeceraManager() throws Exception {
         if (context == null) {

@@ -171,7 +171,7 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             Personas ejPersona = personaManager.editar(usuario.getPersona());
 
             usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
-            usuario.setAlias(usuario.getAlias().toUpperCase());
+            //usuario.setAlias(usuario.getAlias().toUpperCase());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
@@ -208,6 +208,7 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
 
         Funcionarios model = this.get(usuario);
         if (model != null) {
+            
             Personas persona = personaManager.getPersona(new Personas(model.getPersona().getId()),included);
 
             model.setPersona(persona);

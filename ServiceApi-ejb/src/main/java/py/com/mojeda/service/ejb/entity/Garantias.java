@@ -17,7 +17,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -88,6 +87,7 @@ public class Garantias implements Serializable {
     
     @Column(name = "GENERACION_AUTOMATICA")
     private String generacionAutomatica;
+
 //    @JoinColumns({
 //        @JoinColumn(name = "ID_AHORRO", referencedColumnName = "ID_AHORRO")
 //        , @JoinColumn(name = "ID_BLOQUEO", referencedColumnName = "ID_BLOQUEO")})
@@ -104,6 +104,7 @@ public class Garantias implements Serializable {
     @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")
     @ManyToOne
     private PropuestaSolicitud propuestaSolicitud;
+    
 
     public Garantias() {
     }
@@ -357,5 +358,5 @@ public class Garantias implements Serializable {
     public void setTipoRelacion(String tipoRelacion) {
         this.tipoRelacion = tipoRelacion;
     }
-        
+       
 }

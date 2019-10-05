@@ -1,7 +1,9 @@
 package py.com.mojeda.service.web.spring.config;
 
 import java.util.Arrays;
+import javax.servlet.MultipartConfigElement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -35,6 +37,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public UserSession userSession() {
         return new UserSession();
+    }
+
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        factory.setMaxFileSize("2000MB");
+        factory.setMaxRequestSize("2000MB");
+        return factory.createMultipartConfig();
+
     }
 
     @Bean

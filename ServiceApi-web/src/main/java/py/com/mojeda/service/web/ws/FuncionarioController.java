@@ -216,8 +216,9 @@ public class FuncionarioController extends BaseController {
             Funcionarios ejUsuarios = new Funcionarios();
             ejUsuarios.setAlias(model.getAlias());
             ejUsuarios.setSucursal(ejSucursales);
-
-            Map<String, Object> usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
+            ejUsuarios.setActivo("S");
+            
+            Map<String, Object> usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "alias".split(","),false,false);
 
             if (usuarioMaps != null) {
                 response.setStatus(205);
@@ -228,8 +229,9 @@ public class FuncionarioController extends BaseController {
             ejUsuarios = new Funcionarios();
             ejUsuarios.setNroLegajo(model.getNroLegajo());
             ejUsuarios.setSucursal(ejSucursales);
-
-            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
+            ejUsuarios.setActivo("S");
+            
+            usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "nroLegajo".split(","),false,false);
 
             if (usuarioMaps != null) {
                 response.setStatus(205);
@@ -240,11 +242,12 @@ public class FuncionarioController extends BaseController {
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
+            
             ejUsuarios = new Funcionarios();
             ejUsuarios.setPersona(ejPersona);
-
-            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "alias".split(","));
+            ejUsuarios.setActivo("S");
+            
+            usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "alias".split(","),false,false);
 
             if (usuarioMaps != null) {
                 response.setStatus(205);
@@ -312,8 +315,9 @@ public class FuncionarioController extends BaseController {
             Funcionarios ejUsuarios = new Funcionarios();
             ejUsuarios.setAlias(model.getAlias());
             ejUsuarios.setSucursal(ejSucursales);
+            ejUsuarios.setActivo("S");
 
-            Map<String, Object> usuarioMaps = funcionarioManager.getLike(ejUsuarios, "id".split(","));
+            Map<String, Object> usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "id".split(","),false,false);
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -327,8 +331,10 @@ public class FuncionarioController extends BaseController {
 
             ejUsuarios = new Funcionarios();
             ejUsuarios.setPersona(ejPersona);
+            ejUsuarios.setActivo("S");
 
-            usuarioMaps = funcionarioManager.getLike(ejUsuarios, "id".split(","));
+            usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "id".split(","),false,false);
+            
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -336,7 +342,7 @@ public class FuncionarioController extends BaseController {
                 return response;
             }
 
-            usuarioMaps = funcionarioManager.getLike(new Funcionarios(id), "claveAcceso".split(","));
+            usuarioMaps = funcionarioManager.getAtributos(new Funcionarios(id), "claveAcceso".split(","),false,false);
 
             if (usuarioMaps.get("claveAcceso").toString().compareToIgnoreCase(model.getClaveAcceso()) != 0) {
                 model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));

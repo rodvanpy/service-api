@@ -39,7 +39,7 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
     }
     protected static final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     protected static final DateFormat dateFormatHHMM = new SimpleDateFormat("HH:mm");
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/FuncionariosManagerImpl")
     private FuncionariosManager funcionariosManager;
 
@@ -91,13 +91,14 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
         EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera = null;
 
         String atributos = "id,fechaInicioAnalisis,fechaFinAnalisis,fechaPrimeraAprobRech,fechaSegundaAprobRech,funcionarioAprobacion.id,estado.id,"
-                + "montoAprobado,funcionarioAnalisis.id,funcionarioVerificador.id,obsApro,observacion,observacionRecomendacion,propuestaSolicitud.id,fechaCreacion,"
+                + "montoAprobado,funcionarioAnalisis.id,funcionarioVerificador.id,obsApro,observacion,observacionRecomendacion,propuestaSolicitud.id,fechaCreacion,requiereVerificador,"
                 + "idUsuarioCreacion,fechaModificacion,idUsuarioModificacion,activo";
 
         Map<String, Object> evaluacionCabecera = this.getAtributos(evaluacion, atributos.split(","));
 
         evaluacionSolicitudesCabecera = new EvaluacionSolicitudesCabecera();
         evaluacionSolicitudesCabecera.setActivo(evaluacionCabecera.get("activo") == null ? "" : evaluacionCabecera.get("activo").toString());
+        evaluacionSolicitudesCabecera.setRequiereVerificador(evaluacionCabecera.get("requiereVerificador") == null ? false : Boolean.parseBoolean(evaluacionCabecera.get("requiereVerificador").toString()));
         evaluacionSolicitudesCabecera.setEstado(evaluacionCabecera.get("estado.id") == null ? null : estadosSolicitudManager.get(Long.parseLong(evaluacionCabecera.get("estado.id").toString())));
         evaluacionSolicitudesCabecera.setFechaFinAnalisis(evaluacionCabecera.get("fechaFinAnalisis") == null ? null : date.parse(evaluacionCabecera.get("fechaFinAnalisis").toString()));
         evaluacionSolicitudesCabecera.setFechaInicioAnalisis(evaluacionCabecera.get("fechaInicioAnalisis") == null ? null : date.parse(evaluacionCabecera.get("fechaInicioAnalisis").toString()));
@@ -134,60 +135,80 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
                 || evaluacionSolicitudes.getId() == null) {
             return null;
         }
-        
+
         evaluacionSolicitudesCabecera = this.get(evaluacionSolicitudes.getId());
-        
+
         evaluacionSolicitudesCabecera.setEstado(evaluacionSolicitudes.getEstado());
-        
-        if(evaluacionSolicitudes.getEstado().getId() != 1
-                || evaluacionSolicitudes.getEstado().getId() != 2){
+
+        if (evaluacionSolicitudes.getEstado().getId() != 1
+                || evaluacionSolicitudes.getEstado().getId() != 2) {
             //Actualizar estado de la propuesta
             PropuestaSolicitud propuesta = propuestaSolicitudManager.get(evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId());
-            
+
             propuesta.setEstado(evaluacionSolicitudes.getEstado());
             propuesta.setFechaEstado(new Date(System.currentTimeMillis()));
             propuesta.setHoraEstado(dateFormatHHMM.format(new Date(System.currentTimeMillis())));
             propuesta.setIdUsuarioModificacion(idFuncionario);
             propuesta.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            
-            if(evaluacionSolicitudes.getEstado().getId() == 4){
+            //Solicitud Rechazada
+            if (evaluacionSolicitudes.getEstado().getId() == 4) {
                 propuesta.setFechaRechazo(new Date(System.currentTimeMillis()));
             }
-            
-            if(evaluacionSolicitudes.getEstado().getId() == 6){
+            //Solicitud Aprobada
+            if (evaluacionSolicitudes.getEstado().getId() == 6) {
+
                 evaluacionSolicitudesCabecera.setFuncionarioAprobacion(new Funcionarios(idFuncionario));
                 evaluacionSolicitudesCabecera.setObsApro(evaluacionSolicitudes.getObsApro());
                 evaluacionSolicitudesCabecera.setMontoAprobado(evaluacionSolicitudes.getMontoAprobado());
-                
+
+                //Se verifica si el monto aprobado es diferente al solicitado
+                if (propuesta.getMontoSolicitado().longValue() > evaluacionSolicitudes.getMontoAprobado()) {
+                    //Calcular descuentos
+                    Long descuentos = propuesta.getImpuestos() + propuesta.getComision()
+                            + propuesta.getGastosVarios() + propuesta.getSeguros();
+
+                    //Cargar los valores con los montos aprobados
+                    propuesta.setTipoDescuento("I-D");
+                    propuesta.setImporteEntregar(evaluacionSolicitudes.getMontoAprobado() - descuentos);
+                    propuesta.setMontoSolicitado(new BigDecimal(evaluacionSolicitudes.getMontoAprobado()));
+
+                    //Recalcular Cuota con el monto Aprobado          
+                    Long cuota = propuestaSolicitudManager.calcularCuota(propuesta.getModalidad().getInteres().doubleValue(), propuesta.getPlazo().doubleValue(),
+                            propuesta.getPeriodoCapital().longValue(), propuesta.getVencimientoInteres(),
+                            propuesta.getTasaInteres().doubleValue(), propuesta.getMontoSolicitado().doubleValue(),
+                            propuesta.getTipoCalculoImporte(), propuesta.getGastosAdministrativos().doubleValue());
+                    
+                    propuesta.setImporteCuota(cuota);
+                }
                 propuesta.setFechaAprobacion(new Date(System.currentTimeMillis()));
             }
-            
+
             propuestaSolicitudManager.update(propuesta);
-            
+
             evaluacionSolicitudesCabecera.setFechaFinAnalisis(new Timestamp(System.currentTimeMillis()));
-               
-            if(evaluacionSolicitudes.getEstado().getId() == 5){
+
+            if (evaluacionSolicitudes.getEstado().getId() == 5) {
                 evaluacionSolicitudesCabecera.setObservacionRetransferencia(evaluacionSolicitudes.getObservacionRetransferencia());
             }
-            
-            if(evaluacionSolicitudesCabecera.getFechaPrimeraAprobRech() == null){
+
+            if (evaluacionSolicitudesCabecera.getFechaPrimeraAprobRech() == null) {
                 evaluacionSolicitudesCabecera.setFechaPrimeraAprobRech(new Timestamp(System.currentTimeMillis()));
-            }else{
+            } else {
                 evaluacionSolicitudesCabecera.setFechaSegundaAprobRech(new Timestamp(System.currentTimeMillis()));
             }
-        }        
-        
+        }
+
         evaluacionSolicitudesCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
         evaluacionSolicitudesCabecera.setObservacion(evaluacionSolicitudes.getObservacion());
         evaluacionSolicitudesCabecera.setObservacionRecomendacion(evaluacionSolicitudes.getObservacionRecomendacion());
-        
+
         this.update(evaluacionSolicitudesCabecera);
-        
+
         EvaluacionSolicitudesDetalles detalles;
-        for(EvaluacionSolicitudesDetalles rpc: evaluacionSolicitudes.getDetalles()){
-            
+        for (EvaluacionSolicitudesDetalles rpc : evaluacionSolicitudes.getDetalles()) {
+
             detalles = evaluacionSolicitudesDetallesManager.get(rpc.getId());
-            
+
             detalles.setAntiguedadLaboral(BigDecimal.ZERO);
             detalles.setCalificacionCredCanc(rpc.getCalificacionCredCanc());
             detalles.setCalificacionCreditosActual(rpc.getCalificacionCreditosActual());
@@ -240,10 +261,10 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
             detalles.setTotalDeudaCuotaExterior(rpc.getTotalDeudaCuotaExterior());
             detalles.setTotalDeudaExterior(rpc.getTotalDeudaExterior());
             detalles.setTotalDiferenciaIngEgr(rpc.getTotalDiferenciaIngEgr());
-            
+
             evaluacionSolicitudesDetallesManager.update(detalles);
         }
-        
+
         EvaluacionSolicitudesDetalles ejDetalle = new EvaluacionSolicitudesDetalles();
         ejDetalle.setEvaluacionSolicitudCabecera(new EvaluacionSolicitudesCabecera(evaluacionSolicitudesCabecera.getId()));
 

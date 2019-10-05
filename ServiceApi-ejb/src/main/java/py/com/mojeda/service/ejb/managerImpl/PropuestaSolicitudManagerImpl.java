@@ -184,7 +184,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         propuestaSolicitud.setSucursal(new Sucursales(idSucursal));
         propuestaSolicitud.setEntidad("PROPUESTA_SOLICITUD");
         propuestaSolicitud.setTipoSolicitud(new TipoSolicitudes(1L));
-
+        propuestaSolicitud.setDesembolsado("N");
         //Crear Cliente
         if (propuestaSolicitud.getCliente().getId() == null) {
 
@@ -210,22 +210,22 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
         }
 
-        //Calcular descuentos
-        Long descuentos = propuestaSolicitud.getImpuestos() + propuestaSolicitud.getComision() + propuestaSolicitud.getGastosVarios() + propuestaSolicitud.getSeguros();
-        Long montoEntregar;
-        if (propuestaSolicitud.getTipoDescuento().equals("I-D")) {
-            montoEntregar = propuestaSolicitud.getMontoSolicitadoOriginal().longValue() - descuentos;
-            propuestaSolicitud.setImporteEntregar(montoEntregar);
-            if (propuestaSolicitud.getMontoSolicitadoOriginal() != propuestaSolicitud.getMontoSolicitado()) {
-                propuestaSolicitud.setMontoSolicitado(propuestaSolicitud.getMontoSolicitadoOriginal());
-            }
-        } else {
-            montoEntregar = (propuestaSolicitud.getMontoSolicitadoOriginal().longValue() + descuentos) - descuentos;
-            propuestaSolicitud.setImporteEntregar(montoEntregar);
-            if (new BigDecimal(montoEntregar) != propuestaSolicitud.getMontoSolicitado()) {
-                propuestaSolicitud.setMontoSolicitado(new BigDecimal(propuestaSolicitud.getMontoSolicitadoOriginal().longValue() + descuentos));
-            }
-        }
+//        //Calcular descuentos
+//        Long descuentos = propuestaSolicitud.getImpuestos() + propuestaSolicitud.getComision() + propuestaSolicitud.getGastosVarios() + propuestaSolicitud.getSeguros();
+//        Long montoEntregar;
+//        if (propuestaSolicitud.getTipoDescuento().equals("I-D")) {
+//            montoEntregar = propuestaSolicitud.getMontoSolicitado().longValue() - descuentos;
+//            propuestaSolicitud.setImporteEntregar(montoEntregar);
+////            if (propuestaSolicitud.getMontoSolicitadoOriginal() != propuestaSolicitud.getMontoSolicitado()) {
+////                propuestaSolicitud.setMontoSolicitado(propuestaSolicitud.getMontoSolicitadoOriginal());
+////            }
+//        } else {
+//            montoEntregar = propuestaSolicitud.getMontoSolicitado().longValue() + descuentos;
+//            propuestaSolicitud.setImporteEntregar(montoEntregar);
+//            propuestaSolicitud.setMontoSolicitado(new BigDecimal(propuestaSolicitud.getMontoSolicitado().longValue() + descuentos));           
+//        }
+        //Agregar el monto Original
+        propuestaSolicitud.setMontoSolicitadoOriginal(propuestaSolicitud.getMontoSolicitado());
 
         //Calcular Cuota           
         Long cuota = this.calcularCuota(propuestaSolicitud.getModalidad().getInteres().doubleValue(), propuestaSolicitud.getPlazo().doubleValue(), propuestaSolicitud.getPeriodoCapital().longValue(), propuestaSolicitud.getVencimientoInteres(),
@@ -457,9 +457,11 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         ejPropuestaSolicitud.setGastosVarios(propuestaSolicitud.getGastosVarios());
         ejPropuestaSolicitud.setSeguros(propuestaSolicitud.getSeguros());
         ejPropuestaSolicitud.setTipoDescuento(propuestaSolicitud.getTipoDescuento());
-        ejPropuestaSolicitud.setMontoSolicitadoOriginal(propuestaSolicitud.getMontoSolicitadoOriginal());
+        if (ejPropuestaSolicitud.getEstado().getCodigo().compareToIgnoreCase("PEN") == 0) {
+            ejPropuestaSolicitud.setMontoSolicitadoOriginal(propuestaSolicitud.getMontoSolicitado());
+        }
         ejPropuestaSolicitud.setMontoSolicitado(propuestaSolicitud.getMontoSolicitado());
-        ejPropuestaSolicitud.setImporteCuota(propuestaSolicitud.getImporteCuota());
+        //ejPropuestaSolicitud.setImporteCuota(propuestaSolicitud.getImporteCuota());
         ejPropuestaSolicitud.setImporteEntregar(propuestaSolicitud.getImporteEntregar());
         ejPropuestaSolicitud.setModalidad(propuestaSolicitud.getModalidad());
         ejPropuestaSolicitud.setPlazo(propuestaSolicitud.getPlazo());
@@ -470,31 +472,31 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         ejPropuestaSolicitud.setTipoGarantia(propuestaSolicitud.getTipoGarantia());
         ejPropuestaSolicitud.setGastosAdministrativos(propuestaSolicitud.getGastosAdministrativos());
         ejPropuestaSolicitud.setCodeudor(propuestaSolicitud.getCodeudor());
+        ejPropuestaSolicitud.setMontoSolicitado(propuestaSolicitud.getMontoSolicitado());
 
-        //Calcular descuentos
-        Long descuentos = ejPropuestaSolicitud.getImpuestos() + ejPropuestaSolicitud.getComision() + ejPropuestaSolicitud.getGastosVarios() + ejPropuestaSolicitud.getSeguros();
-        Long montoEntregar;
-        if (ejPropuestaSolicitud.getTipoDescuento().equals("I-D")) {
-            montoEntregar = ejPropuestaSolicitud.getMontoSolicitadoOriginal().longValue() - descuentos;
-            ejPropuestaSolicitud.setImporteEntregar(montoEntregar);
-            if (ejPropuestaSolicitud.getMontoSolicitadoOriginal() != ejPropuestaSolicitud.getMontoSolicitado()) {
-                ejPropuestaSolicitud.setMontoSolicitado(ejPropuestaSolicitud.getMontoSolicitadoOriginal());
-            }
-        } else {
-            montoEntregar = (ejPropuestaSolicitud.getMontoSolicitadoOriginal().longValue() + descuentos) - descuentos;
-            ejPropuestaSolicitud.setImporteEntregar(montoEntregar);
-            if (new BigDecimal(montoEntregar) != ejPropuestaSolicitud.getMontoSolicitado()) {
-                ejPropuestaSolicitud.setMontoSolicitado(new BigDecimal(ejPropuestaSolicitud.getMontoSolicitadoOriginal().longValue() + descuentos));
-            }
-        }
-
+//        //Calcular descuentos
+//        Long descuentos = ejPropuestaSolicitud.getImpuestos() + ejPropuestaSolicitud.getComision() + ejPropuestaSolicitud.getGastosVarios() + ejPropuestaSolicitud.getSeguros();
+//        Long montoEntregar;
+//        if (ejPropuestaSolicitud.getTipoDescuento().equals("I-D")) {
+//            montoEntregar = ejPropuestaSolicitud.getMontoSolicitadoOriginal().longValue() - descuentos;
+//            ejPropuestaSolicitud.setImporteEntregar(montoEntregar);
+////            if (ejPropuestaSolicitud.getMontoSolicitadoOriginal() != ejPropuestaSolicitud.getMontoSolicitado()) {
+////                ejPropuestaSolicitud.setMontoSolicitado(ejPropuestaSolicitud.getMontoSolicitadoOriginal());
+////            }
+//        } else {
+//            montoEntregar = ejPropuestaSolicitud.getMontoSolicitado().longValue() + descuentos;
+//            ejPropuestaSolicitud.setImporteEntregar(montoEntregar);
+//            if (new BigDecimal(montoEntregar) != ejPropuestaSolicitud.getMontoSolicitado()) {
+//                ejPropuestaSolicitud.setMontoSolicitado(new BigDecimal(ejPropuestaSolicitud.getMontoSolicitadoOriginal().longValue() + descuentos));
+//            }
+//        }
         //Calcular Cuota           
         Long cuota = this.calcularCuota(ejPropuestaSolicitud.getModalidad().getInteres().doubleValue(), ejPropuestaSolicitud.getPlazo().doubleValue(), ejPropuestaSolicitud.getPeriodoCapital().longValue(), ejPropuestaSolicitud.getVencimientoInteres(),
                 ejPropuestaSolicitud.getTasaInteres().doubleValue(), ejPropuestaSolicitud.getMontoSolicitado().doubleValue(), ejPropuestaSolicitud.getTipoCalculoImporte(), ejPropuestaSolicitud.getGastosAdministrativos().doubleValue());
 
-        if (ejPropuestaSolicitud.getImporteCuota() != cuota) {
-            ejPropuestaSolicitud.setImporteCuota(cuota);
-        }
+        //if (ejPropuestaSolicitud.getImporteCuota() != cuota) {
+        ejPropuestaSolicitud.setImporteCuota(cuota);
+        //}
 
         ejPropuestaSolicitud.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
 
@@ -1194,6 +1196,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @Override
     public void tranferirPropuesta(Long idSolicitud, Long idPersona) throws Exception {
+        
         PropuestaSolicitud ejPropuestaSolicitud = this.get(idSolicitud);
 
         //ESTADO PENDIENTE
@@ -1202,7 +1205,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             ejPropuestaSolicitud.setEstado(new EstadosSolicitud(2L));
             ejPropuestaSolicitud.setFechaEstado(new Date(System.currentTimeMillis()));
             ejPropuestaSolicitud.setFechaAnalisis(new Date(System.currentTimeMillis()));
-            
+
             this.update(ejPropuestaSolicitud);
 
             //Cargar cabera de la evaluacion
@@ -1214,7 +1217,12 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             evaluacionCabecera.setIdUsuarioModificacion(idPersona);
             evaluacionCabecera.setEstado(new EstadosSolicitud(1L));
             evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+            //Verificar si requiere verificacion del credito
+            Map<String, Object> montoVerificacion = personaManager.getAtributos(new Personas(idPersona), "empresa.montoVerificacionCredito".split(","));
 
+            if (montoVerificacion != null) {
+                evaluacionCabecera.setRequiereVerificador(ejPropuestaSolicitud.getMontoSolicitado().longValue() > new BigDecimal(montoVerificacion.get("empresa.montoVerificacionCredito").toString()).longValue());
+            }
             evaluacionSolicitudesCabeceraManager.save(evaluacionCabecera);
 
             Solicitantes solicitantes = new Solicitantes();
@@ -1249,7 +1257,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 detalle.setIdUsuarioCreacion(idPersona);
                 detalle.setIdUsuarioModificacion(idPersona);
                 //detalle.setDescripcionProfesion(CONTENT_PATH);
-                detalle.setEdad(new Timestamp(System.currentTimeMillis()).getHours() - rpc.getIdPersona().getFechaNacimiento().getHours());
+                detalle.setEdad(new Timestamp(System.currentTimeMillis()).getYear() - rpc.getIdPersona().getFechaNacimiento().getYear());
                 detalle.setEstadoCivil(rpc.getEstadoCivil());
                 detalle.setPersona(new Personas(rpc.getIdPersona().getId()));
                 detalle.setProfesion(rpc.getProfesiones());
@@ -1267,29 +1275,30 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 evaluacionSolicitudesDetallesManager.save(detalle);
 
             }
-        //ESTADO RETRANSFERIR
+            //ESTADO RETRANSFERIR
         } else if (ejPropuestaSolicitud.getEstado().getId() == 5) {
             //Cambiar estado solicitud
             ejPropuestaSolicitud.setEstado(new EstadosSolicitud(2L));
             ejPropuestaSolicitud.setFechaEstado(new Date(System.currentTimeMillis()));
-            
+
             this.update(ejPropuestaSolicitud);
-            
+
             EvaluacionSolicitudesCabecera evaluacionCabecera = new EvaluacionSolicitudesCabecera();
             evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(ejPropuestaSolicitud.getId()));
 
             evaluacionCabecera = evaluacionSolicitudesCabeceraManager.get(evaluacionCabecera);
-            
+
             evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             evaluacionCabecera.setIdUsuarioModificacion(idPersona);
             evaluacionCabecera.setEstado(new EstadosSolicitud(2L));
 
             evaluacionSolicitudesCabeceraManager.update(evaluacionCabecera);
-            
+
         }
 
     }
 
+    @Override
     public Long calcularCuota(Double modalidad, Double plazo, Long periodoCapital, Long vencimientoInteres,
             Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos) {
         try {
@@ -1343,7 +1352,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
                 //this.myForm.controls['importeCuota'].setValue(Math.round(montoCuota));
                 return montoCuota;
-            } else if (tipoCalculoImporte != null && "TC-5".equals(tipoCalculoImporte.getCodigo())) {
+            } else if (tipoCalculoImporte != null && "TC-6".equals(tipoCalculoImporte.getCodigo())) {
 
                 Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
 
@@ -1361,6 +1370,66 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         return null;
 
     }
+    
+    @Override
+    public Long calcularMontoInteres(Double plazo, Long periodoCapital, Long vencimientoInteres,
+            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos) {
+        try {
+            if (tipoCalculoImporte != null && "TC-2".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double interes = (gastosAdministrativos == null ? 0 : gastosAdministrativos) + tasaInteres;
+
+                Double valor_1 = ((montoSolicitado * interes) / 36500) * vencimientoInteres;
+
+                Long valor_2 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo)) - 1;
+
+                Long valor_3 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo));
+
+                Double valor_4 = valor_1 / valor_2;
+
+                //this.myForm.controls['importeCuota'].setValue(Math.round(valor_4 * valor_3));
+                return (Math.round(valor_4 * valor_3));
+
+            } else if (tipoCalculoImporte != null && "TC-4".equals(tipoCalculoImporte.getCodigo())) {
+
+                //Interés simple (i) = Capital (c) x Tipo de Interés (r) x Tiempo (t)
+                //• Si la duración es 3 años, t = 3
+                //• Si la duración es 18 meses, t = 18 / 12 = 1,5
+                //• Si la duración es 1 año, t = 1
+                //• Si la duración es 6 meses, t = 6 / 12 = 0,5
+                //• Si la duración es 1 día, t = 1 / 365
+                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
+
+                Double periodoInteres = this.periodoInteresSimple(plazo, interes, periodoCapital, vencimientoInteres);
+
+                Double montoInteres = montoSolicitado * periodoInteres * plazo;
+
+                return montoInteres.longValue();
+
+            } else if (tipoCalculoImporte != null && "TC-5".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
+
+                Double periodoInteres = this.periodoInteresCompuesto(plazo, interes, periodoCapital, vencimientoInteres);
+
+                Double montoInteres = montoSolicitado * periodoInteres;
+
+                return montoInteres.longValue();
+                
+            } else if (tipoCalculoImporte != null && "TC-6".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
+
+                Double montoInteres = montoSolicitado * interes;
+
+                return montoInteres.longValue();
+            }
+        } catch (Exception e) {
+            logger.error("Error al calcularMontoInteres", e);
+        }
+        return null;
+
+    }
 
     public Double calcularInteres(Double tasaInteres, Double gastosAdministrativos) {
         try {
@@ -1374,6 +1443,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     }
 
+    @Override
     public Double periodoInteresSimple(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres) {
         try {
             Double periodoInteres = 0.0;
@@ -1423,6 +1493,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     }
 
+    @Override
     public Double periodoInteresCompuesto(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres) {
         try {
             Double periodoInteres = 0.0;
@@ -1914,6 +1985,6 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             this.guardarReferencias(referenciaManager.list(ejReferencias), idPropuesta, idFuncionario);
 
         }
-    }
+    }   
 
 }

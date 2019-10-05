@@ -101,7 +101,7 @@ public class EmpresaManagerImpl extends GenericDaoImpl<Empresas, Long>
     @Override
     public Map<String, Object> getEmpresa(Empresas empresa) throws Exception {
         String atributos = "id,nombre,nombreFantasia,descripcion,ruc,direccion,telefono,fax,telefonoMovil,email,observacion,"
-                + "latitud,longitud,activo,pais.id,departamento.id,ciudad.id,barrio.id,imagePath";
+                + "latitud,longitud,activo,pais.id,departamento.id,ciudad.id,barrio.id,imagePath,montoVerificacionCredito";
         Map<String, Object> model = this.getAtributos(empresa, atributos.split(","));
         if (model != null) {
             Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(model.get("pais.id") == null ? "0" : model.get("pais.id").toString())), "id,nombre,activo".split(","));

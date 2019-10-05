@@ -146,25 +146,55 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             ejPersona.setCiudad(new Ciudades(persona.getCiudad().getId()));
             ejPersona.setBarrio((persona.getBarrio() != null && persona.getBarrio().getId() != null) ? new Barrios(persona.getBarrio().getId()) : null);
             ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
+            ejPersona.setEntidad("PERSONAS");
+            ejPersona.setLatitud(persona.getLatitud());
+            ejPersona.setLongitud(persona.getLongitud());
 
         } else {
-            persona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
-            persona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
-            persona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
-            persona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
-            persona.setActivo("S");
-            persona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-            persona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-
-            this.save(persona);
 
             ejPersona = new Personas();
+            ejPersona.setRuc(persona.getRuc());
             ejPersona.setDocumento(persona.getDocumento());
+            ejPersona.setEmpresa(persona.getEmpresa());
+            ejPersona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
+            ejPersona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
+            ejPersona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
+            ejPersona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
+            ejPersona.setEmail(persona.getEmail());
+            ejPersona.setSexo(persona.getSexo());
+            ejPersona.setEstadoCivil(persona.getEstadoCivil());
+            ejPersona.setNumeroHijos(persona.getNumeroHijos());
+            ejPersona.setNumeroDependientes(persona.getNumeroDependientes());
+            ejPersona.setSeparacionBienes(persona.getSeparacionBienes());
+            ejPersona.setTelefonoParticular(persona.getTelefonoParticular());
+            ejPersona.setTelefonoSecundario(persona.getTelefonoSecundario());
+            ejPersona.setTipoPersona(persona.getTipoPersona());
+            ejPersona.setDireccionParticular(persona.getDireccionParticular());
+            ejPersona.setFechaNacimiento(persona.getFechaNacimiento());
+            ejPersona.setDireccionDetallada(persona.getDireccionDetallada());
+            ejPersona.setObservacion(persona.getObservacion());
+            ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            ejPersona.setIdUsuarioModificacion(persona.getIdUsuarioModificacion());
+            ejPersona.setIdUsuarioCreacion(persona.getIdUsuarioModificacion());
+            ejPersona.setNacionalidad(new Nacionalidades(persona.getNacionalidad().getId()));
+            ejPersona.setPais(new Paises(persona.getPais().getId()));
+            ejPersona.setDepartamento(new DepartamentosPais(persona.getDepartamento().getId()));
+            ejPersona.setCiudad(new Ciudades(persona.getCiudad().getId()));
+            ejPersona.setBarrio((persona.getBarrio() != null && persona.getBarrio().getId() != null) ? new Barrios(persona.getBarrio().getId()) : null);
+            ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
+            ejPersona.setActivo("S");
+            ejPersona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            ejPersona.setEntidad("PERSONAS");
+            ejPersona.setLatitud(persona.getLatitud());
+            ejPersona.setLongitud(persona.getLongitud());
 
-            ejPersona = this.get(ejPersona);
+            this.save(ejPersona);
+
         }
 
         if (persona.getConyuge() != null) {
+
             Personas ejConyuge = new Personas();
             ejConyuge.setDocumento(persona.getConyuge().getDocumento());
 
@@ -367,7 +397,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
         this.update(ejPersona);
 
-        return this.getPersona(new Personas(ejPersona.getId()), null);
+        return ejPersona;
     }
 
     @Override
@@ -401,6 +431,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                 ejPersona.setSeparacionBienes(persona.getSeparacionBienes());
                 ejPersona.setTelefonoParticular(persona.getTelefonoParticular());
                 ejPersona.setTelefonoSecundario(persona.getTelefonoSecundario());
+                ejPersona.setLatitud(persona.getLatitud());
+                ejPersona.setLongitud(persona.getLongitud());
                 //ejPersona.setTipoPersona(persona.getTipoPersona());
                 ejPersona.setDireccionParticular(persona.getDireccionParticular());
                 ejPersona.setFechaNacimiento(persona.getFechaNacimiento());
@@ -414,25 +446,50 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                 ejPersona.setCiudad(new Ciudades(persona.getCiudad().getId()));
                 ejPersona.setBarrio((persona.getBarrio() != null && persona.getBarrio().getId() != null) ? new Barrios(persona.getBarrio().getId()) : null);
                 ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
+                ejPersona.setEntidad("PERSONAS");
 
                 this.update(ejPersona);
 
             } else {
-                persona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
-                persona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
-                persona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
-                persona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
-                persona.setActivo("S");
-                persona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                persona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-
-                this.save(persona);
 
                 ejPersona = new Personas();
+                ejPersona.setRuc(persona.getRuc());
                 ejPersona.setDocumento(persona.getDocumento());
                 ejPersona.setEmpresa(persona.getEmpresa());
+                ejPersona.setPrimerNombre(persona.getPrimerNombre() == null ? null : persona.getPrimerNombre().toUpperCase());
+                ejPersona.setSegundoNombre(persona.getSegundoNombre() == null ? null : persona.getSegundoNombre().toUpperCase());
+                ejPersona.setPrimerApellido(persona.getPrimerApellido() == null ? null : persona.getPrimerApellido().toUpperCase());
+                ejPersona.setSegundoApellido(persona.getSegundoApellido() == null ? null : persona.getSegundoApellido().toUpperCase());
+                ejPersona.setEmail(persona.getEmail());
+                ejPersona.setSexo(persona.getSexo());
+                ejPersona.setEstadoCivil(persona.getEstadoCivil());
+                ejPersona.setNumeroHijos(persona.getNumeroHijos());
+                ejPersona.setNumeroDependientes(persona.getNumeroDependientes());
+                ejPersona.setSeparacionBienes(persona.getSeparacionBienes());
+                ejPersona.setTelefonoParticular(persona.getTelefonoParticular());
+                ejPersona.setTelefonoSecundario(persona.getTelefonoSecundario());
+                ejPersona.setTipoPersona(persona.getTipoPersona());
+                ejPersona.setDireccionParticular(persona.getDireccionParticular());
+                ejPersona.setFechaNacimiento(persona.getFechaNacimiento());
+                ejPersona.setDireccionDetallada(persona.getDireccionDetallada());
+                ejPersona.setObservacion(persona.getObservacion());
+                ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                ejPersona.setIdUsuarioModificacion(persona.getIdUsuarioModificacion());
+                ejPersona.setIdUsuarioCreacion(persona.getIdUsuarioModificacion());
+                ejPersona.setNacionalidad(new Nacionalidades(persona.getNacionalidad().getId()));
+                ejPersona.setPais(new Paises(persona.getPais().getId()));
+                ejPersona.setDepartamento(new DepartamentosPais(persona.getDepartamento().getId()));
+                ejPersona.setCiudad(new Ciudades(persona.getCiudad().getId()));
+                ejPersona.setBarrio((persona.getBarrio() != null && persona.getBarrio().getId() != null) ? new Barrios(persona.getBarrio().getId()) : null);
+                ejPersona.setProfesion((persona.getProfesion() != null && persona.getProfesion().getId() != null) ? new Profesiones(persona.getProfesion().getId()) : null);
+                ejPersona.setActivo("S");
+                ejPersona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                ejPersona.setEntidad("PERSONAS");
+                ejPersona.setLatitud(persona.getLatitud());
+                ejPersona.setLongitud(persona.getLongitud());
 
-                ejPersona = this.get(ejPersona);
+                this.save(ejPersona);
             }
 
             //Guardar Conyuge
@@ -719,7 +776,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                 } else {
                     model.setConyuge(new Personas());
                 }
-            }else{
+            } else {
                 model.setConyuge(new Personas());
             }
 
@@ -818,9 +875,9 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
                 personaMap.setVinculos(vinculoManager.list(ejVinculos, true, "tipoVinculo", notIn, "NOT_IN"));
             }
-            
+
             if (personaMap.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
-                
+
                 Vinculos ejVinculo = new Vinculos();
                 ejVinculo.setActivo("S");
                 ejVinculo.setPersona(new Personas(personaMap.getId()));
@@ -841,7 +898,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                 } else {
                     personaMap.setConyuge(new Personas());
                 }
-            }else{
+            } else {
                 personaMap.setConyuge(new Personas());
             }
 

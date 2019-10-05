@@ -6,6 +6,7 @@
 package py.com.mojeda.service.ejb.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -102,6 +103,9 @@ public class Empresas extends Base {
     
     @Column(name = "IMAGE_PATH")
     private String imagePath;
+    
+    @Column(name = "MONTO_VERIFICACION_CREDITO")
+    private BigDecimal montoVerificacionCredito;
     
     @Column(name = "ENTIDAD")
     private String entidad = "EMPRESAS";
@@ -377,5 +381,13 @@ public class Empresas extends Base {
     public void setEntidad(String entidad) {
         this.entidad = entidad;
     }
+
+    public BigDecimal getMontoVerificacionCredito() {
+        return montoVerificacionCredito;
+    }
+
+    public void setMontoVerificacionCredito(BigDecimal montoVerificacionCredito) {
+        this.montoVerificacionCredito = montoVerificacionCredito;
+    }    
     
 }

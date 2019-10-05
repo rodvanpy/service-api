@@ -6,6 +6,7 @@
 package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -404,6 +405,35 @@ public class AnalisisController extends BaseController {
         return response;
     }
     
+    /**
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Analisis)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @GetMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO getObject(
+            @ModelAttribute("id") Long id) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarEvaluacionSolicitudesCabeceraManager();
+            
+            EvaluacionSolicitudesCabecera model = evaluacionSolicitudesCabeceraManager.getEvaluacion(new EvaluacionSolicitudesCabecera(id));
+
+            response.setModel(model);
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
      /**
      * Mapping para el metodo PUT de la vista actualizar.(actualizar Analisis)
      *
@@ -434,7 +464,8 @@ public class AnalisisController extends BaseController {
                 return response;
             }            
             
-            Map<String, Object> modelMaps = evaluacionSolicitudesCabeceraManager.getAtributos(new EvaluacionSolicitudesCabecera(id), "estado.id".split(","));
+            Map<String, Object> modelMaps = evaluacionSolicitudesCabeceraManager.getAtributos(new EvaluacionSolicitudesCabecera(id),
+                    "estado.id,propuestaSolicitud.montoSolicitado".split(","));
 
             if (modelMaps != null
                     && modelMaps.get("estado.id") != null
@@ -442,6 +473,18 @@ public class AnalisisController extends BaseController {
                 response.setModel(null);
                 response.setStatus(404);
                 response.setMessage("El analisis ya no puede ser modificado.");
+                
+                return response;
+            }
+            
+            if (modelMaps != null
+                    && modelMaps.get("propuestaSolicitud.montoSolicitado") != null
+                    && model.getEstado().getId() == 6
+                    && model.getMontoAprobado() != null
+                    && new BigDecimal(modelMaps.get("propuestaSolicitud.montoSolicitado").toString()).longValue() < model.getMontoAprobado()) {
+                response.setModel(null);
+                response.setStatus(404);
+                response.setMessage("El monto aprobado no puede ser mayor al solicitado.");
                 
                 return response;
             }

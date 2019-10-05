@@ -23,4 +23,5 @@ public interface EvaluacionSolicitudesCabeceraManager extends GenericDao<Evaluac
     public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion) throws Exception;
     
     public EvaluacionSolicitudesCabecera getEvaluacion(EvaluacionSolicitudesCabecera evaluacion) throws Exception;
+    
 }

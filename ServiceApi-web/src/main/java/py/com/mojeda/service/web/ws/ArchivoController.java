@@ -21,9 +21,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,7 +103,30 @@ public class ArchivoController extends BaseController {
                 String path = ejDocumento.getEntidad() + "/" + ejDocumento.getIdEntidad() + "/" + ejDocumento.getTipoDocumento().getCodigo() + "/" + file.getOriginalFilename();
 
                 File fos = new File(CONTENT_PATH + path);
-                file.transferTo(fos);
+                //Reducir Calidad Imagen en un 30%
+                if (ejDocumento.getTipoArchivo().compareToIgnoreCase("image/jpeg") == 0) {
+                    BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+                    Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
+                    ImageWriter writer = (ImageWriter) iter.next();
+                    ImageWriteParam iwp = writer.getDefaultWriteParam();
+
+                    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                    float quality = 0.5f;  // reduce quality by 30%  
+                    iwp.setCompressionQuality(quality);
+
+                    FileImageOutputStream output = new FileImageOutputStream(fos);
+                    writer.setOutput(output);
+
+                    IIOImage image = new IIOImage(originalImage, null, null);
+                    writer.write(null, image, iwp);
+                    writer.dispose();
+                    
+                    fos = new File(CONTENT_PATH + path);
+                    ejDocumento.setSize(fos.length());
+                } else {
+                    file.transferTo(fos);
+                }
 
                 ejDocumento.setDocumento(null);
                 ejDocumento.setPath(CONTENT_PATH + path);
@@ -217,10 +245,14 @@ public class ArchivoController extends BaseController {
         try {
             inicializarDocumentoManager();
 
-            List<Map<String, Object>> model = documentoManager.listAtributos(new Documentos(id), "path".split(","));
+            List<Map<String, Object>> model = documentoManager.listAtributos(new Documentos(id), "path,tipoArchivo".split(","));
             List<String> listBase64 = new ArrayList<>();
-            for(Map<String, Object> rpc : model){
+            for (Map<String, Object> rpc : model) {
+                if (rpc.get("tipoArchivo").toString().compareToIgnoreCase("image/jpeg") == 0) {
+
+                }
                 File f = new File(rpc.get("path").toString());
+
                 String base64 = encodeFileToBase64Binary(f);
                 listBase64.add(base64);
             }
@@ -261,7 +293,7 @@ public class ArchivoController extends BaseController {
             ejDocumentos.setActivo("S");
             List<String> listBase64 = new ArrayList<>();
             List<Map<String, Object>> model = documentoManager.listAtributos(ejDocumentos, "path".split(","));
-            for(Map<String, Object> rpc : model){
+            for (Map<String, Object> rpc : model) {
                 File f = new File(rpc.get("path").toString());
                 String base64 = encodeFileToBase64Binary(f);
                 listBase64.add(base64);

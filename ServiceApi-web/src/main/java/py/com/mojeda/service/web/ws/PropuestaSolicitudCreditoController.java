@@ -6,7 +6,9 @@
 package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Clientes;
+import py.com.mojeda.service.ejb.entity.Cuotas;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
 import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
@@ -31,6 +34,9 @@ import py.com.mojeda.service.ejb.entity.Personas;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.entity.Sucursales;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.Modalidades;
+import py.com.mojeda.service.ejb.entity.TipoCalculos;
+import py.com.mojeda.service.ejb.entity.TipoDesembolsos;
 import py.com.mojeda.service.ejb.entity.TipoSolicitudes;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
@@ -48,7 +54,7 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 public class PropuestaSolicitudCreditoController extends BaseController {
 
     String atributos = "id,fechaPresentacion,horaPresentacion,estado,fechaEstado,puntaje,montoSolicitado,tipoCredito,tasaInteres,tipoDesembolso.id,cliente.id,entidad,"
-            + "tipoCalculoImporte.id,tipoInteres,ordenCheque,formaPago,plazo,montoSolicitadoOriginal,sucursal.id,sucursal.empresa.id,estado.id,activo";
+            + "tipoCalculoImporte.id,tipoInteres,ordenCheque,formaPago,plazo,montoSolicitadoOriginal,sucursal.id,sucursal.empresa.id,desembolsado,fechaDesembolso,estado.id,activo";
 
     @GetMapping
     public @ResponseBody
@@ -188,6 +194,54 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
+    
+    /**
+     * Mapping para el metodo GET de la vista visualizar.(visualizar Detalle Cuotas)
+     *
+     * @param montoCapital
+     * @param montoInteres
+     * @param plazo
+     * @param periodoCapital
+     * @param periodoInteres
+     * @param periodoGracia
+     * @param tipoCalculo
+     * @param modalidad
+     * @param tipoDesembolso
+     * @return
+     */
+    @GetMapping("/detalle-cuotas")
+    public @ResponseBody
+    ResponseDTO getCuotas(
+            @ModelAttribute("montoCapital") BigDecimal montoCapital,
+            @ModelAttribute("montoInteres") BigDecimal montoInteres,
+            @ModelAttribute("plazo") Short plazo,
+            @ModelAttribute("periodoCapital") Short periodoCapital,
+            @ModelAttribute("periodoInteres") Short periodoInteres,
+            @ModelAttribute("periodoGracia") Short periodoGracia,
+            @ModelAttribute("tipoCalculo") Long tipoCalculo,
+            @ModelAttribute("modalidad") Long modalidad,
+            @ModelAttribute("tipoDesembolso") Long tipoDesembolso) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarCuotasManager();
+
+            List<Cuotas> listCuotas = cuotasManager.cuotasCredito(montoCapital, montoInteres, new Date(System.currentTimeMillis()),
+                    5, plazo, periodoCapital, periodoInteres, periodoGracia, new TipoCalculos(tipoCalculo),
+                    new Modalidades(modalidad), new TipoDesembolsos(tipoDesembolso), new Date(System.currentTimeMillis()));            
+
+            response.setModel(listCuotas);
+            response.setStatus(listCuotas == null ? 404 : 200);
+            response.setMessage(listCuotas == null ? "Registro no encontrado" : "Registro encontrado");
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);
@@ -363,15 +417,27 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                 return response;
             }
             
-            Map<String, Object> modelMaps = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(id), "estado.id".split(","));
+            Map<String, Object> modelMaps = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(id), "estado.codigo,montoSolicitado".split(","));
 
             if (modelMaps != null
-                    && modelMaps.get("estado.id") != null
-                    && modelMaps.get("estado.id").toString().compareToIgnoreCase("1") != 0 
-                    && modelMaps.get("estado.id").toString().compareToIgnoreCase("5") != 0) {
+                    && modelMaps.get("estado.codigo") != null
+                    && modelMaps.get("estado.codigo").toString().compareToIgnoreCase("PEN") != 0 
+                    && modelMaps.get("estado.codigo").toString().compareToIgnoreCase("RET") != 0) {
                 response.setModel(null);
                 response.setStatus(404);
                 response.setMessage("La propuesta ya no puede ser modificada.");
+                
+                return response;
+            }
+            
+            if (modelMaps != null 
+                    && modelMaps.get("estado.codigo") != null
+                    && modelMaps.get("estado.codigo").toString().compareToIgnoreCase("RET") == 0
+                    && new BigDecimal(modelMaps.get("montoSolicitado").toString()).longValue() < model.getMontoSolicitado().longValue()) {
+                
+                response.setModel(null);
+                response.setStatus(404);
+                response.setMessage("El monto solicitado no puede ser mayor a la solicitada anteriormente.");
                 
                 return response;
             }
@@ -478,7 +544,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
     }
 
     /**
-     * Mapping para el metodo DELETE de la vista.(eliminar Usuario)
+     * Mapping para el metodo DELETE de la vista.(eliminar PropuestaSolicitud)
      *
      * @param id de la entidad
      * @return
@@ -492,12 +558,14 @@ public class PropuestaSolicitudCreditoController extends BaseController {
         try {
             inicializarPropuestaSolicitudManager();
 
-            Funcionarios model = funcionarioManager.get(id);
+            PropuestaSolicitud model = propuestaSolicitudManager.get(id);
             model.setActivo("N");
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioModificacion(userDetail.getId());
             model.setIdUsuarioEliminacion(userDetail.getId());
             model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
 
-            funcionarioManager.update(model);
+            propuestaSolicitudManager.update(model);
 
             response.setModel(model);
             response.setStatus(200);

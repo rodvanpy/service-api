@@ -76,6 +76,9 @@ public class EvaluacionSolicitudesCabecera extends Base {
     @JoinColumn(name = "ID_FUNCIONARIO_VERIFICADOR", referencedColumnName = "ID")
     @ManyToOne(optional = true)
     private Funcionarios funcionarioVerificador;
+    
+    @Column(name = "REQUIERE_VERIFICADOR")
+    private Boolean requiereVerificador;
 
     @Column(name = "OBSERVACION")
     private String observacion;
@@ -321,7 +324,13 @@ public class EvaluacionSolicitudesCabecera extends Base {
     public void setObservacionRetransferencia(String observacionRetransferencia) {
         this.observacionRetransferencia = observacionRetransferencia;
     }
-    
-    
+
+    public Boolean getRequiereVerificador() {
+        return requiereVerificador;
+    }
+
+    public void setRequiereVerificador(Boolean requiereVerificador) {
+        this.requiereVerificador = requiereVerificador;
+    }    
 
 }

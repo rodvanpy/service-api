@@ -246,13 +246,14 @@ public class PersonaController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         Funcionarios ejUsuario = new Funcionarios();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        Gson gson = new Gson();
         try {
             inicializarPersonaManager();
             inicializarBienesManager();
             inicializarIngresosEgresosManager();
             inicializarOcupacionPersonaManager();
             inicializarReferenciaManager();
-
+            logger.info("GUARDAR FUNCIONARIO : " + gson.toJson(model));
             if (errors.hasErrors()) {
 
                 response.setStatus(400);
@@ -267,7 +268,7 @@ public class PersonaController extends BaseController {
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             ejPersona.setDocumento(model.getDocumento());
 
-            Map<String, Object> personaMaps = personaManager.getLike(ejPersona, "id".split(","));
+            Map<String, Object> personaMaps = personaManager.getAtributos(ejPersona, "id".split(","),false,false);
 
             if (personaMaps != null) {
                 response.setStatus(205);
@@ -282,11 +283,12 @@ public class PersonaController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            personaManager.guardar(model);
+            model = personaManager.guardar(model);
 
-            response.setModel(personaManager.getPersona(ejPersona, "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
-            response.setStatus(200);
-            response.setMessage("Persona creado/a con exito");
+            response.setModel(personaManager.getPersona(new Personas(model.getId()), "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Error al guardar registro" : "Registro guardado con exito");
+            
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);
@@ -364,11 +366,12 @@ public class PersonaController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            personaManager.editar(model);
+            model = personaManager.editar(model);
             
             response.setModel(personaManager.getPersona(new Personas(model.getId()), "inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones"));
-            response.setStatus(200);
-            response.setMessage("Persona modificado/a con exito");
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Error al modificar registro" : "Registro modificado/a con exito");
+            
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);
