@@ -19,6 +19,7 @@ import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
 import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesDetalles;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
+import py.com.mojeda.service.ejb.manager.CreditosManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesDetallesManager;
@@ -51,6 +52,9 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/EvaluacionSolicitudesDetallesManagerImpl")
     private EvaluacionSolicitudesDetallesManager evaluacionSolicitudesDetallesManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/CreditosManagerImpl")
+    private CreditosManager creditosManager;
 
     @Override
     public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion) throws Exception {
@@ -177,7 +181,7 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
                             propuesta.getPeriodoCapital().longValue(), propuesta.getVencimientoInteres(),
                             propuesta.getTasaInteres().doubleValue(), propuesta.getMontoSolicitado().doubleValue(),
                             propuesta.getTipoCalculoImporte(), propuesta.getGastosAdministrativos().doubleValue());
-                    
+
                     propuesta.setImporteCuota(cuota);
                 }
                 propuesta.setFechaAprobacion(new Date(System.currentTimeMillis()));
@@ -203,6 +207,12 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
         evaluacionSolicitudesCabecera.setObservacionRecomendacion(evaluacionSolicitudes.getObservacionRecomendacion());
 
         this.update(evaluacionSolicitudesCabecera);
+
+        //Generar Credito
+        //Solicitud Aprobada
+        if (evaluacionSolicitudesCabecera.getEstado().getId() == 6) {
+            creditosManager.generarCredito(evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId(), evaluacionSolicitudesCabecera.getId(), idFuncionario);
+        }
 
         EvaluacionSolicitudesDetalles detalles;
         for (EvaluacionSolicitudesDetalles rpc : evaluacionSolicitudes.getDetalles()) {

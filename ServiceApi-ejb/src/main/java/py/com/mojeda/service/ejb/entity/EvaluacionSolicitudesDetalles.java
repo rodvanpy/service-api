@@ -138,16 +138,16 @@ public class EvaluacionSolicitudesDetalles extends Base {
     @Column(name = "TOTAL_DIFERENCIA_ING_EGR")
     private Long totalDiferenciaIngEgr;
 
-    @Column(name = "CALIFICACION_CREDITOS_ACTUAL")
+    @Column(name = "CALIFICACION_CREDITOS_ACTUAL", length = 4000)
     private String calificacionCreditosActual;
 
-    @Column(name = "GARANTIAS_VIGENTE")
+    @Column(name = "GARANTIAS_VIGENTE", length = 4000)
     private String garantiasVigente;
     
-    @Column(name = "CREDITO_VIGENTE")
+    @Column(name = "CREDITO_VIGENTE", length = 4000)
     private String creditoVigente;
 
-    @Column(name = "INFORMCONF")
+    @Column(name = "INFORMCONF", length = 4000)
     private String informconf;
 
     @Column(name = "CAPACIDAD_PAGO")
@@ -166,7 +166,7 @@ public class EvaluacionSolicitudesDetalles extends Base {
     @Column(name = "ESTADO_CIVIL")
     private String estadoCivil;
     
-    @Column(name = "DATOS_RELEVANTES")
+    @Column(name = "DATOS_RELEVANTES", length = 4000)
     private String datosRelevantes;
 
     @Column(name = "FECHA_REUNION")
@@ -180,7 +180,7 @@ public class EvaluacionSolicitudesDetalles extends Base {
     @JoinColumn(name = "ID_PROFESION", referencedColumnName = "id")
     private Profesiones profesion;
 
-    @Column(name = "DESCRIPCION_PROFESION")
+    @Column(name = "DESCRIPCION_PROFESION", length = 4000)
     private String descripcionProfesion;    
 
     @Column(name = "CALIFICACION_CRED_CANC")

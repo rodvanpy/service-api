@@ -60,11 +60,11 @@ public class Creditos extends Base {
     @Column(name = "ORDEN_CHEQUE")
     private String ordenCheque;
     
-    @Basic(optional = false)
+    @Basic(optional = true)
     @Column(name = "ID_FUNCIONARIO_DESEMBOLSO")
     private Long idFunsionarioDesembolso;
     
-    @Basic(optional = false)
+    @Basic(optional = true)
     @Column(name = "OPERACION")
     private String operacion;
     

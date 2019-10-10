@@ -26,6 +26,7 @@ import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.entity.Sucursales;
+import py.com.mojeda.service.ejb.entity.TipoSolicitudes;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
 import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
@@ -41,8 +42,10 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @RequestMapping(value = "/analisis_solicitudes")
 public class AnalisisController extends BaseController {
 
-    String atributos = "id,fechaInicioAnalisis,fechaFinAnalisis,fechaPrimeraAprobRech,fechaSegundaAprobRech,funcionarioAprobacion.id,estado.id,"
-            + "montoAprobado,funcionarioAnalisis.id,funcionarioVerificador.id,obsApro,propuestaSolicitud.id,activo";
+    String atributos = "id,fechaInicioAnalisis,fechaFinAnalisis,fechaPrimeraAprobRech,fechaSegundaAprobRech,funcionarioAprobacion.id,funcionarioAprobacion.alias,estado.id,"
+            + "montoAprobado,funcionarioAnalisis.id,funcionarioAnalisis.alias,funcionarioVerificador.id,funcionarioVerificador.alias,obsApro,propuestaSolicitud.id,"
+            + "propuestaSolicitud.fechaPresentacion,propuestaSolicitud.montoSolicitado,propuestaSolicitud.tipoSolicitud.nombre,propuestaSolicitud.tipoSolicitud.id,"
+            + "propuestaSolicitud.sucursal.nombre,propuestaSolicitud.montoSolicitadoOriginal,activo";
 
     @GetMapping
     public @ResponseBody
@@ -113,19 +116,50 @@ public class AnalisisController extends BaseController {
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-
+            
+            PropuestaSolicitud propuesta;
+            TipoSolicitudes tipoSolicitud;
+            Funcionarios funcionarios;
             for (Map<String, Object> rpm : listMapGrupos) {
-
-                rpm.put("propuestaSolicitud", rpm.get("propuestaSolicitud.id") == null ? null : propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(Long.parseLong(rpm.get("propuestaSolicitud.id").toString()))));
-                rpm.put("funcionarioAprobacion", rpm.get("funcionarioAprobacion.id") == null ? null : funcionarioManager.getUsuario(new Funcionarios(Long.parseLong(rpm.get("funcionarioAprobacion.id").toString())), null));
-                rpm.put("funcionarioAnalisis", rpm.get("funcionarioAnalisis.id") == null ? null : funcionarioManager.getUsuario(new Funcionarios(Long.parseLong(rpm.get("funcionarioAnalisis.id").toString())), null));
-                rpm.put("funcionarioVerificador", rpm.get("funcionarioVerificador.id") == null ? null : funcionarioManager.getUsuario(new Funcionarios(Long.parseLong(rpm.get("funcionarioVerificador.id").toString())), null));
+                propuesta = new PropuestaSolicitud();
+                propuesta.setFechaPresentacion(rpm.get("propuestaSolicitud.fechaPresentacion") == null ? null : date.parse(rpm.get("propuestaSolicitud.fechaPresentacion").toString()));
+                propuesta.setId(rpm.get("propuestaSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.id").toString()));
+                propuesta.setMontoSolicitado(rpm.get("propuestaSolicitud.montoSolicitado") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitado").toString()));
+                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));               
+                tipoSolicitud = new TipoSolicitudes();
+                tipoSolicitud.setId(rpm.get("propuestaSolicitud.tipoSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.tipoSolicitud.id").toString()));
+                tipoSolicitud.setNombre(rpm.get("propuestaSolicitud.tipoSolicitud.nombre") == null ? null : rpm.get("propuestaSolicitud.tipoSolicitud.nombre").toString());
+                propuesta.setTipoSolicitud(tipoSolicitud);                
+                rpm.put("propuestaSolicitud", propuesta); 
+                rpm.put("sucursal", rpm.get("propuestaSolicitud.sucursal.nombre"));
+                
+                funcionarios = new Funcionarios();
+                funcionarios.setId(rpm.get("funcionarioAprobacion.id") == null ? null : Long.parseLong(rpm.get("funcionarioAprobacion.id").toString()));
+                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());                
+                rpm.put("funcionarioAprobacion", funcionarios.getId() == null ? null : funcionarios);
+                
+                funcionarios = new Funcionarios();
+                funcionarios.setId(rpm.get("funcionarioAnalisis.id") == null ? null : Long.parseLong(rpm.get("funcionarioAnalisis.id").toString()));
+                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());                
+                rpm.put("funcionarioAnalisis", funcionarios.getId() == null ? null : funcionarios);
+                
+                funcionarios = new Funcionarios();
+                funcionarios.setId(rpm.get("funcionarioVerificador.id") == null ? null : Long.parseLong(rpm.get("funcionarioVerificador.id").toString()));
+                funcionarios.setAlias(rpm.get("funcionarioVerificador.alias") == null ? null : rpm.get("funcionarioVerificador.alias").toString());
+                rpm.put("funcionarioVerificador", funcionarios.getId() == null ? null : funcionarios);
+                
                 rpm.put("estado", estadosSolicitudManager.getEstadosSolicitud(new EstadosSolicitud(Long.parseLong(rpm.get("estado.id").toString()))));
+                
                 rpm.remove("funcionarioAnalisis.id");
                 rpm.remove("funcionarioVerificador.id");
                 rpm.remove("funcionarioAprobacion.id");
                 rpm.remove("propuestaSolicitud.id");
                 rpm.remove("estado.id");
+                rpm.remove("propuestaSolicitud.fechaPresentacion");
+                rpm.remove("propuestaSolicitud.montoSolicitado");
+                rpm.remove("propuestaSolicitud.montoSolicitadoOriginal");
+                rpm.remove("propuestaSolicitud.tipoSolicitud.nombre");
+                rpm.remove("propuestaSolicitud.sucursal.nombre");
             }
 
             if (todos) {
@@ -220,19 +254,49 @@ public class AnalisisController extends BaseController {
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-
+            
+            PropuestaSolicitud propuesta;
+            TipoSolicitudes tipoSolicitud;
+            Funcionarios funcionarios;
             for (Map<String, Object> rpm : listMapGrupos) {
-
-                rpm.put("propuestaSolicitud", rpm.get("propuestaSolicitud.id") == null ? null : propuestaSolicitudManager.getPropuestaSolicitud(new PropuestaSolicitud(Long.parseLong(rpm.get("propuestaSolicitud.id").toString()))));
-                rpm.put("funcionarioAprobacion", rpm.get("funcionarioAprobacion.id") == null ? null : funcionarioManager.getUsuario(new Funcionarios(Long.parseLong(rpm.get("funcionarioAprobacion.id").toString())), null));
-                rpm.put("funcionarioAnalisis", rpm.get("funcionarioAnalisis.id") == null ? null : funcionarioManager.getUsuario(new Funcionarios(Long.parseLong(rpm.get("funcionarioAnalisis.id").toString())), null));
-                rpm.put("funcionarioVerificador", rpm.get("funcionarioVerificador.id") == null ? null : funcionarioManager.getUsuario(new Funcionarios(Long.parseLong(rpm.get("funcionarioVerificador.id").toString())), null));
+                propuesta = new PropuestaSolicitud();
+                propuesta.setFechaPresentacion(rpm.get("propuestaSolicitud.fechaPresentacion") == null ? null : date.parse(rpm.get("propuestaSolicitud.fechaPresentacion").toString()));
+                propuesta.setId(rpm.get("propuestaSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.id").toString()));
+                propuesta.setMontoSolicitado(rpm.get("propuestaSolicitud.montoSolicitado") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitado").toString()));
+                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));               
+                tipoSolicitud = new TipoSolicitudes();
+                tipoSolicitud.setId(rpm.get("propuestaSolicitud.tipoSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.tipoSolicitud.id").toString()));
+                tipoSolicitud.setNombre(rpm.get("propuestaSolicitud.tipoSolicitud.nombre") == null ? null : rpm.get("propuestaSolicitud.tipoSolicitud.nombre").toString());
+                propuesta.setTipoSolicitud(tipoSolicitud);                
+                rpm.put("propuestaSolicitud", propuesta); 
+                rpm.put("sucursal", rpm.get("propuestaSolicitud.sucursal.nombre"));
+                
+                funcionarios = new Funcionarios();
+                funcionarios.setId(rpm.get("funcionarioAprobacion.id") == null ? null : Long.parseLong(rpm.get("funcionarioAprobacion.id").toString()));
+                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());                
+                rpm.put("funcionarioAprobacion", funcionarios.getId() == null ? null : funcionarios);
+                
+                funcionarios = new Funcionarios();
+                funcionarios.setId(rpm.get("funcionarioAnalisis.id") == null ? null : Long.parseLong(rpm.get("funcionarioAnalisis.id").toString()));
+                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());                
+                rpm.put("funcionarioAnalisis", funcionarios.getId() == null ? null : funcionarios);
+                
+                funcionarios = new Funcionarios();
+                funcionarios.setId(rpm.get("funcionarioVerificador.id") == null ? null : Long.parseLong(rpm.get("funcionarioVerificador.id").toString()));
+                funcionarios.setAlias(rpm.get("funcionarioVerificador.alias") == null ? null : rpm.get("funcionarioVerificador.alias").toString());
+                rpm.put("funcionarioVerificador", funcionarios.getId() == null ? null : funcionarios);
                 rpm.put("estado", estadosSolicitudManager.getEstadosSolicitud(new EstadosSolicitud(Long.parseLong(rpm.get("estado.id").toString()))));
+                
                 rpm.remove("funcionarioAnalisis.id");
                 rpm.remove("funcionarioVerificador.id");
                 rpm.remove("funcionarioAprobacion.id");
                 rpm.remove("propuestaSolicitud.id");
                 rpm.remove("estado.id");
+                rpm.remove("propuestaSolicitud.fechaPresentacion");
+                rpm.remove("propuestaSolicitud.montoSolicitado");
+                rpm.remove("propuestaSolicitud.montoSolicitadoOriginal");
+                rpm.remove("propuestaSolicitud.tipoSolicitud.nombre");
+                rpm.remove("propuestaSolicitud.sucursal.nombre");
             }
 
             if (todos) {

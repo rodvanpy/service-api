@@ -183,6 +183,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         //Cargar la sucursal
         propuestaSolicitud.setSucursal(new Sucursales(idSucursal));
         propuestaSolicitud.setEntidad("PROPUESTA_SOLICITUD");
+        propuestaSolicitud.setMoneda(new Monedas(1L));
         propuestaSolicitud.setTipoSolicitud(new TipoSolicitudes(1L));
         propuestaSolicitud.setDesembolsado("N");
         //Crear Cliente

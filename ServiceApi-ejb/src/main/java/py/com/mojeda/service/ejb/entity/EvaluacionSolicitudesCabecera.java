@@ -80,16 +80,16 @@ public class EvaluacionSolicitudesCabecera extends Base {
     @Column(name = "REQUIERE_VERIFICADOR")
     private Boolean requiereVerificador;
 
-    @Column(name = "OBSERVACION")
+    @Column(name = "OBSERVACION", length = 4000)
     private String observacion;
 
-    @Column(name = "OBSERVACION_RECOMENDACION")
+    @Column(name = "OBSERVACION_RECOMENDACION", length = 4000)
     private String observacionRecomendacion;
     
-    @Column(name = "OBSERVACION_RETRANSFERENCIA")
+    @Column(name = "OBSERVACION_RETRANSFERENCIA", length = 4000)
     private String observacionRetransferencia;
 
-    @Column(name = "OBS_APRO")
+    @Column(name = "OBS_APRO", length = 4000)
     private String obsApro;
 
     @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")

@@ -6,7 +6,6 @@
 package py.com.mojeda.service.ejb.managerImpl;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
@@ -14,7 +13,6 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import py.com.mojeda.service.ejb.entity.Creditos;
 import py.com.mojeda.service.ejb.entity.EstadosCredito;
-import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
 import py.com.mojeda.service.ejb.entity.Modalidades;
 import py.com.mojeda.service.ejb.entity.Monedas;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
@@ -26,6 +24,7 @@ import py.com.mojeda.service.ejb.entity.TipoDestinos;
 import py.com.mojeda.service.ejb.manager.CreditosManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.PropuestaSolicitudManager;
+import py.com.mojeda.service.ejb.manager.TipoCalculosManager;
 
 /**
  *
@@ -45,6 +44,9 @@ public class CreditosManagerImpl extends GenericDaoImpl<Creditos, Long>
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/EvaluacionSolicitudesCabeceraManagerImpl")
     private EvaluacionSolicitudesCabeceraManager evaluacionSolicitudesCabeceraManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/TipoCalculosManagerImpl")
+    private TipoCalculosManager tipoCalculosManager;
 
     @Override
     public void generarCredito(Long idSolicitud, Long idEvaluacionCabecera, Long idPersona) throws Exception {
@@ -59,16 +61,17 @@ public class CreditosManagerImpl extends GenericDaoImpl<Creditos, Long>
         Map<String, Object> modelMaps = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(idSolicitud), atributos.split(","));
         //Cargar credito
         Creditos credito = new Creditos();
-        credito.setEstado(new EstadosCredito("PEN"));
+        credito.setEstado(new EstadosCredito(1L));
         credito.setFechaEstado(new Date(System.currentTimeMillis()));
         credito.setFechaGeneracion(new Date(System.currentTimeMillis()));
         credito.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
         credito.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+        credito.setFechaVencimiento(new Timestamp(System.currentTimeMillis()));
         credito.setActivo("S");
         credito.setIdUsuarioCreacion(idPersona);
         credito.setIdUsuarioModificacion(idPersona);
         credito.setModalidad(new Modalidades(Long.parseLong(modelMaps.get("modalidad.id").toString())));
-        credito.setMoneda(modelMaps.get("moneda.id") == null ? null : new Monedas(Long.parseLong(modelMaps.get("moneda.id").toString())));
+        credito.setMoneda(new Monedas(1L));
         credito.setMontoCapital(modelMaps.get("montoSolicitado") == null ? null : new BigDecimal(modelMaps.get("montoSolicitado").toString()));
         credito.setSaldoCapital(modelMaps.get("montoSolicitado") == null ? null : new BigDecimal(modelMaps.get("montoSolicitado").toString()));
         credito.setPeriodoCapital(modelMaps.get("periodoCapital") == null ? null : Short.parseShort(modelMaps.get("periodoCapital").toString()));
@@ -76,11 +79,13 @@ public class CreditosManagerImpl extends GenericDaoImpl<Creditos, Long>
         credito.setPeriodoInteres(modelMaps.get("periodoInteres") == null ? null : Short.parseShort(modelMaps.get("periodoInteres").toString()));
         credito.setPlazoOperacion(modelMaps.get("plazo") == null ? null : Short.parseShort(modelMaps.get("plazo").toString()));
         credito.setSucursal(new Sucursales(Long.parseLong(modelMaps.get("sucursal.id").toString())));
-        credito.setTipoCalculoImporte(new TipoCalculos(Long.parseLong(modelMaps.get("tipoCalculoImporte.id").toString())));
+        credito.setTipoCalculoImporte(modelMaps.get("tipoCalculoImporte.id") == null ? null : tipoCalculosManager.get(Long.parseLong(modelMaps.get("tipoCalculoImporte.id").toString())));
         credito.setTipoDesembolso(new TipoDesembolsos(Long.parseLong(modelMaps.get("tipoDesembolso.id").toString())));
         credito.setTipoDestino(new TipoDestinos(Long.parseLong(modelMaps.get("tipoDestino.id").toString())));
-        credito.setTipoInteres(modelMaps.get("tipoInteres").toString());
-        credito.setTasaInteres(new BigDecimal(modelMaps.get("tasaInteres").toString()));
+        credito.setTipoInteres(modelMaps.get("tipoInteres") == null ? null : modelMaps.get("tipoInteres").toString());
+        credito.setTasaInteres(new BigDecimal(modelMaps.get("tasaInteres") == null ? null : modelMaps.get("tasaInteres").toString()));
+        credito.setTotalDevengado(BigDecimal.ZERO);
+        credito.setOperacion("N");
         credito.setGastosAdministrativos(modelMaps.get("gastosAdministrativos") == null ? null : new BigDecimal(modelMaps.get("gastosAdministrativos").toString()));
         credito.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
         credito.setSituacionCredito(new SituacionesCredito(1L));
@@ -93,7 +98,6 @@ public class CreditosManagerImpl extends GenericDaoImpl<Creditos, Long>
         credito.setMontoInteres(new BigDecimal(montoInteres));
         credito.setSaldoInteres(new BigDecimal(montoInteres));
         
-        
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.save(credito);
     }
 }

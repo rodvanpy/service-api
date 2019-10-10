@@ -5,6 +5,8 @@
  */
 package py.com.mojeda.service.web.ws;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -13,6 +15,7 @@ import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.BienesSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.CiudadesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
+import py.com.mojeda.service.ejb.manager.CreditosManager;
 import py.com.mojeda.service.ejb.manager.CuotasManager;
 import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EmpresaManager;
@@ -33,6 +36,7 @@ import py.com.mojeda.service.ejb.manager.PermisoManager;
 import py.com.mojeda.service.ejb.manager.PersonaManager;
 import py.com.mojeda.service.ejb.manager.RolPermisoManager;
 import py.com.mojeda.service.ejb.manager.DocumentoManager;
+import py.com.mojeda.service.ejb.manager.EstadosCreditoManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
 import py.com.mojeda.service.ejb.manager.EstudiosManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
@@ -66,6 +70,8 @@ import py.com.mojeda.service.ejb.manager.TipoMotivosRetiroManager;
 public class BaseController {
     
     protected static final String CONTENT_IMAGE = "C:\\imagen\\";
+    
+    protected static final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
     private Context context;
     
@@ -153,7 +159,9 @@ public class BaseController {
     
     protected VinculoManager vinculoManager;
     
-    protected EstadosSolicitudManager estadosSolicitudManager;    
+    protected EstadosSolicitudManager estadosSolicitudManager; 
+    
+    protected EstadosCreditoManager estadosCreditoManager;
     
     protected OcupacionSolicitudesManager ocupacionSolicitudesManager;
     
@@ -167,8 +175,44 @@ public class BaseController {
     
     protected CuotasManager cuotasManager;
     
+    protected CreditosManager creditosManager;
+    
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
+    
+    protected void inicializarCreditosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (creditosManager == null) {
+            try {
+                creditosManager = (CreditosManager) context.lookup("java:app/ServiceApi-ejb/CreditosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarEstadosCreditoManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (estadosCreditoManager == null) {
+            try {
+                estadosCreditoManager = (EstadosCreditoManager) context.lookup("java:app/ServiceApi-ejb/EstadosCreditoManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarCuotasManager() throws Exception {
         if (context == null) {
