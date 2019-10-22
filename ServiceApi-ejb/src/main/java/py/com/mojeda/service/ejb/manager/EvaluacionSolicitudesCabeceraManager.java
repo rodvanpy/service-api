@@ -18,7 +18,7 @@ import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
 @Local
 public interface EvaluacionSolicitudesCabeceraManager extends GenericDao<EvaluacionSolicitudesCabecera, Long>{
     
-    public EvaluacionSolicitudesCabecera guardar(EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera, Long idFuncionario) throws Exception;
+    public EvaluacionSolicitudesCabecera guardar(EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera, Long idFuncionario, Long idEmpresa) throws Exception;
     
     public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion) throws Exception;
     

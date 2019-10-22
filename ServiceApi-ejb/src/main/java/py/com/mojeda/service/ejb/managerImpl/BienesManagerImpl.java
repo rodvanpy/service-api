@@ -33,8 +33,8 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
-    
+    protected static final DateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/PaisesManagerImpl")
     private PaisesManager paisesManager;
 
@@ -48,42 +48,49 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     public Bienes guardarBienes(Bienes bienes) throws Exception {
         Bienes object = null;
         try {
-            if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
-                if (bienes.getId() != null) {
-                    
-                    Bienes upBienes = this.get(bienes.getId());
-                    
-                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    
-                    this.update(upBienes);
-                    
-                } else {
-                    if (bienes.getMarca() != null) {
-                        bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                        bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                        bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                        this.save(bienes);
-                    }
-                }
+            if (bienes.getId() != null) {
+
+                Bienes upBienes = this.get(bienes.getId());
+
+                upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                upBienes.setBarrio(bienes.getBarrio() == null ? null : bienes.getBarrio().toUpperCase());
+                upBienes.setCiudad(bienes.getCiudad() == null ? null : bienes.getCiudad());
+                upBienes.setCuentaCatastral(bienes.getCuentaCatastral() == null ? null : bienes.getCuentaCatastral().toUpperCase());
+                upBienes.setCuotaMensual(bienes.getCuotaMensual() == null ? null : bienes.getCuotaMensual());
+                upBienes.setDepartamento(bienes.getDepartamento() == null ? null : bienes.getDepartamento());
+                upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                upBienes.setDistrito(bienes.getDistrito() == null ? null : bienes.getDistrito().toUpperCase());
+                upBienes.setEdificado(bienes.getEdificado() == null ? false : bienes.getEdificado());
+                upBienes.setEscriturado(bienes.getEscriturado() == null ? false : bienes.getEscriturado());
+                upBienes.setFechaDeclaracion(bienes.getFechaDeclaracion() == null ? null : bienes.getFechaDeclaracion());
+                upBienes.setFechaHipoteca(bienes.getFechaHipoteca() == null ? null : bienes.getFechaHipoteca());
+                upBienes.setFechaVenta(bienes.getFechaVenta() == null ? null : bienes.getFechaVenta());
+                upBienes.setHipotecado(bienes.getHipotecado() == null ? false : bienes.getHipotecado());
+                upBienes.setLatitud(bienes.getLatitud() == null ? null : bienes.getLatitud());
+                upBienes.setLongitud(bienes.getLongitud() == null ? null : bienes.getLongitud());
+                upBienes.setNumeroFinca(bienes.getNumeroFinca() == null ? null : bienes.getNumeroFinca().toUpperCase());
+                upBienes.setModeloAnio(bienes.getModeloAnio() == null ? null : bienes.getModeloAnio());
+                upBienes.setNumeroMatricula(bienes.getNumeroMatricula() == null ? null : bienes.getNumeroMatricula().toUpperCase());
+                upBienes.setPais(bienes.getPais() == null ? null : bienes.getPais());
+                upBienes.setSaldo(bienes.getSaldo() == null ? null : bienes.getSaldo());
+                upBienes.setValorActual(bienes.getValorActual() == null ? null : bienes.getValorActual());
+                upBienes.setVencimientoHipoteca(bienes.getVencimientoHipoteca() == null ? null : bienes.getVencimientoHipoteca());
+
+                this.update(upBienes);
+
             } else {
-                if (bienes.getId() != null) {
-                    Bienes upBienes = this.get(bienes.getId());
-                    
-                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    
-                    this.update(upBienes);
-                } else {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.save(bienes);
-                }
+
+                bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+
+                this.save(bienes);
+
             }
-            object = this.getBienes(new Bienes(bienes.getId()));
+
+            object = bienes.getId() == null ? null : this.getBienes(new Bienes(bienes.getId()));
+
         } catch (Exception e) {
             logger.error("Error al guardar registro", e);
         }
@@ -94,38 +101,44 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     public Bienes editarBienes(Bienes bienes) throws Exception {
         Bienes object = null;
         try {
-            if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
-                if (bienes.getId() != null) {
-                    Bienes upBienes = this.get(bienes.getId());
-                    
-                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    
-                    this.update(upBienes);
-                } else {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.save(bienes);
-                }
+            if (bienes.getId() != null) {
+                Bienes upBienes = this.get(bienes.getId());
+
+                upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                upBienes.setBarrio(bienes.getBarrio() == null ? null : bienes.getBarrio().toUpperCase());
+                upBienes.setCiudad(bienes.getCiudad() == null ? null : bienes.getCiudad());
+                upBienes.setCuentaCatastral(bienes.getCuentaCatastral() == null ? null : bienes.getCuentaCatastral().toUpperCase());
+                upBienes.setCuotaMensual(bienes.getCuotaMensual() == null ? null : bienes.getCuotaMensual());
+                upBienes.setDepartamento(bienes.getDepartamento() == null ? null : bienes.getDepartamento());
+                upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                upBienes.setDistrito(bienes.getDistrito() == null ? null : bienes.getDistrito().toUpperCase());
+                upBienes.setEdificado(bienes.getEdificado() == null ? false : bienes.getEdificado());
+                upBienes.setEscriturado(bienes.getEscriturado() == null ? false : bienes.getEscriturado());
+                upBienes.setFechaDeclaracion(bienes.getFechaDeclaracion() == null ? null : bienes.getFechaDeclaracion());
+                upBienes.setFechaHipoteca(bienes.getFechaHipoteca() == null ? null : bienes.getFechaHipoteca());
+                upBienes.setFechaVenta(bienes.getFechaVenta() == null ? null : bienes.getFechaVenta());
+                upBienes.setHipotecado(bienes.getHipotecado() == null ? false : bienes.getHipotecado());
+                upBienes.setLatitud(bienes.getLatitud() == null ? null : bienes.getLatitud());
+                upBienes.setLongitud(bienes.getLongitud() == null ? null : bienes.getLongitud());
+                upBienes.setNumeroFinca(bienes.getNumeroFinca() == null ? null : bienes.getNumeroFinca().toUpperCase());
+                upBienes.setModeloAnio(bienes.getModeloAnio() == null ? null : bienes.getModeloAnio());
+                upBienes.setNumeroMatricula(bienes.getNumeroMatricula() == null ? null : bienes.getNumeroMatricula().toUpperCase());
+                upBienes.setPais(bienes.getPais() == null ? null : bienes.getPais());
+                upBienes.setSaldo(bienes.getSaldo() == null ? null : bienes.getSaldo());
+                upBienes.setValorActual(bienes.getValorActual() == null ? null : bienes.getValorActual());
+                upBienes.setVencimientoHipoteca(bienes.getVencimientoHipoteca() == null ? null : bienes.getVencimientoHipoteca());
+
+                this.update(upBienes);
             } else {
-                if (bienes.getId() != null) {
-                    
-                    Bienes upBienes = this.get(bienes.getId());
-                    
-                    upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    
-                    this.update(upBienes);
-                } else {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.save(bienes);
-                }
+                
+                bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                
+                this.save(bienes);
             }
+
             object = this.getBienes(new Bienes(bienes.getId()));
         } catch (Exception e) {
             logger.error("Error al  editar registro", e);
@@ -134,14 +147,14 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
     }
 
     @Override
-    public Bienes getBienes(Bienes bienes)throws Exception {
+    public Bienes getBienes(Bienes bienes) throws Exception {
         Bienes model = null;
         String atributos = "id,numeroFinca,cuentaCatastral,distrito,escriturado,edificado,hipotecado,fechaHipoteca,vencimientoHipoteca,"
                 + "lugarHipoteca,fechaDeclaracion,cuotaMensual,valorActual,saldo,direccion,marca,modeloAnio,fechaVenta,numeroMatricula,"
                 + "pais.id,departamento.id,ciudad.id,barrio,tipoBien,latitud,longitud,activo";
 
         Map<String, Object> bienesMap = this.getAtributos(bienes, atributos.split(","));
-        
+
         if (bienesMap != null) {
             model = new Bienes();
             model.setId(Long.parseLong(bienesMap.get("id").toString()));
@@ -167,10 +180,10 @@ public class BienesManagerImpl extends GenericDaoImpl<Bienes, Long>
             model.setTipoBien(bienesMap.get("tipoBien") == null ? "" : bienesMap.get("tipoBien").toString());
             model.setLatitud(bienesMap.get("latitud") == null ? null : Double.parseDouble(bienesMap.get("latitud").toString()));
             model.setLongitud(bienesMap.get("longitud") == null ? null : Double.parseDouble(bienesMap.get("longitud").toString()));
-            model.setActivo(bienesMap.get("activo") == null ? "" : bienesMap.get("activo").toString());            
-            model.setPais(bienesMap.get("pais.id") == null ? null:  paisesManager.get(Long.parseLong(bienesMap.get("pais.id").toString())));
-            model.setDepartamento(bienesMap.get("departamento.id") == null ? null :  departamentosPaisManager.get(Long.parseLong(bienesMap.get("departamento.id").toString())));
-            model.setCiudad(bienesMap.get("ciudad.id") == null ? null :  ciudadesManager.get(Long.parseLong(bienesMap.get("ciudad.id").toString())));
+            model.setActivo(bienesMap.get("activo") == null ? "" : bienesMap.get("activo").toString());
+            model.setPais(bienesMap.get("pais.id") == null ? null : paisesManager.get(Long.parseLong(bienesMap.get("pais.id").toString())));
+            model.setDepartamento(bienesMap.get("departamento.id") == null ? null : departamentosPaisManager.get(Long.parseLong(bienesMap.get("departamento.id").toString())));
+            model.setCiudad(bienesMap.get("ciudad.id") == null ? null : ciudadesManager.get(Long.parseLong(bienesMap.get("ciudad.id").toString())));
         }
         return model;
     }

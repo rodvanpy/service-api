@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import org.hibernate.annotations.Index;
 
 /**
  *
@@ -244,6 +246,10 @@ public class PropuestaSolicitud extends Base{
     @ManyToOne
     @JoinColumn(name = "ID_TIPO_SOLICITUD", referencedColumnName = "id")
     private TipoSolicitudes tipoSolicitud;
+    
+    @JsonIgnore
+    @Column(name = "ID_EMPRESA")
+    private Long idEmpresa;
     
     @Transient
     private EvaluacionSolicitudesCabecera evaluacion;
@@ -1057,6 +1063,13 @@ public class PropuestaSolicitud extends Base{
     public void setFechaDesembolso(Date fechaDesembolso) {
         this.fechaDesembolso = fechaDesembolso;
     }
-    
-    
+
+    public Long getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+        this.idEmpresa = idEmpresa;
+    }
+              
 }

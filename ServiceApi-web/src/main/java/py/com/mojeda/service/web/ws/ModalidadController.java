@@ -280,7 +280,8 @@ public class ModalidadController extends BaseController {
                 response.setMessage("Ya existe una modalidad con el mismo nombre.");
                 return response;
             }
-                
+            
+            model.setActivo(dato.getActivo());
             model.setCodigo(dato.getCodigo());
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));

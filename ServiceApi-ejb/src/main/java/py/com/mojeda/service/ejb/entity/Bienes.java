@@ -124,9 +124,6 @@ public class Bienes extends Base {
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Personas persona;
-    
-    @Column(name = "ENTIDAD")
-    private String entidad = "BIENES";
 
     public Bienes() {
     }
@@ -483,20 +480,6 @@ public class Bienes extends Base {
 
     public void setLongitud(Double longitud) {
         this.longitud = longitud;
-    }
-
-    /**
-     * @return the entidad
-     */
-    public String getEntidad() {
-        return entidad;
-    }
-
-    /**
-     * @param entidad the entidad to set
-     */
-    public void setEntidad(String entidad) {
-        this.entidad = entidad;
     }
 
 }

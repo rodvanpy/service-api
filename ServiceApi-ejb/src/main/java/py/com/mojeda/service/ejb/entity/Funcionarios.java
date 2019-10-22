@@ -87,6 +87,9 @@ public class Funcionarios extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_TIPO_MOTI_RETIRO", referencedColumnName = "id")
     private TipoMotivosRetiro tipoMotivoRetiro;
+    
+    @Column(name = "OBSERVACION_RETIRO")
+    private String observacionRetiro;
 
     @ManyToOne
     @JoinColumn(name = "ID_PERSONA", referencedColumnName = "id")
@@ -101,6 +104,9 @@ public class Funcionarios extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_ROL", referencedColumnName = "id")
     private Rol rol;
+    
+    @Column(name = "RETIRADO")
+    private Boolean retirado;
     
     @Column(name = "ENTIDAD")
     private String entidad = "FUNCIONARIOS";
@@ -328,5 +334,21 @@ public class Funcionarios extends Base {
     public void setEntidad(String entidad) {
         this.entidad = entidad;
     }
+
+    public Boolean getRetirado() {
+        return retirado;
+    }
+
+    public void setRetirado(Boolean retirado) {
+        this.retirado = retirado;
+    } 
+
+    public String getObservacionRetiro() {
+        return observacionRetiro;
+    }
+
+    public void setObservacionRetiro(String observacionRetiro) {
+        this.observacionRetiro = observacionRetiro;
+    }    
 
 }

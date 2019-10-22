@@ -47,6 +47,8 @@ public interface GenericDao<T, ID extends Serializable> {
         public List<T> listCartera(Long estado, String tipoPersona);
         
         public int total(T ejemplo);
+        
+        public Long total(T ejemplo, String orderBy, String dir);
                 
         //public long countAll(List<CountAll> params);       
 	

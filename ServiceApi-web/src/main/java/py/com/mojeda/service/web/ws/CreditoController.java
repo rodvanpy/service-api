@@ -74,13 +74,9 @@ public class CreditoController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        //Buscar usuario por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
         Creditos model = new Creditos();
         model.setActivo("S");
-        model.setSucursal(ejSucursales);
+        model.setIdEmpresa(userDetail.getIdEmpresa());
 
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -113,7 +109,7 @@ public class CreditoController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(creditosManager.list(model).size() + "");
+                total = creditosManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -253,33 +249,7 @@ public class CreditoController extends BaseController {
         return response;
     }
     
-    /**
-     * Mapping para el metodo GET de la vista transferir.(transferir propuesta)
-     *
-     * @param id de la entidad
-     * @return
-     */
-    @PutMapping("/transferir/{id}")
-    public @ResponseBody
-    ResponseDTO transferir(
-            @ModelAttribute("id") Long id) {
-        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        ResponseDTO response = new ResponseDTO();
-        try {
-            inicializarPropuestaSolicitudManager();
 
-            propuestaSolicitudManager.tranferirPropuesta(id,userDetail.getId());
-
-            response.setStatus(200);
-            response.setMessage("Propuesta tranferida para analisis");
-        } catch (Exception e) {
-            logger.error("Error: ", e);
-            response.setStatus(500);
-            response.setMessage("Error interno del servidor.");
-        }
-
-        return response;
-    }
 
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
@@ -311,149 +281,6 @@ public class CreditoController extends BaseController {
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
-        } catch (Exception e) {
-            logger.error("Error: ", e);
-            response.setStatus(500);
-            response.setMessage("Error interno del servidor.");
-        }
-
-        return response;
-    }
-
-    /**
-     * Mapping para el metodo POST de la vista crear.(crear Usuario)
-     *
-     * @param model entidad Usuario recibida de la vista
-     * @param errors
-     * @return
-     */
-    @PostMapping
-    public @ResponseBody
-    ResponseDTO create(
-            @RequestBody @Valid PropuestaSolicitud model,
-            Errors errors) {
-
-        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        ResponseDTO response = new ResponseDTO();
-        Funcionarios ejUsuario = new Funcionarios();
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        Gson gson = new Gson();
-        try {
-            inicializarPropuestaSolicitudManager();
-
-            if (errors.hasErrors()) {
-
-                response.setStatus(400);
-                response.setMessage(errors.getAllErrors()
-                        .stream()
-                        .map(x -> x.getDefaultMessage())
-                        .collect(Collectors.joining(",")));
-                return response;
-            }
-            //Buscar usuario por empresa
-            model.setIdUsuarioCreacion(userDetail.getId());
-            model.setIdUsuarioModificacion(userDetail.getId());
-            model.setFuncionario(new Funcionarios(userDetail.getId()));
-
-            //Buscar cliente con estado pendiente
-            Personas ejPersonas = new Personas();
-            ejPersonas.setDocumento(model.getCliente().getPersona().getDocumento());
-
-            Clientes ejCliente = new Clientes();
-            ejCliente.setPersona(ejPersonas);
-
-            PropuestaSolicitud ejPropuestaSolicitud = new PropuestaSolicitud();
-            ejPropuestaSolicitud.setCliente(ejCliente);
-            ejPropuestaSolicitud.setEstado(new EstadosSolicitud(1L));
-
-            if (propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0) {
-                response.setStatus(205);
-                response.setMessage("El cliente cuenta con una solicitud en estado pendiente.");
-                return response;
-            }
-
-            model = propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
-            
-            response.setModel(model);
-            response.setStatus(model == null ? 404 : 200);
-            response.setMessage(model == null ? "Error al crear registro" : "Registro creado con exito");
-            
-        } catch (Exception e) {
-            logger.error("Error: ", e);
-            response.setStatus(500);
-            response.setMessage("Error interno del servidor.");
-        }
-
-        return response;
-    }
-
-    /**
-     * Mapping para el metodo PUT de la vista actualizar.(actualizar
-     * PropuestaSolicitud)
-     *
-     * @param id de la entidad
-     * @param model entidad PropuestaSolicitud recibida de la vista
-     * @param errors
-     * @return
-     */
-    @PutMapping("/{id}")
-    public @ResponseBody
-    ResponseDTO update(
-            @ModelAttribute("id") Long id,
-            @RequestBody @Valid PropuestaSolicitud model,
-            Errors errors) {
-
-        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        ResponseDTO response = new ResponseDTO();
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        try {
-            inicializarPropuestaSolicitudManager();
-
-            if (errors.hasErrors()) {
-
-                response.setStatus(400);
-                response.setMessage(errors.getAllErrors()
-                        .stream()
-                        .map(x -> x.getDefaultMessage())
-                        .collect(Collectors.joining(",")));
-                return response;
-            }
-            
-            Map<String, Object> modelMaps = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(id), "estado.codigo,montoSolicitado".split(","));
-
-            if (modelMaps != null
-                    && modelMaps.get("estado.codigo") != null
-                    && modelMaps.get("estado.codigo").toString().compareToIgnoreCase("PEN") != 0 
-                    && modelMaps.get("estado.codigo").toString().compareToIgnoreCase("RET") != 0) {
-                response.setModel(null);
-                response.setStatus(404);
-                response.setMessage("La propuesta ya no puede ser modificada.");
-                
-                return response;
-            }
-            
-            if (modelMaps != null 
-                    && modelMaps.get("estado.codigo") != null
-                    && modelMaps.get("estado.codigo").toString().compareToIgnoreCase("RET") == 0
-                    && new BigDecimal(modelMaps.get("montoSolicitado").toString()).longValue() < model.getMontoSolicitado().longValue()) {
-                
-                response.setModel(null);
-                response.setStatus(404);
-                response.setMessage("El monto solicitado no puede ser mayor a la solicitada anteriormente.");
-                
-                return response;
-            }
-
-            //Buscar usuario por empresa
-            model.setIdUsuarioCreacion(userDetail.getId());
-            model.setIdUsuarioModificacion(userDetail.getId());
-
-            model = propuestaSolicitudManager.editar(model, userDetail.getIdSusursal());
-
-            response.setModel(model);
-            response.setStatus(model == null ? 404 : 200);
-            response.setMessage(model == null ? "Error al modificar registro" : "Registro modificado con exito");
-            
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);

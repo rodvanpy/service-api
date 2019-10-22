@@ -28,6 +28,7 @@ import py.com.mojeda.service.ejb.entity.Modalidades;
 import py.com.mojeda.service.ejb.entity.TipoCalculos;
 import py.com.mojeda.service.ejb.entity.TipoDesembolsos;
 import py.com.mojeda.service.ejb.manager.CuotasManager;
+import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 
 /**
  *
@@ -42,6 +43,7 @@ public class CuotasManagerImpl extends GenericDaoImpl<Cuotas, Long>
         return Cuotas.class;
     }
 
+    private static final ApplicationLogger logger = ApplicationLogger.getInstance();
     protected static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     protected static final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -55,398 +57,224 @@ public class CuotasManagerImpl extends GenericDaoImpl<Cuotas, Long>
         this.amortizacionCuotas(listaCuotas, montoCapital, plazo, periodoCapital, periodoInteres);
 
         return listaCuotas;
-        //Calcular plazo en meses dependiento del periodo capital
-//        if (null != periodoCapital) {
-//            retorno = new ArrayList<>();
-//            switch (periodoCapital) {
-//                case 1:
-//                    for (int dia = 0; dia <= plazo; dia++) {
-//                        if (dia == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(dia);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(BigDecimal.ZERO);
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusDays(dia);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(dia);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (dia == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                case 7:
-//                    for (int semana = 0; semana <= plazo; semana++) {
-//                        if (semana == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(semana);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(BigDecimal.ZERO);
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusDays(7 * semana);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(semana);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (semana == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                case 15:
-//                    for (int quincenal = 0; quincenal <= plazo; quincenal++) {
-//                        if (quincenal == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(quincenal);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusDays(15 * quincenal);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(quincenal);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (quincenal == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                case 30:
-//                    for (int mensual = 0; mensual <= plazo; mensual++) {
-//                        if (mensual == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(mensual);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(BigDecimal.ZERO);
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(mensual);
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            if (diaVencimiento.equals(28)
-//                                    || diaVencimiento.equals(29)
-//                                    || diaVencimiento.equals(30)) {
-//                                YearMonth daysMonth = YearMonth.of(fechaZona.getYear(), Month.of(fechaZona.getMonthValue() + 1));
-//                                if (daysMonth.lengthOfMonth() <= diaVencimiento) {
-//                                    fechaInicio = fechaZona.withDayOfMonth(daysMonth.lengthOfMonth()).plusMonths(mensual);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                } else {
-//                                    fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(mensual);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                }
-//                            } else {
-//                                fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(mensual);
-//                                cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            }
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (mensual == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                case 60:
-//                    for (int bimestral = 0; bimestral <= plazo; bimestral++) {
-//                        if (bimestral == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(bimestral);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(BigDecimal.ZERO);
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(bimestral);
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            if (diaVencimiento.equals(28)
-//                                    || diaVencimiento.equals(29)
-//                                    || diaVencimiento.equals(30)) {
-//                                YearMonth daysMonth = YearMonth.of(fechaZona.getYear(), Month.of(fechaZona.getMonthValue() + 2));
-//                                if (daysMonth.lengthOfMonth() <= diaVencimiento) {
-//                                    fechaInicio = fechaZona.withDayOfMonth(daysMonth.lengthOfMonth()).plusMonths(2 * bimestral);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                } else {
-//                                    fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(2 * bimestral);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                }
-//                            } else {
-//                                fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(2 * bimestral);
-//                                cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            }
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (bimestral == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                case 90:
-//                    for (int trimestral = 0; trimestral <= plazo; trimestral++) {
-//                        if (trimestral == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(trimestral);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(BigDecimal.ZERO);
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(trimestral);
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            if (diaVencimiento.equals(28)
-//                                    || diaVencimiento.equals(29)
-//                                    || diaVencimiento.equals(30)) {
-//                                YearMonth daysMonth = YearMonth.of(fechaZona.getYear(), Month.of(fechaZona.getMonthValue() + 3));
-//                                if (daysMonth.lengthOfMonth() <= diaVencimiento) {
-//                                    fechaInicio = fechaZona.withDayOfMonth(daysMonth.lengthOfMonth()).plusMonths(3 * trimestral);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                } else {
-//                                    fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(3 * trimestral);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                }
-//                            } else {
-//                                fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(3 * trimestral);
-//                                cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            }
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (trimestral == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                case 180:
-//                    for (int semestral = 0; semestral <= plazo; semestral++) {
-//                        if (semestral == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(semestral);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(BigDecimal.ZERO);
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(semestral);
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            if (diaVencimiento.equals(28)
-//                                    || diaVencimiento.equals(29)
-//                                    || diaVencimiento.equals(30)) {
-//                                YearMonth daysMonth = YearMonth.of(fechaZona.getYear(), Month.of(fechaZona.getMonthValue() + 6));
-//                                if (daysMonth.lengthOfMonth() <= diaVencimiento) {
-//                                    fechaInicio = fechaZona.withDayOfMonth(daysMonth.lengthOfMonth()).plusMonths(6 * semestral);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                } else {
-//                                    fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(6 * semestral);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                }
-//                            } else {
-//                                fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(6 * semestral);
-//                                cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            }
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (semestral == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                case 360:
-//                    for (int semestral = 0; semestral <= plazo; semestral++) {
-//                        if (semestral == 0) {
-//                            fechaInicio = fechaZona.withDayOfMonth(diaVencimiento);
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(semestral);
-//                            cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            cuota.setCapital(BigDecimal.ZERO);
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//                        } else {
-//
-//                            cuota = new Cuotas();
-//                            cuota.setNumeroCuota(semestral);
-//                            cuota.setCapital(new BigDecimal(amortizacion));
-//                            cuota.setInteres(BigDecimal.ZERO);
-//                            cuota.setInteresAdelantado(BigDecimal.ZERO);
-//                            cuota.setInteresDescontado(BigDecimal.ZERO);
-//                            cuota.setInteresPunitorio(BigDecimal.ZERO);
-//                            cuota.setInteresMoratorio(BigDecimal.ZERO);
-//
-//                            if (diaVencimiento.equals(28)
-//                                    || diaVencimiento.equals(29)
-//                                    || diaVencimiento.equals(30)) {
-//                                YearMonth daysMonth = YearMonth.of(fechaZona.getYear(), Month.of(fechaZona.getMonthValue() + 12));
-//                                if (daysMonth.lengthOfMonth() <= diaVencimiento) {
-//                                    fechaInicio = fechaZona.withDayOfMonth(daysMonth.lengthOfMonth()).plusMonths(12);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                } else {
-//                                    fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(12);
-//                                    cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                                }
-//                            } else {
-//                                fechaInicio = fechaZona.withDayOfMonth(diaVencimiento).plusMonths(12);
-//                                cuota.setFechaVencimiento(java.util.Date.from(fechaInicio.toInstant()));
-//                            }
-//
-//                            //Suma de amortizaciones
-//                            amortizacionTotal = amortizacionTotal + amortizacion;
-//                            //Calcular diferencia con el capital total y sumar a la ultima cuota
-//                            if (semestral == plazo) {
-//                                if (amortizacionTotal < montoCapital.longValue()) {
-//                                    Long diferenciaAmortizacion = montoCapital.longValue() - amortizacionTotal;
-//                                    cuota.setCapital(new BigDecimal(amortizacion + diferenciaAmortizacion));
-//                                }
-//                            }
-//
-//                        }
-//                        retorno.add(cuota);
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//
-//        return retorno;
+
+    }
+    
+        @Override
+    public Long calcularCuota(Double modalidad, Double plazo, Long periodoCapital, Long vencimientoInteres, Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos) {
+        try {
+            
+            Double interes = ((gastosAdministrativos == null ? 0 : gastosAdministrativos) + tasaInteres) / 100;
+            
+            if (tipoCalculoImporte != null && "TC-2".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double valor_1 = ((montoSolicitado * interes) / 36500) * vencimientoInteres;
+
+                Long valor_2 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo)) - 1;
+
+                Long valor_3 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo));
+
+                Double valor_4 = valor_1 / valor_2;
+
+                //this.myForm.controls['importeCuota'].setValue(Math.round(valor_4 * valor_3));
+                return (Math.round(valor_4 * valor_3));
+
+            } else if (tipoCalculoImporte != null && "TC-4".equals(tipoCalculoImporte.getCodigo())) {
+
+                //Interés simple (i) = Capital (c) x Tipo de Interés (r) x Tiempo (t)
+                //• Si la duración es 3 años, t = 3
+                //• Si la duración es 18 meses, t = 18 / 12 = 1,5
+                //• Si la duración es 1 año, t = 1
+                //• Si la duración es 6 meses, t = 6 / 12 = 0,5
+                //• Si la duración es 1 día, t = 1 / 365
+
+                Double periodoInteres = this.periodoInteresSimple(plazo, interes, periodoCapital, vencimientoInteres);
+
+                Double montoInteres = montoSolicitado * periodoInteres * plazo;
+
+                Double montoTotal = montoSolicitado + montoInteres;
+
+                Long montoCuota = Math.round(montoTotal / plazo);
+
+                //this.myForm.controls['importeCuota'].setValue();
+                return montoCuota;
+
+            } else if (tipoCalculoImporte != null && "TC-5".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double periodoInteres = this.periodoInteresCompuesto(plazo, interes, periodoCapital, vencimientoInteres);
+
+                Double montoInteres = montoSolicitado * periodoInteres;
+
+                Double montoTotal = montoSolicitado + montoInteres;
+
+                Long montoCuota = Math.round(montoTotal / plazo);
+
+                //this.myForm.controls['importeCuota'].setValue(Math.round(montoCuota));
+                return montoCuota;
+            } else if (tipoCalculoImporte != null && "TC-6".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double montoInteres = montoSolicitado * interes;
+
+                Double montoTotal = montoSolicitado + montoInteres;
+
+                Long montoCuota = Math.round(montoTotal / plazo);
+
+                return montoCuota;
+            }
+        } catch (Exception e) {
+            logger.error("Error al calcularCuota", e);
+        }
+        return null;
+    }
+
+    @Override
+    public Long calcularMontoInteres(Double plazo, Long periodoCapital, Long vencimientoInteres, Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos) {
+         try {
+             
+             Double interes = ((gastosAdministrativos == null ? 0 : gastosAdministrativos) + tasaInteres) / 100;
+             
+            if (tipoCalculoImporte != null && "TC-2".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double valor_1 = ((montoSolicitado * interes) / 36500) * vencimientoInteres;
+
+                Long valor_2 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo)) - 1;
+
+                Long valor_3 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo));
+
+                Double valor_4 = valor_1 / valor_2;
+
+                //this.myForm.controls['importeCuota'].setValue(Math.round(valor_4 * valor_3));
+                return (Math.round(valor_4 * valor_3));
+
+            } else if (tipoCalculoImporte != null && "TC-4".equals(tipoCalculoImporte.getCodigo())) {
+
+                //Interés simple (i) = Capital (c) x Tipo de Interés (r) x Tiempo (t)
+                //• Si la duración es 3 años, t = 3
+                //• Si la duración es 18 meses, t = 18 / 12 = 1,5
+                //• Si la duración es 1 año, t = 1
+                //• Si la duración es 6 meses, t = 6 / 12 = 0,5
+                //• Si la duración es 1 día, t = 1 / 365
+
+                Double periodoInteres = this.periodoInteresSimple(plazo, interes, periodoCapital, vencimientoInteres);
+
+                Double montoInteres = montoSolicitado * periodoInteres * plazo;
+
+                return montoInteres.longValue();
+
+            } else if (tipoCalculoImporte != null && "TC-5".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double periodoInteres = this.periodoInteresCompuesto(plazo, interes, periodoCapital, vencimientoInteres);
+
+                Double montoInteres = montoSolicitado * periodoInteres;
+
+                return montoInteres.longValue();
+
+            } else if (tipoCalculoImporte != null && "TC-6".equals(tipoCalculoImporte.getCodigo())) {
+
+                Double montoInteres = montoSolicitado * interes;
+
+                return montoInteres.longValue();
+            }
+        } catch (Exception e) {
+            logger.error("Error al calcularMontoInteres", e);
+        }
+        return null;
+    }
+    
+    public Double periodoInteresSimple(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres) {
+        try {
+            Double periodoInteres = 0.0;
+
+            if (vencimientoInteres == 30) {
+
+                periodoInteres = interes / 12;
+
+            } else if (vencimientoInteres == 0) {
+
+                if (periodoCapital == 60) {
+
+                    periodoInteres = interes / 6;
+
+                } else if (periodoCapital == 90) {
+
+                    periodoInteres = interes / 4;
+
+                } else if (periodoCapital == 180) {
+
+                    periodoInteres = interes / 2;
+
+                } else if (periodoCapital == 360) {
+
+                    periodoInteres = interes / 1;
+
+                } else if (periodoCapital == 15) {
+
+                    periodoInteres = interes / 24;
+
+                } else if (periodoCapital == 1) {
+
+                    periodoInteres = interes / 36;
+
+                } else if (periodoCapital == 30) {
+
+                    periodoInteres = interes / 12;
+
+                }
+            }
+
+            return periodoInteres;
+        } catch (Exception e) {
+            logger.error("Error al periodoInteresSimple", e);
+        }
+        return null;
+
+    }
+    
+    public Double periodoInteresCompuesto(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres) {
+        try {
+            Double periodoInteres = 0.0;
+            if (vencimientoInteres == 30) {
+
+                periodoInteres = (Math.pow((1 + interes), plazo / 12)) - 1;
+
+            } else if (vencimientoInteres == 0) {
+
+                if (periodoCapital == 60) {
+
+                    periodoInteres = (Math.pow((1 + (interes / 6)), ((plazo / 12) * 6))) - 1;
+
+                } else if (periodoCapital == 90) {
+
+                    periodoInteres = (Math.pow((1 + (interes / 4)), ((plazo / 12) * 4))) - 1;
+
+                } else if (periodoCapital == 180) {
+
+                    periodoInteres = (Math.pow((1 + (interes / 2)), ((plazo / 12) * 2))) - 1;
+
+                } else if (periodoCapital == 360) {
+
+                    periodoInteres = (Math.pow((1 + interes), plazo / 12)) - 1;
+
+                } else if (periodoCapital == 15) {
+
+                    periodoInteres = interes / 24;
+
+                } else if (periodoCapital == 1) {
+
+                    periodoInteres = (Math.pow((1 + (interes / 2)), ((plazo / 12) * 2))) - 1;
+
+                } else if (periodoCapital == 30) {
+
+                    periodoInteres = (Math.pow((1 + interes), plazo / 12)) - 1;
+
+                }
+            }
+            return periodoInteres;
+        } catch (Exception e) {
+            logger.error("Error al periodoInteresSimple", e);
+        }
+        return null;
+
     }
 
     public void amortizacionCuotas(List<Cuotas> cuotas, BigDecimal montoCapital, Short plazo,

@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +39,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @RequestMapping(value = "/tipos-motivos-retiro")
 public class TipoMotivosRetiroController extends BaseController {
     
-    String atributos = "id,nombre,codigo,descripcion,fechaInicio,fechaFin,horaEntrada,horaSalida,horaAlmuerzoInicio,horaAlmuerzoFin,activo";
+    String atributos = "id,nombre,codigo,descripcion,activo";
     
     @GetMapping
     public @ResponseBody
@@ -182,7 +183,7 @@ public class TipoMotivosRetiroController extends BaseController {
             
             TipoMotivosRetiro dato = new TipoMotivosRetiro();
             dato.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            dato.setNombre(model.getNombre());
+            dato.setNombre(model.getNombre().toUpperCase());
             
             Map<String,Object> objMaps = tipoMotivosRetiroManager.getLike(dato,"id".split(","));
             
@@ -198,7 +199,7 @@ public class TipoMotivosRetiroController extends BaseController {
             Integer numeroCodigo = tipoMotivosRetiroManager.total(dato) + 1;
             
             model.setCodigo("TMR-" + numeroCodigo);
-            
+            model.setNombre(model.getNombre().toUpperCase());
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
@@ -208,12 +209,9 @@ public class TipoMotivosRetiroController extends BaseController {
             
             tipoMotivosRetiroManager.save(model);
             
-            TipoMotivosRetiro empresa = new TipoMotivosRetiro();
-            empresa.setCodigo(model.getCodigo());
-            
-            response.setStatus(200);
-            response.setMessage("El registro ha sido guardado");           
-            response.setModel(tipoMotivosRetiroManager.get(empresa));
+            response.setModel(model);
+            response.setStatus(model == null && model.getId() == null  ? 404 : 200);
+            response.setMessage("El registro ha sido guardado.");           
             
         } catch (Exception e) {
             logger.error("Error: ",e);
@@ -268,20 +266,51 @@ public class TipoMotivosRetiroController extends BaseController {
                 return response;
             }
             
-            model.setCodigo(dato.getCodigo());
-            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioModificacion(userDetail.getId());
-            model.setFechaCreacion(dato.getFechaCreacion());
-            model.setIdUsuarioCreacion(dato.getIdUsuarioCreacion());
-            model.setIdUsuarioEliminacion(dato.getIdUsuarioEliminacion());
+            dato.setDescripcion(model.getDescripcion());
+            dato.setNombre(model.getNombre());
+            dato.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            dato.setIdUsuarioModificacion(userDetail.getId());
             
-            tipoMotivosRetiroManager.update(model);
+            tipoMotivosRetiroManager.update(dato);
             
             response.setStatus(200);
             response.setMessage("El registro ha sido guardado");
         } catch (Exception e) {
             logger.error("Error: ",e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
+    
+    /**
+     * Mapping para el metodo DELETE de la vista.(eliminar TipoMotivosRetiro)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO deleteObject(
+            @ModelAttribute("id") Long id) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarTipoMotivosRetiroManager();
+
+            TipoMotivosRetiro model = tipoMotivosRetiroManager.get(id);
+            model.setActivo("N");
+            model.setIdUsuarioEliminacion(userDetail.getId());
+            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+
+            tipoMotivosRetiroManager.update(model);
+
+            response.setModel(model);
+            response.setStatus(200);
+            response.setMessage("Registro eliminado con exito.");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }

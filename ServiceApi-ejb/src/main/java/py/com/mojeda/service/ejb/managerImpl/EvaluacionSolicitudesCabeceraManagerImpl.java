@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -18,12 +19,15 @@ import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
 import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
 import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesDetalles;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
+import py.com.mojeda.service.ejb.entity.Garantias;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.manager.CreditosManager;
+import py.com.mojeda.service.ejb.manager.CuotasManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesDetallesManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
+import py.com.mojeda.service.ejb.manager.GarantiasManager;
 import py.com.mojeda.service.ejb.manager.PropuestaSolicitudManager;
 
 /**
@@ -55,6 +59,12 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/CreditosManagerImpl")
     private CreditosManager creditosManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/GarantiasManagerImpl")
+    private GarantiasManager garantiasManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/CuotasManagerImpl")
+    private CuotasManager cuotasManager;
 
     @Override
     public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion) throws Exception {
@@ -131,7 +141,7 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
     }
 
     @Override
-    public EvaluacionSolicitudesCabecera guardar(EvaluacionSolicitudesCabecera evaluacionSolicitudes, Long idFuncionario) throws Exception {
+    public EvaluacionSolicitudesCabecera guardar(EvaluacionSolicitudesCabecera evaluacionSolicitudes, Long idFuncionario, Long idEmpresa) throws Exception {
         EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera = null;
 
         if (idFuncionario == null
@@ -156,7 +166,21 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
             propuesta.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             //Solicitud Rechazada
             if (evaluacionSolicitudes.getEstado().getId() == 4) {
+
                 propuesta.setFechaRechazo(new Date(System.currentTimeMillis()));
+
+                //Actualizar las garantias
+                Garantias garantias = new Garantias();
+                garantias.setPropuestaSolicitud(new PropuestaSolicitud(evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId()));
+
+                List<Garantias> listGarantias = garantiasManager.list(garantias);
+                for (Garantias rpc : listGarantias) {
+                    rpc.setEstado("INACTIVO");
+                    rpc.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    rpc.setFechaEstado(new Timestamp(System.currentTimeMillis()));
+
+                    garantiasManager.update(rpc);
+                }
             }
             //Solicitud Aprobada
             if (evaluacionSolicitudes.getEstado().getId() == 6) {
@@ -177,7 +201,7 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
                     propuesta.setMontoSolicitado(new BigDecimal(evaluacionSolicitudes.getMontoAprobado()));
 
                     //Recalcular Cuota con el monto Aprobado          
-                    Long cuota = propuestaSolicitudManager.calcularCuota(propuesta.getModalidad().getInteres().doubleValue(), propuesta.getPlazo().doubleValue(),
+                    Long cuota = cuotasManager.calcularCuota(propuesta.getModalidad().getInteres().doubleValue(), propuesta.getPlazo().doubleValue(),
                             propuesta.getPeriodoCapital().longValue(), propuesta.getVencimientoInteres(),
                             propuesta.getTasaInteres().doubleValue(), propuesta.getMontoSolicitado().doubleValue(),
                             propuesta.getTipoCalculoImporte(), propuesta.getGastosAdministrativos().doubleValue());
@@ -188,6 +212,12 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
             }
 
             propuestaSolicitudManager.update(propuesta);
+
+            //Una ves que se actualiza la propuesta se verifica si fue aprobada para generar el credito
+            //Solicitud Aprobada
+            if (evaluacionSolicitudesCabecera.getEstado().getId() == 6) {
+                creditosManager.generarCredito(propuesta.getId(), evaluacionSolicitudesCabecera.getId(), idFuncionario, idEmpresa);
+            }
 
             evaluacionSolicitudesCabecera.setFechaFinAnalisis(new Timestamp(System.currentTimeMillis()));
 
@@ -207,12 +237,6 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
         evaluacionSolicitudesCabecera.setObservacionRecomendacion(evaluacionSolicitudes.getObservacionRecomendacion());
 
         this.update(evaluacionSolicitudesCabecera);
-
-        //Generar Credito
-        //Solicitud Aprobada
-        if (evaluacionSolicitudesCabecera.getEstado().getId() == 6) {
-            creditosManager.generarCredito(evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId(), evaluacionSolicitudesCabecera.getId(), idFuncionario);
-        }
 
         EvaluacionSolicitudesDetalles detalles;
         for (EvaluacionSolicitudesDetalles rpc : evaluacionSolicitudes.getDetalles()) {

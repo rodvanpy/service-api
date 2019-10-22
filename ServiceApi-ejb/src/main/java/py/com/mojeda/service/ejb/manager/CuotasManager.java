@@ -27,4 +27,10 @@ public interface CuotasManager extends GenericDao<Cuotas, Long>{
     public List<Cuotas> cuotasCredito(BigDecimal montoCapital, BigDecimal montoInteres,Date fechaVencimiento,Integer diaVencimiento,
             Short plazo, Short periodoCapital, Short periodoInteres, Short periodoGracia, TipoCalculos tipoCalculo,
             Modalidades modalidad, TipoDesembolsos tipoDesembolso, Date fechaGeneracion) throws Exception;
+    
+    public Long calcularCuota(Double modalidad, Double plazo, Long periodoCapital, Long vencimientoInteres,
+            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos);
+    
+    public Long calcularMontoInteres(Double plazo, Long periodoCapital, Long vencimientoInteres,
+            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos);
 }

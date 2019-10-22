@@ -53,6 +53,7 @@ import py.com.mojeda.service.ejb.entity.Vinculos;
 import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.BienesSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
+import py.com.mojeda.service.ejb.manager.CuotasManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesDetallesManager;
@@ -172,15 +173,19 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/EvaluacionSolicitudesDetallesManagerImpl")
     private EvaluacionSolicitudesDetallesManager evaluacionSolicitudesDetallesManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/CuotasManagerImpl")
+    private CuotasManager cuotasManager;
 
     @Override
-    public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception {
+    public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal, Long idEmpresa) throws Exception {
 
         if (idSucursal == null
                 && propuestaSolicitud == null) {
             return null;
         }
         //Cargar la sucursal
+        propuestaSolicitud.setIdEmpresa(idEmpresa);
         propuestaSolicitud.setSucursal(new Sucursales(idSucursal));
         propuestaSolicitud.setEntidad("PROPUESTA_SOLICITUD");
         propuestaSolicitud.setMoneda(new Monedas(1L));
@@ -229,7 +234,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         propuestaSolicitud.setMontoSolicitadoOriginal(propuestaSolicitud.getMontoSolicitado());
 
         //Calcular Cuota           
-        Long cuota = this.calcularCuota(propuestaSolicitud.getModalidad().getInteres().doubleValue(), propuestaSolicitud.getPlazo().doubleValue(), propuestaSolicitud.getPeriodoCapital().longValue(), propuestaSolicitud.getVencimientoInteres(),
+        Long cuota = cuotasManager.calcularCuota(propuestaSolicitud.getModalidad().getInteres().doubleValue(), propuestaSolicitud.getPlazo().doubleValue(), propuestaSolicitud.getPeriodoCapital().longValue(), propuestaSolicitud.getVencimientoInteres(),
                 propuestaSolicitud.getTasaInteres().doubleValue(), propuestaSolicitud.getMontoSolicitado().doubleValue(), propuestaSolicitud.getTipoCalculoImporte(), propuestaSolicitud.getGastosAdministrativos().doubleValue());
 
         if (propuestaSolicitud.getImporteCuota() != cuota) {
@@ -256,6 +261,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             propuestaSolicitud.getCliente().setPersona(deudor);
 
             Solicitantes ejSolicitantes = new Solicitantes();
+            ejSolicitantes.setIdEmpresa(idEmpresa);
             ejSolicitantes.setBarrio(deudor.getBarrio());
             ejSolicitantes.setCiudad(deudor.getCiudad());
             ejSolicitantes.setDepartamento(deudor.getDepartamento());
@@ -278,8 +284,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             ejSolicitantes.setTipoRelacion("DEUDOR");
             ejSolicitantes.setConsiderarConyuge(false);
 
-            if (deudor.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
-                    && deudor.getSeparacionBienes()) {
+            if (deudor.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
 
                 Vinculos ejVinculo = new Vinculos();
                 ejVinculo.setPersona(new Personas(deudor.getId()));
@@ -289,10 +294,13 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id".split(","));
 
                 if (conyugeMap != null) {
-
                     ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
-                    ejSolicitantes.setConsiderarConyuge(true);
-
+                    if(deudor.getSeparacionBienes() != null && deudor.getSeparacionBienes()){
+                        ejSolicitantes.setConsiderarConyuge(true);
+                    }else{
+                        ejSolicitantes.setConsiderarConyuge(false);
+                    }
+                    
                     solicitantesManager.save(ejSolicitantes);
 
                     this.guardarDatosConyugeSolicitudes(deudor.getId(), Long.parseLong(conyugeMap.get("personaVinculo.id").toString()),
@@ -304,6 +312,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             }
 
             Garantias ejGarantias = new Garantias();
+            ejGarantias.setIdEmpresa(idEmpresa);
             ejGarantias.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             ejGarantias.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             ejGarantias.setEstado("PENDIENTE");
@@ -327,18 +336,21 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
             ejIngresosEgresos.setActivo("S");
             ejIngresosEgresos.setPersona(new Personas(deudor.getId()));
+            
             this.guardarIngresosEgresosSolicitud(ingresosEgresosManager.list(ejIngresosEgresos), propuestaSolicitud.getId(), propuestaSolicitud.getFuncionario().getId());
 
             //GUARDAR OCUPACIONES
             OcupacionPersona ejOcupacionPersona = new OcupacionPersona();
             ejOcupacionPersona.setPersona(new Personas(deudor.getId()));
             ejOcupacionPersona.setActivo("S");
+            
             this.guardarOcupaciones(ocupacionPersonaManager.list(ejOcupacionPersona), propuestaSolicitud.getId(), propuestaSolicitud.getFuncionario().getId());
 
             //GUARDAR REFERENCIAS
             Referencias ejReferencias = new Referencias();
             ejReferencias.setPersona(new Personas(deudor.getId()));
             ejReferencias.setActivo("S");
+            
             this.guardarReferencias(referenciaManager.list(ejReferencias), propuestaSolicitud.getId(), propuestaSolicitud.getFuncionario().getId());
 
             if (propuestaSolicitud.getCodeudor() != null
@@ -351,6 +363,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
                 //GUARDAR SOLICITUD/GARANTIA CODEUDOR
                 ejSolicitantes = new Solicitantes();
+                ejSolicitantes.setIdEmpresa(idEmpresa);
                 ejSolicitantes.setBarrio(propuestaSolicitud.getCodeudor().getBarrio());
                 ejSolicitantes.setCiudad(propuestaSolicitud.getCodeudor().getCiudad());
                 ejSolicitantes.setDepartamento(propuestaSolicitud.getCodeudor().getDepartamento());
@@ -373,8 +386,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 ejSolicitantes.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
                 ejSolicitantes.setConsiderarConyuge(false);
 
-                if (propuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
-                        && propuestaSolicitud.getCodeudor().getSeparacionBienes()) {
+                if (propuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
 
                     Vinculos ejVinculo = new Vinculos();
                     ejVinculo.setPersona(new Personas(propuestaSolicitud.getCodeudor().getId()));
@@ -384,10 +396,13 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo,
                             "personaVinculo.id".split(","));
 
-                    if (conyugeMap != null) {
-                        ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
-                        ejSolicitantes.setConsiderarConyuge(true);
-
+                    if (conyugeMap != null) {                        
+                        ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));                       
+                        if(propuestaSolicitud.getCodeudor().getSeparacionBienes() != null && propuestaSolicitud.getCodeudor().getSeparacionBienes()){
+                            ejSolicitantes.setConsiderarConyuge(true);
+                        }else{
+                            ejSolicitantes.setConsiderarConyuge(false);
+                        }                       
                         solicitantesManager.save(ejSolicitantes);
 
                         this.guardarDatosConyugeSolicitudes(propuestaSolicitud.getCodeudor().getId(), Long.parseLong(conyugeMap.get("personaVinculo.id").toString()),
@@ -400,6 +415,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 }
 
                 ejGarantias = new Garantias();
+                ejGarantias.setIdEmpresa(idEmpresa);
                 ejGarantias.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
                 ejGarantias.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejGarantias.setEstado("PENDIENTE");
@@ -445,7 +461,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
     }
 
     @Override
-    public PropuestaSolicitud editar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception {
+    public PropuestaSolicitud editar(PropuestaSolicitud propuestaSolicitud, Long idSucursal, Long idEmpresa) throws Exception {
         PropuestaSolicitud ejPropuestaSolicitud;
         if (propuestaSolicitud.getId() == null) {
             return null;
@@ -492,7 +508,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 //            }
 //        }
         //Calcular Cuota           
-        Long cuota = this.calcularCuota(ejPropuestaSolicitud.getModalidad().getInteres().doubleValue(), ejPropuestaSolicitud.getPlazo().doubleValue(), ejPropuestaSolicitud.getPeriodoCapital().longValue(), ejPropuestaSolicitud.getVencimientoInteres(),
+        Long cuota = cuotasManager.calcularCuota(ejPropuestaSolicitud.getModalidad().getInteres().doubleValue(), ejPropuestaSolicitud.getPlazo().doubleValue(), ejPropuestaSolicitud.getPeriodoCapital().longValue(), ejPropuestaSolicitud.getVencimientoInteres(),
                 ejPropuestaSolicitud.getTasaInteres().doubleValue(), ejPropuestaSolicitud.getMontoSolicitado().doubleValue(), ejPropuestaSolicitud.getTipoCalculoImporte(), ejPropuestaSolicitud.getGastosAdministrativos().doubleValue());
 
         //if (ejPropuestaSolicitud.getImporteCuota() != cuota) {
@@ -562,8 +578,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     ejSolicitantes.setTelefonoParticular(ejPropuestaSolicitud.getCodeudor().getTelefonoParticular() + (ejPropuestaSolicitud.getCodeudor().getTelefonoSecundario() == null ? "" : " / " + ejPropuestaSolicitud.getCodeudor().getTelefonoSecundario()));
                     ejSolicitantes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
 
-                    if (ejPropuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
-                            && ejPropuestaSolicitud.getCodeudor().getSeparacionBienes()) {
+                    if (ejPropuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
 
                         Vinculos ejVinculo = new Vinculos();
                         ejVinculo.setPersona(new Personas(ejPropuestaSolicitud.getCodeudor().getId()));
@@ -573,8 +588,8 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                         Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id,personaVinculo.profesion.id,personaVinculo.numeroHijos,personaVinculo.numeroDependientes".split(","));
 
                         if (conyugeMap != null) {
-                            ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
-                            ejSolicitantes.setConsiderarConyuge(true);
+                            ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));                            
+                            ejSolicitantes.setConsiderarConyuge(ejPropuestaSolicitud.getCodeudor().getSeparacionBienes() == null ? false : ejPropuestaSolicitud.getCodeudor().getSeparacionBienes());
                             ejSolicitantes.setCantPersonasACargoCony(conyugeMap.get("numeroDependientes") == null ? null : Integer.parseInt(conyugeMap.get("numeroDependientes").toString()));
                             ejSolicitantes.setCantHijosCony(conyugeMap.get("numeroHijos") == null ? null : Integer.parseInt(conyugeMap.get("numeroHijos").toString()));
                             ejSolicitantes.setFechaDireccionCony(new Timestamp(System.currentTimeMillis()));
@@ -607,8 +622,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     ejSolicitantes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                     ejSolicitantes.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
 
-                    if (ejPropuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
-                            && ejPropuestaSolicitud.getCodeudor().getSeparacionBienes()) {
+                    if (ejPropuestaSolicitud.getCodeudor().getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
 
                         Vinculos ejVinculo = new Vinculos();
                         ejVinculo.setPersona(new Personas(ejPropuestaSolicitud.getCodeudor().getId()));
@@ -619,7 +633,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
                         if (conyugeMap != null) {
                             ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
-                            ejSolicitantes.setConsiderarConyuge(true);
+                            ejSolicitantes.setConsiderarConyuge(ejPropuestaSolicitud.getCodeudor().getSeparacionBienes() == null ? false : ejPropuestaSolicitud.getCodeudor().getSeparacionBienes());
                             ejSolicitantes.setCantPersonasACargoCony(conyugeMap.get("numeroDependientes") == null ? null : Integer.parseInt(conyugeMap.get("numeroDependientes").toString()));
                             ejSolicitantes.setCantHijosCony(conyugeMap.get("numeroHijos") == null ? null : Integer.parseInt(conyugeMap.get("numeroHijos").toString()));
                             ejSolicitantes.setFechaDireccionCony(new Timestamp(System.currentTimeMillis()));
@@ -1196,8 +1210,8 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
     }
 
     @Override
-    public void tranferirPropuesta(Long idSolicitud, Long idPersona) throws Exception {
-        
+    public void tranferirPropuesta(Long idSolicitud, Long idPersona, Long idEmpresa) throws Exception {
+
         PropuestaSolicitud ejPropuestaSolicitud = this.get(idSolicitud);
 
         //ESTADO PENDIENTE
@@ -1211,6 +1225,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
             //Cargar cabera de la evaluacion
             EvaluacionSolicitudesCabecera evaluacionCabecera = new EvaluacionSolicitudesCabecera();
+            evaluacionCabecera.setIdEmpresa(idEmpresa);
             evaluacionCabecera.setActivo("S");
             evaluacionCabecera.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -1250,6 +1265,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 }
 
                 detalle = new EvaluacionSolicitudesDetalles();
+                detalle.setIdEmpresa(idEmpresa);
                 detalle.setActivo("S");
                 detalle.setGarantiasVigente(ejPropuestaSolicitud.getTipoGarantia().getNombre());
                 detalle.setEgresosTotal(totalEgresos);
@@ -1300,246 +1316,28 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
     }
 
     @Override
-    public Long calcularCuota(Double modalidad, Double plazo, Long periodoCapital, Long vencimientoInteres,
-            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos) {
-        try {
-            if (tipoCalculoImporte != null && "TC-2".equals(tipoCalculoImporte.getCodigo())) {
+    public void delete(Long idSolicitud, Long idFuncionario) throws Exception {
+        
+        PropuestaSolicitud model = this.get(idSolicitud);
+        
+        model.setActivo("N");
+        model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+        model.setIdUsuarioModificacion(idFuncionario);
+        model.setIdUsuarioEliminacion(idFuncionario);
+        model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
 
-                Double interes = (gastosAdministrativos == null ? 0 : gastosAdministrativos) + tasaInteres;
-
-                Double valor_1 = ((montoSolicitado * interes) / 36500) * vencimientoInteres;
-
-                Long valor_2 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo)) - 1;
-
-                Long valor_3 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo));
-
-                Double valor_4 = valor_1 / valor_2;
-
-                //this.myForm.controls['importeCuota'].setValue(Math.round(valor_4 * valor_3));
-                return (Math.round(valor_4 * valor_3));
-
-            } else if (tipoCalculoImporte != null && "TC-4".equals(tipoCalculoImporte.getCodigo())) {
-
-                //Interés simple (i) = Capital (c) x Tipo de Interés (r) x Tiempo (t)
-                //• Si la duración es 3 años, t = 3
-                //• Si la duración es 18 meses, t = 18 / 12 = 1,5
-                //• Si la duración es 1 año, t = 1
-                //• Si la duración es 6 meses, t = 6 / 12 = 0,5
-                //• Si la duración es 1 día, t = 1 / 365
-                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
-
-                Double periodoInteres = this.periodoInteresSimple(plazo, interes, periodoCapital, vencimientoInteres);
-
-                Double montoInteres = montoSolicitado * periodoInteres * plazo;
-
-                Double montoTotal = montoSolicitado + montoInteres;
-
-                Long montoCuota = Math.round(montoTotal / plazo);
-
-                //this.myForm.controls['importeCuota'].setValue();
-                return montoCuota;
-
-            } else if (tipoCalculoImporte != null && "TC-5".equals(tipoCalculoImporte.getCodigo())) {
-
-                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
-
-                Double periodoInteres = this.periodoInteresCompuesto(plazo, interes, periodoCapital, vencimientoInteres);
-
-                Double montoInteres = montoSolicitado * periodoInteres;
-
-                Double montoTotal = montoSolicitado + montoInteres;
-
-                Long montoCuota = Math.round(montoTotal / plazo);
-
-                //this.myForm.controls['importeCuota'].setValue(Math.round(montoCuota));
-                return montoCuota;
-            } else if (tipoCalculoImporte != null && "TC-6".equals(tipoCalculoImporte.getCodigo())) {
-
-                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
-
-                Double montoInteres = montoSolicitado * interes;
-
-                Double montoTotal = montoSolicitado + montoInteres;
-
-                Long montoCuota = Math.round(montoTotal / plazo);
-
-                return montoCuota;
-            }
-        } catch (Exception e) {
-            logger.error("Error al calcularCuota", e);
+        this.update(model);
+        
+        //Actualizar las garantias con el idCredito
+        Garantias garantias = new Garantias();
+        garantias.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+        
+        List<Garantias> listGarantias = garantiasManager.list(garantias);
+        for(Garantias rpc : listGarantias){
+            rpc.setEstado("INACTIVO");
+            rpc.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            garantiasManager.update(rpc);
         }
-        return null;
-
-    }
-    
-    @Override
-    public Long calcularMontoInteres(Double plazo, Long periodoCapital, Long vencimientoInteres,
-            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos) {
-        try {
-            if (tipoCalculoImporte != null && "TC-2".equals(tipoCalculoImporte.getCodigo())) {
-
-                Double interes = (gastosAdministrativos == null ? 0 : gastosAdministrativos) + tasaInteres;
-
-                Double valor_1 = ((montoSolicitado * interes) / 36500) * vencimientoInteres;
-
-                Long valor_2 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo)) - 1;
-
-                Long valor_3 = Math.round(Math.pow((1 + ((interes / 36500) * vencimientoInteres)), plazo));
-
-                Double valor_4 = valor_1 / valor_2;
-
-                //this.myForm.controls['importeCuota'].setValue(Math.round(valor_4 * valor_3));
-                return (Math.round(valor_4 * valor_3));
-
-            } else if (tipoCalculoImporte != null && "TC-4".equals(tipoCalculoImporte.getCodigo())) {
-
-                //Interés simple (i) = Capital (c) x Tipo de Interés (r) x Tiempo (t)
-                //• Si la duración es 3 años, t = 3
-                //• Si la duración es 18 meses, t = 18 / 12 = 1,5
-                //• Si la duración es 1 año, t = 1
-                //• Si la duración es 6 meses, t = 6 / 12 = 0,5
-                //• Si la duración es 1 día, t = 1 / 365
-                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
-
-                Double periodoInteres = this.periodoInteresSimple(plazo, interes, periodoCapital, vencimientoInteres);
-
-                Double montoInteres = montoSolicitado * periodoInteres * plazo;
-
-                return montoInteres.longValue();
-
-            } else if (tipoCalculoImporte != null && "TC-5".equals(tipoCalculoImporte.getCodigo())) {
-
-                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
-
-                Double periodoInteres = this.periodoInteresCompuesto(plazo, interes, periodoCapital, vencimientoInteres);
-
-                Double montoInteres = montoSolicitado * periodoInteres;
-
-                return montoInteres.longValue();
-                
-            } else if (tipoCalculoImporte != null && "TC-6".equals(tipoCalculoImporte.getCodigo())) {
-
-                Double interes = this.calcularInteres(gastosAdministrativos, tasaInteres);
-
-                Double montoInteres = montoSolicitado * interes;
-
-                return montoInteres.longValue();
-            }
-        } catch (Exception e) {
-            logger.error("Error al calcularMontoInteres", e);
-        }
-        return null;
-
-    }
-
-    public Double calcularInteres(Double tasaInteres, Double gastosAdministrativos) {
-        try {
-            Double interes = ((gastosAdministrativos == null ? 0 : gastosAdministrativos) + tasaInteres) / 100;
-
-            return interes;
-        } catch (Exception e) {
-            logger.error("Error al calcularInteres", e);
-        }
-        return null;
-
-    }
-
-    @Override
-    public Double periodoInteresSimple(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres) {
-        try {
-            Double periodoInteres = 0.0;
-
-            if (vencimientoInteres == 30) {
-
-                periodoInteres = interes / 12;
-
-            } else if (vencimientoInteres == 0) {
-
-                if (periodoCapital == 60) {
-
-                    periodoInteres = interes / 6;
-
-                } else if (periodoCapital == 90) {
-
-                    periodoInteres = interes / 4;
-
-                } else if (periodoCapital == 180) {
-
-                    periodoInteres = interes / 2;
-
-                } else if (periodoCapital == 360) {
-
-                    periodoInteres = interes / 1;
-
-                } else if (periodoCapital == 15) {
-
-                    periodoInteres = interes / 24;
-
-                } else if (periodoCapital == 1) {
-
-                    periodoInteres = interes / 36;
-
-                } else if (periodoCapital == 30) {
-
-                    periodoInteres = interes / 12;
-
-                }
-            }
-
-            return periodoInteres;
-        } catch (Exception e) {
-            logger.error("Error al periodoInteresSimple", e);
-        }
-        return null;
-
-    }
-
-    @Override
-    public Double periodoInteresCompuesto(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres) {
-        try {
-            Double periodoInteres = 0.0;
-            if (vencimientoInteres == 30) {
-
-                periodoInteres = (Math.pow((1 + interes), plazo / 12)) - 1;
-
-            } else if (vencimientoInteres == 0) {
-
-                if (periodoCapital == 60) {
-
-                    periodoInteres = (Math.pow((1 + (interes / 6)), ((plazo / 12) * 6))) - 1;
-
-                } else if (periodoCapital == 90) {
-
-                    periodoInteres = (Math.pow((1 + (interes / 4)), ((plazo / 12) * 4))) - 1;
-
-                } else if (periodoCapital == 180) {
-
-                    periodoInteres = (Math.pow((1 + (interes / 2)), ((plazo / 12) * 2))) - 1;
-
-                } else if (periodoCapital == 360) {
-
-                    periodoInteres = (Math.pow((1 + interes), plazo / 12)) - 1;
-
-                } else if (periodoCapital == 15) {
-
-                    periodoInteres = interes / 24;
-
-                } else if (periodoCapital == 1) {
-
-                    periodoInteres = (Math.pow((1 + (interes / 2)), ((plazo / 12) * 2))) - 1;
-
-                } else if (periodoCapital == 30) {
-
-                    periodoInteres = (Math.pow((1 + interes), plazo / 12)) - 1;
-
-                }
-            }
-            return periodoInteres;
-        } catch (Exception e) {
-            logger.error("Error al periodoInteresSimple", e);
-        }
-        return null;
-
     }
 
     public void guardarIngresosEgresosSolicitud(List<IngresosEgresos> ingresosEgresos, Long idSolicitud, Long idUsuarioAlta) throws Exception {
@@ -1986,6 +1784,6 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             this.guardarReferencias(referenciaManager.list(ejReferencias), idPropuesta, idFuncionario);
 
         }
-    }   
+    }
 
 }

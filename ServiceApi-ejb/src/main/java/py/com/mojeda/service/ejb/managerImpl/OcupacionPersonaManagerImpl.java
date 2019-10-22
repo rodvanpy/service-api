@@ -37,7 +37,7 @@ public class OcupacionPersonaManagerImpl extends GenericDaoImpl<OcupacionPersona
     }
 
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    protected static final DateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/TipoOcupacionesManagerImpl")
     private TipoOcupacionesManager tipoOcupacionesManager;

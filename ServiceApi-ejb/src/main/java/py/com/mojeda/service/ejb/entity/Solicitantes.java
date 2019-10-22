@@ -145,6 +145,10 @@ public class Solicitantes implements Serializable {
     @JsonIgnore
     @Column(name = "FECHA_MODIFICACION")
     private Timestamp fechaModificacion;
+    
+    @JsonIgnore
+    @Column(name = "ID_EMPRESA")
+    private Long idEmpresa;
 
     public Solicitantes() {
     }
@@ -641,6 +645,14 @@ public class Solicitantes implements Serializable {
      */
     public void setFechaModificacion(Timestamp fechaModificacion) {
         this.fechaModificacion = fechaModificacion;
+    }
+
+    public Long getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+        this.idEmpresa = idEmpresa;
     }
 
     

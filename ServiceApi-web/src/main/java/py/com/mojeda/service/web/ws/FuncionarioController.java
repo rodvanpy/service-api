@@ -43,7 +43,7 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @RequestMapping(value = "/funcionarios")
 public class FuncionarioController extends BaseController {
 
-    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,"
+    String atributos = "id,alias,claveAcceso,superUsuario,expirationTimeTokens,retirado,"
             + "nroLegajo,fechaIngreso,fechaEgreso,cargo.id,tipoFuncionario.id,tipoMotivoRetiro.id,persona.id,"
             + "rol.id,sucursal.id,sucursal.empresa.id,activo";
 
@@ -99,7 +99,7 @@ public class FuncionarioController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(funcionarioManager.list(model).size() + "");
+                total = funcionarioManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;

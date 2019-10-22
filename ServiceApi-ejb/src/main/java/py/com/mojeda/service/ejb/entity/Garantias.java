@@ -22,6 +22,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.hibernate.annotations.Index;
 
 /**
  *
@@ -68,7 +69,7 @@ public class Garantias implements Serializable {
     private String indicadorImpresion;
     
     @Column(name = "ID_CREDITO")
-    private String idCredito;
+    private Long idCredito;
     
     @Column(name = "ID_HIPOTECA")
     private Integer idHipoteca;
@@ -104,6 +105,10 @@ public class Garantias implements Serializable {
     @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")
     @ManyToOne
     private PropuestaSolicitud propuestaSolicitud;
+    
+    @JsonIgnore
+    @Column(name = "ID_EMPRESA")
+    private Long idEmpresa;
     
 
     public Garantias() {
@@ -186,14 +191,14 @@ public class Garantias implements Serializable {
     /**
      * @return the idCredito
      */
-    public String getIdCredito() {
+    public Long getIdCredito() {
         return idCredito;
     }
 
     /**
      * @param idCredito the idCredito to set
      */
-    public void setIdCredito(String idCredito) {
+    public void setIdCredito(Long idCredito) {
         this.idCredito = idCredito;
     }
 
@@ -358,5 +363,13 @@ public class Garantias implements Serializable {
     public void setTipoRelacion(String tipoRelacion) {
         this.tipoRelacion = tipoRelacion;
     }
-       
+
+    public Long getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+        this.idEmpresa = idEmpresa;
+    }   
+    
 }

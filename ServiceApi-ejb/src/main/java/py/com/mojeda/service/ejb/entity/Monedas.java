@@ -37,7 +37,7 @@ public class Monedas extends Base{
     
     @Basic(optional = false)
     @Column(name = "DESCRIPCION")
-    private String descripcion;
+    private String nombre;
     
     @Column(name = "ENTIDAD")
     private String entidad = "MONEDAS";
@@ -77,19 +77,14 @@ public class Monedas extends Base{
         this.decimales = decimales;
     }
 
-    /**
-     * @return the descripcion
-     */
-    public String getDescripcion() {
-        return descripcion;
+    public String getNombre() {
+        return nombre;
     }
 
-    /**
-     * @param descripcion the descripcion to set
-     */
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
+    
     
     /**
      * @return the entidad

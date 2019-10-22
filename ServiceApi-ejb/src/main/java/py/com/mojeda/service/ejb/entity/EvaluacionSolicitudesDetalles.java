@@ -24,6 +24,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Index;
 
 /**
  *
@@ -239,6 +240,10 @@ public class EvaluacionSolicitudesDetalles extends Base {
     @ManyToOne
     @JoinColumn(name = "ID_CABECERA", referencedColumnName = "id")
     private EvaluacionSolicitudesCabecera evaluacionSolicitudCabecera;
+    
+    @JsonIgnore
+    @Column(name = "ID_EMPRESA")
+    private Long idEmpresa;
 
     public EvaluacionSolicitudesDetalles() {
 
@@ -1127,5 +1132,14 @@ public class EvaluacionSolicitudesDetalles extends Base {
     public void setCreditoVigente(String creditoVigente) {
         this.creditoVigente = creditoVigente;
     }
+
+    public Long getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+        this.idEmpresa = idEmpresa;
+    }
+        
         
 }

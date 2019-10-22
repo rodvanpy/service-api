@@ -61,8 +61,8 @@ public class ImagenController extends BaseController {
 
                 if (imagen != null) { // Si existe la imagen
                     File file;
-                    if(imagen.getDocumento()!= null){
-                        file = convertirImagen(imagen.getDocumento(), 640);
+                    if(imagen.getArchivo() != null){
+                        file = convertirImagen(imagen.getArchivo(), 640);
                     }else{
                         file = new File(imagen.getPath());
                     }
@@ -90,7 +90,7 @@ public class ImagenController extends BaseController {
                 imagen = documentoManager.get(imagen);
 
                 if (imagen != null) { // Si existe la imagen temporal
-                    File file = convertirImagen(imagen.getDocumento(), 640);
+                    File file = convertirImagen(imagen.getArchivo(), 640);
                     BufferedImage bufferedImage = ImageIO.read(file);
                     OutputStream output = response.getOutputStream();
                     ImageIO.write(bufferedImage, "jpg", output);

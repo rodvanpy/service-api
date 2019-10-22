@@ -97,7 +97,7 @@ public class ClienteController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(clientesManager.list(model).size() + "");
+                total = clientesManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -356,7 +356,9 @@ public class ClienteController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            model = clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()));
+            clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()));
+            
+            model = clientesManager.getCliente(new Clientes(id),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
             
             response.setModel(model);
             response.setStatus(200);

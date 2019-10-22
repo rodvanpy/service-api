@@ -69,13 +69,9 @@ public class PropuestaSolicitudCreditoController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        //Buscar usuario por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
         PropuestaSolicitud model = new PropuestaSolicitud();
         model.setActivo("S");
-        model.setSucursal(ejSucursales);
+        model.setIdEmpresa(userDetail.getIdEmpresa());
         model.setTipoSolicitud(new TipoSolicitudes(1L));
         //Listar solo las propuestas del funcionario
         if (!userDetail.tienePermiso("ROLE_SOLICITUDE.LISTALL")) {
@@ -115,7 +111,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(propuestaSolicitudManager.list(model).size() + "");
+                total = propuestaSolicitudManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -266,7 +262,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
         try {
             inicializarPropuestaSolicitudManager();
 
-            propuestaSolicitudManager.tranferirPropuesta(id,userDetail.getId());
+            propuestaSolicitudManager.tranferirPropuesta(id, userDetail.getId(), userDetail.getIdEmpresa());
 
             response.setStatus(200);
             response.setMessage("Propuesta tranferida para analisis");
@@ -348,11 +344,6 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                         .collect(Collectors.joining(",")));
                 return response;
             }
-            //Buscar usuario por empresa
-            model.setIdUsuarioCreacion(userDetail.getId());
-            model.setIdUsuarioModificacion(userDetail.getId());
-            model.setFuncionario(new Funcionarios(userDetail.getId()));
-
             //Buscar cliente con estado pendiente
             Personas ejPersonas = new Personas();
             ejPersonas.setDocumento(model.getCliente().getPersona().getDocumento());
@@ -362,6 +353,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
 
             PropuestaSolicitud ejPropuestaSolicitud = new PropuestaSolicitud();
             ejPropuestaSolicitud.setCliente(ejCliente);
+            ejPropuestaSolicitud.setActivo("S");
             ejPropuestaSolicitud.setEstado(new EstadosSolicitud(1L));
 
             if (propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0) {
@@ -369,8 +361,23 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                 response.setMessage("El cliente cuenta con una solicitud en estado pendiente.");
                 return response;
             }
+            
+            ejPropuestaSolicitud = new PropuestaSolicitud();
+            ejPropuestaSolicitud.setCliente(ejCliente);
+            ejPropuestaSolicitud.setActivo("S");
+            ejPropuestaSolicitud.setEstado(new EstadosSolicitud(2L));
 
-            model = propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal());
+            if (propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0) {
+                response.setStatus(205);
+                response.setMessage("El cliente cuenta con una solicitud en analisis.");
+                return response;
+            }
+
+            model.setIdUsuarioCreacion(userDetail.getId());
+            model.setIdUsuarioModificacion(userDetail.getId());
+            model.setFuncionario(new Funcionarios(userDetail.getId()));
+            
+            model = propuestaSolicitudManager.guardar(model, userDetail.getIdSusursal(), userDetail.getIdEmpresa());
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -446,7 +453,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
 
-            model = propuestaSolicitudManager.editar(model, userDetail.getIdSusursal());
+            model = propuestaSolicitudManager.editar(model, userDetail.getIdSusursal(), userDetail.getIdEmpresa());
 
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -558,16 +565,8 @@ public class PropuestaSolicitudCreditoController extends BaseController {
         try {
             inicializarPropuestaSolicitudManager();
 
-            PropuestaSolicitud model = propuestaSolicitudManager.get(id);
-            model.setActivo("N");
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioModificacion(userDetail.getId());
-            model.setIdUsuarioEliminacion(userDetail.getId());
-            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
-
-            propuestaSolicitudManager.update(model);
-
-            response.setModel(model);
+            propuestaSolicitudManager.delete(id,userDetail.getId());
+            
             response.setStatus(200);
             response.setMessage("Registro eliminado con exito.");
         } catch (Exception e) {

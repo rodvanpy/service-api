@@ -33,6 +33,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import net.sourceforge.tess4j.Tesseract;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -90,6 +91,7 @@ public class ArchivoController extends BaseController {
                 documentoManager.update(ejDocumento);
 
             } else {
+                
                 ejDocumento.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
                 ejDocumento.setActivo("S");
                 ejDocumento.setIdUsuarioCreacion(userDetail.getId());
@@ -105,30 +107,33 @@ public class ArchivoController extends BaseController {
                 File fos = new File(CONTENT_PATH + path);
                 //Reducir Calidad Imagen en un 30%
                 if (ejDocumento.getTipoArchivo().compareToIgnoreCase("image/jpeg") == 0) {
-                    BufferedImage originalImage = ImageIO.read(file.getInputStream());
-
-                    Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
-                    ImageWriter writer = (ImageWriter) iter.next();
-                    ImageWriteParam iwp = writer.getDefaultWriteParam();
-
-                    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                    float quality = 0.5f;  // reduce quality by 30%  
-                    iwp.setCompressionQuality(quality);
-
-                    FileImageOutputStream output = new FileImageOutputStream(fos);
-                    writer.setOutput(output);
-
-                    IIOImage image = new IIOImage(originalImage, null, null);
-                    writer.write(null, image, iwp);
-                    writer.dispose();
+                    file.transferTo(fos);
                     
-                    fos = new File(CONTENT_PATH + path);
+                    fos = this.reduceImageQuality(120000, CONTENT_PATH + path , CONTENT_PATH + path);
+//                    BufferedImage originalImage = ImageIO.read(file.getInputStream());
+//
+//                    Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
+//                    ImageWriter writer = (ImageWriter) iter.next();
+//                    ImageWriteParam iwp = writer.getDefaultWriteParam();
+//
+//                    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+//                    float quality = 0.5f;  // reduce quality by 30%  
+//                    iwp.setCompressionQuality(quality);
+//
+//                    FileImageOutputStream output = new FileImageOutputStream(fos);
+//                    writer.setOutput(output);
+//
+//                    IIOImage image = new IIOImage(originalImage, null, null);
+//                    writer.write(null, image, iwp);
+//                    writer.dispose();
+//
+//                    fos = new File(CONTENT_PATH + path);
                     ejDocumento.setSize(fos.length());
                 } else {
                     file.transferTo(fos);
                 }
 
-                ejDocumento.setDocumento(null);
+                ejDocumento.setArchivo(null);
                 ejDocumento.setPath(CONTENT_PATH + path);
 
                 documentoManager.save(ejDocumento);
@@ -136,6 +141,11 @@ public class ArchivoController extends BaseController {
 
             ejDocumento = documentoManager.get(ejDocumento.getId());
 
+//            Tesseract tesseract = new Tesseract();
+//            tesseract.setDatapath("/image/");
+//            
+//            String text = tesseract.doOCR(new File(ejDocumento.getPath()));
+//            logger.info("TEXTO IMAGEN: " + text);
             response.setModel(ejDocumento);
             response.setStatus(ejDocumento == null ? 404 : 200);
             response.setMessage(ejDocumento == null ? "No se pudo guardar el registro." : "Registro creado/modificado con exito");
@@ -399,6 +409,68 @@ public class ArchivoController extends BaseController {
         } finally {
             file.deleteOnExit();
         }
+    }
+
+    public File reduceImageQuality(int sizeThreshold, String srcImg, String destImg) throws Exception {
+        float quality = 1.0f;
+
+        File file = new File(srcImg);
+
+        long fileSize = file.length();
+
+        if (fileSize <= sizeThreshold) {
+            System.out.println("Image file size is under threshold");
+            return file;
+        }
+
+        Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
+
+        ImageWriter writer = (ImageWriter) iter.next();
+
+        ImageWriteParam iwp = writer.getDefaultWriteParam();
+
+        iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+
+        FileInputStream inputStream = new FileInputStream(file);
+
+        BufferedImage originalImage = ImageIO.read(inputStream);
+        IIOImage image = new IIOImage(originalImage, null, null);
+
+        float percent = 0.1f;   // 10% of 1  
+        File fileOut2 = null;
+        while (fileSize > sizeThreshold) {
+            if (percent >= quality) {
+                percent = percent * 0.1f;
+            }
+
+            quality -= percent;
+
+            File fileOut = new File(destImg);
+            if (fileOut.exists()) {
+                fileOut.delete();
+            }
+            FileImageOutputStream output = new FileImageOutputStream(fileOut);
+
+            writer.setOutput(output);
+
+            iwp.setCompressionQuality(quality);
+
+            writer.write(null, image, iwp);
+
+            fileOut2 = new File(destImg);
+            long newFileSize = fileOut2.length();
+            if (newFileSize == fileSize) {
+                // cannot reduce more, return  
+                break;
+            } else {
+                fileSize = newFileSize;
+            }
+            output.close();
+        }
+
+        writer.dispose();
+        
+        return fileOut2;
     }
 
 }

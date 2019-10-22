@@ -86,7 +86,7 @@ public class DepartamentosPaisController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(departamentosPaisManager.list(model).size() + "");
+                total = departamentosPaisManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;

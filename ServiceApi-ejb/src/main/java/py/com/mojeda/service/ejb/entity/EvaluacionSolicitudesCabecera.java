@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -22,6 +23,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+import org.hibernate.annotations.Index;
 
 /**
  *
@@ -95,6 +97,11 @@ public class EvaluacionSolicitudesCabecera extends Base {
     @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")
     @ManyToOne
     private PropuestaSolicitud propuestaSolicitud;
+    
+    @JsonIgnore
+    @Index(name="empresa_id_idx")
+    @Column(name = "ID_EMPRESA")
+    private Long idEmpresa;
 
     @Transient
     private List<EvaluacionSolicitudesDetalles> detalles;
@@ -331,6 +338,14 @@ public class EvaluacionSolicitudesCabecera extends Base {
 
     public void setRequiereVerificador(Boolean requiereVerificador) {
         this.requiereVerificador = requiereVerificador;
-    }    
+    } 
+
+    public Long getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+        this.idEmpresa = idEmpresa;
+    }   
 
 }

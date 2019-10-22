@@ -36,7 +36,7 @@ public class OcupacionSolicitudesManagerImpl extends GenericDaoImpl<OcupacionSol
     }
 
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    protected static final DateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/TipoOcupacionesManagerImpl")
     private TipoOcupacionesManager tipoOcupacionesManager;
@@ -173,7 +173,6 @@ public class OcupacionSolicitudesManagerImpl extends GenericDaoImpl<OcupacionSol
                 + "telefonoSecundario,fechaIngreso,fechaSalida,interno,ingresosMensuales,tipoOcupacion.id";
 
         Map<String, Object> ocupacion = this.getAtributos(ocupacionPersona, atributos.split(","));
-
         if (ocupacion != null) {
             
             model = new OcupacionSolicitudes();

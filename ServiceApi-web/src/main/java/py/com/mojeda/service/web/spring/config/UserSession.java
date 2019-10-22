@@ -54,7 +54,9 @@ public class UserSession implements AuthenticationProvider {
             
             Funcionarios ejObjeto = new Funcionarios();
             ejObjeto.setAlias(userLogin);
-
+            ejObjeto.setActivo("S");
+            ejObjeto.setRetirado(Boolean.FALSE);
+            
             Map<String, Object> objetoMap = usuarioManager.getAtributos(ejObjeto,"id,alias,claveAcceso,nroLegajo,persona.id,persona.primerNombre,persona.segundoNombre,persona.primerApellido,persona.segundoApellido,persona.imagePath,sucursal.id,sucursal.empresa.id,rol.id,rol.nombre".split(","));           
             if (objetoMap != null) {
 

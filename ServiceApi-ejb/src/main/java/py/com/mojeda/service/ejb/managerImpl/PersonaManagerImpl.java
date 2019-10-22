@@ -193,7 +193,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
 
         }
 
-        if (persona.getConyuge() != null) {
+        if (persona.getConyuge() != null
+                && persona.getConyuge().getDocumento() != null) {
 
             Personas ejConyuge = new Personas();
             ejConyuge.setDocumento(persona.getConyuge().getDocumento());

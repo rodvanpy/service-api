@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import py.com.mojeda.service.ejb.entity.Bienes;
 import py.com.mojeda.service.ejb.entity.BienesSolicitudes;
 import py.com.mojeda.service.ejb.entity.Ciudades;
 import py.com.mojeda.service.ejb.entity.DepartamentosPais;
@@ -36,7 +37,7 @@ public class BienesSolicitudesManagerImpl extends GenericDaoImpl<BienesSolicitud
     }
 
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    protected static final DateFormat dateFormat= new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    protected static final DateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd HH:mm");
     
     @EJB(mappedName = "java:app/ServiceApi-ejb/PaisesManagerImpl")
     private PaisesManager paisesManager;
@@ -51,32 +52,45 @@ public class BienesSolicitudesManagerImpl extends GenericDaoImpl<BienesSolicitud
     public BienesSolicitudes guardarBienesSolicitud(BienesSolicitudes bienes) throws Exception{
         BienesSolicitudes object = null;
         try {
-            if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
-                if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
-                } else {
-                    if (bienes.getMarca() != null) {
-                        bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                        bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                        bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                        this.save(bienes);
-                    }
-                }
+            if (bienes.getId() != null) {
+
+                BienesSolicitudes upBienes = this.get(bienes.getId());
+
+                upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                upBienes.setBarrio(bienes.getBarrio() == null ? null : bienes.getBarrio().toUpperCase());
+                upBienes.setCiudad(bienes.getCiudad() == null ? null : bienes.getCiudad());
+                upBienes.setCuentaCatastral(bienes.getCuentaCatastral() == null ? null : bienes.getCuentaCatastral().toUpperCase());
+                upBienes.setCuotaMensual(bienes.getCuotaMensual() == null ? null : bienes.getCuotaMensual());
+                upBienes.setDepartamento(bienes.getDepartamento() == null ? null : bienes.getDepartamento());
+                upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                upBienes.setDistrito(bienes.getDistrito() == null ? null : bienes.getDistrito().toUpperCase());
+                upBienes.setEdificado(bienes.getEdificado() == null ? false : bienes.getEdificado());
+                upBienes.setEscriturado(bienes.getEscriturado() == null ? false : bienes.getEscriturado());
+                upBienes.setFechaDeclaracion(bienes.getFechaDeclaracion() == null ? null : bienes.getFechaDeclaracion());
+                upBienes.setFechaHipoteca(bienes.getFechaHipoteca() == null ? null : bienes.getFechaHipoteca());
+                upBienes.setFechaVenta(bienes.getFechaVenta() == null ? null : bienes.getFechaVenta());
+                upBienes.setHipotecado(bienes.getHipotecado() == null ? false : bienes.getHipotecado());
+                upBienes.setLatitud(bienes.getLatitud() == null ? null : bienes.getLatitud());
+                upBienes.setLongitud(bienes.getLongitud() == null ? null : bienes.getLongitud());
+                upBienes.setNumeroFinca(bienes.getNumeroFinca() == null ? null : bienes.getNumeroFinca().toUpperCase());
+                upBienes.setModeloAnio(bienes.getModeloAnio() == null ? null : bienes.getModeloAnio());
+                upBienes.setNumeroMatricula(bienes.getNumeroMatricula() == null ? null : bienes.getNumeroMatricula().toUpperCase());
+                upBienes.setPais(bienes.getPais() == null ? null : bienes.getPais());
+                upBienes.setSaldo(bienes.getSaldo() == null ? null : bienes.getSaldo());
+                upBienes.setValorActual(bienes.getValorActual() == null ? null : bienes.getValorActual());
+                upBienes.setVencimientoHipoteca(bienes.getVencimientoHipoteca() == null ? null : bienes.getVencimientoHipoteca());
+
+                this.update(upBienes);
+
             } else {
-                if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
-                } else {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.save(bienes);
-                }
+
+                bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+
+                this.save(bienes);
+
             }
             object = this.getBienesSolicitud(bienes);
         } catch (Exception e) {
@@ -89,30 +103,45 @@ public class BienesSolicitudesManagerImpl extends GenericDaoImpl<BienesSolicitud
     public BienesSolicitudes editarBienesSolicitud(BienesSolicitudes bienes) throws Exception {
         BienesSolicitudes object = null;
         try {
-            if (bienes.getTipoBien().compareToIgnoreCase("INMUEBLE") == 0) {
-                if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
-                } else {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.save(bienes);
-                }
+            if (bienes.getId() != null) {
+
+                BienesSolicitudes upBienes = this.get(bienes.getId());
+
+                upBienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                upBienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+                upBienes.setBarrio(bienes.getBarrio() == null ? null : bienes.getBarrio().toUpperCase());
+                upBienes.setCiudad(bienes.getCiudad() == null ? null : bienes.getCiudad());
+                upBienes.setCuentaCatastral(bienes.getCuentaCatastral() == null ? null : bienes.getCuentaCatastral().toUpperCase());
+                upBienes.setCuotaMensual(bienes.getCuotaMensual() == null ? null : bienes.getCuotaMensual());
+                upBienes.setDepartamento(bienes.getDepartamento() == null ? null : bienes.getDepartamento());
+                upBienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                upBienes.setDistrito(bienes.getDistrito() == null ? null : bienes.getDistrito().toUpperCase());
+                upBienes.setEdificado(bienes.getEdificado() == null ? false : bienes.getEdificado());
+                upBienes.setEscriturado(bienes.getEscriturado() == null ? false : bienes.getEscriturado());
+                upBienes.setFechaDeclaracion(bienes.getFechaDeclaracion() == null ? null : bienes.getFechaDeclaracion());
+                upBienes.setFechaHipoteca(bienes.getFechaHipoteca() == null ? null : bienes.getFechaHipoteca());
+                upBienes.setFechaVenta(bienes.getFechaVenta() == null ? null : bienes.getFechaVenta());
+                upBienes.setHipotecado(bienes.getHipotecado() == null ? false : bienes.getHipotecado());
+                upBienes.setLatitud(bienes.getLatitud() == null ? null : bienes.getLatitud());
+                upBienes.setLongitud(bienes.getLongitud() == null ? null : bienes.getLongitud());
+                upBienes.setNumeroFinca(bienes.getNumeroFinca() == null ? null : bienes.getNumeroFinca().toUpperCase());
+                upBienes.setModeloAnio(bienes.getModeloAnio() == null ? null : bienes.getModeloAnio());
+                upBienes.setNumeroMatricula(bienes.getNumeroMatricula() == null ? null : bienes.getNumeroMatricula().toUpperCase());
+                upBienes.setPais(bienes.getPais() == null ? null : bienes.getPais());
+                upBienes.setSaldo(bienes.getSaldo() == null ? null : bienes.getSaldo());
+                upBienes.setValorActual(bienes.getValorActual() == null ? null : bienes.getValorActual());
+                upBienes.setVencimientoHipoteca(bienes.getVencimientoHipoteca() == null ? null : bienes.getVencimientoHipoteca());
+
+                this.update(upBienes);
+
             } else {
-                if (bienes.getId() != null) {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.update(bienes);
-                } else {
-                    bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
-                    bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
-                    bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
-                    this.save(bienes);
-                }
+
+                bienes.setMarca(bienes.getMarca() == null ? null : bienes.getMarca().toUpperCase());
+                bienes.setDireccion(bienes.getDireccion() == null ? null : bienes.getDireccion().toUpperCase());
+                bienes.setLugarHipoteca(bienes.getLugarHipoteca() == null ? null : bienes.getLugarHipoteca().toUpperCase());
+
+                this.save(bienes);
+
             }
             object = this.getBienesSolicitud(bienes);
         } catch (Exception e) {

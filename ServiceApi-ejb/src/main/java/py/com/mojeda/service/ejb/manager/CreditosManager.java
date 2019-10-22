@@ -18,5 +18,5 @@ import py.com.mojeda.service.ejb.entity.Creditos;
 @Local
 public interface CreditosManager extends GenericDao<Creditos, Long>{   
     
-    public void generarCredito(Long idSolicitud, Long idEvaluacionCabecera,Long idPersona) throws Exception;
+    public void generarCredito(Long idSolicitud, Long idEvaluacionCabecera,Long idPersona, Long idEmpresa) throws Exception;
 }

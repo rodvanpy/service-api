@@ -40,8 +40,8 @@ public class Documentos extends Base implements Serializable {
     private Long id;
 
     @Lob
-    @Column(name = "DOCUMENTO")
-    private byte[] documento;
+    @Column(name = "ARCHIVO")
+    private byte[] archivo;
 
     @Column(name = "TIPO_ARCHIVO")
     private String tipoArchivo;
@@ -51,6 +51,9 @@ public class Documentos extends Base implements Serializable {
 
     @Column(name = "ENTIDAD")
     private String entidad;
+    
+    @Column(name = "DOCUMENTO_PERSONA")
+    private String documentoPersona;
 
     @Column(name = "PATH")
     private String path;
@@ -142,19 +145,13 @@ public class Documentos extends Base implements Serializable {
         this.empresa = empresa;
     }
 
-    /**
-     * @return the documento
-     */
-    public byte[] getDocumento() {
-        return documento;
+    public byte[] getArchivo() {
+        return archivo;
     }
 
-    /**
-     * @param documento the documento to set
-     */
-    public void setDocumento(byte[] documento) {
-        this.documento = documento;
-    }
+    public void setArchivo(byte[] archivo) {
+        this.archivo = archivo;
+    }    
 
     /**
      * @return the nombreDocumento
@@ -213,7 +210,13 @@ public class Documentos extends Base implements Serializable {
     public void setSize(Long size) {
         this.size = size;
     }
-    
-    
+
+    public String getDocumentoPersona() {
+        return documentoPersona;
+    }
+
+    public void setDocumentoPersona(String documentoPersona) {
+        this.documentoPersona = documentoPersona;
+    }    
 
 }

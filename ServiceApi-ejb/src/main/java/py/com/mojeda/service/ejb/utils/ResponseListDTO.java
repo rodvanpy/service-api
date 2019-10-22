@@ -5,12 +5,15 @@
  */
 package py.com.mojeda.service.ejb.utils;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.List;
 
 /**
  *
  * @author miguel.ojeda
  */
+@JsonInclude(Include.NON_EMPTY)
 public class ResponseListDTO<T> {
        
     
@@ -33,6 +36,7 @@ public class ResponseListDTO<T> {
     /**
      * The actual data
      */
+    @JsonInclude(Include.NON_NULL)
     private List<T> rows;
 
 

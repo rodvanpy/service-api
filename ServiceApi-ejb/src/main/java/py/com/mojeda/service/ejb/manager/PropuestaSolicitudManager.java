@@ -20,9 +20,9 @@ import py.com.mojeda.service.ejb.entity.TipoCalculos;
 @Local
 public interface PropuestaSolicitudManager extends GenericDao<PropuestaSolicitud, Long>{   
     
-    public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception;
+    public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal, Long idEmpresa) throws Exception;
     
-    public PropuestaSolicitud editar(PropuestaSolicitud propuestaSolicitud, Long idSucursal) throws Exception;
+    public PropuestaSolicitud editar(PropuestaSolicitud propuestaSolicitud, Long idSucursal, Long idEmpresa) throws Exception;
     
     public PropuestaSolicitud getPropuestaSolicitud(PropuestaSolicitud propuestaSolicitud) throws Exception;
     
@@ -30,15 +30,7 @@ public interface PropuestaSolicitudManager extends GenericDao<PropuestaSolicitud
     
     public Personas editarPersonaSolicitud(Personas persona, Long idSolicitud, Long idEmpresa) throws Exception;
     
-    public void tranferirPropuesta(Long idSolicitud, Long idPersona) throws Exception;
-       
-    public Double periodoInteresCompuesto(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres);
+    public void tranferirPropuesta(Long idSolicitud, Long idFuncionario, Long idEmpresa) throws Exception;
     
-    public Double periodoInteresSimple(Double plazo, Double interes, Long periodoCapital, Long vencimientoInteres);
-    
-    public Long calcularCuota(Double modalidad, Double plazo, Long periodoCapital, Long vencimientoInteres,
-            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos);
-    
-    public Long calcularMontoInteres(Double plazo, Long periodoCapital, Long vencimientoInteres,
-            Double tasaInteres, Double montoSolicitado, TipoCalculos tipoCalculoImporte, Double gastosAdministrativos);
+    public void delete(Long idSolicitud, Long idFuncionario) throws Exception;
 }

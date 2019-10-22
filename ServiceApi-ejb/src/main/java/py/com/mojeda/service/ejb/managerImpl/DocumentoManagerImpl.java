@@ -44,7 +44,7 @@ public class DocumentoManagerImpl extends GenericDaoImpl<Documentos, Long> imple
             File fos = new File(CONTENT_PATH + path);
             file.transferTo(fos);
 
-            documento.setDocumento(null);
+            documento.setArchivo(null);
             documento.setPath(CONTENT_PATH + path);
 
             this.save(documento);
@@ -60,7 +60,7 @@ public class DocumentoManagerImpl extends GenericDaoImpl<Documentos, Long> imple
         Documentos retorno = null;
         if (documento != null) {
 
-            byte[] archivo = documento.getDocumento();
+            byte[] archivo = documento.getArchivo();
 
             Files.createDirectories(Paths.get(CONTENT_PATH + documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo()));
             String path = documento.getEntidad()+ "/" + documento.getIdEntidad() + "/" + documento.getTipoDocumento().getCodigo() + "/" + documento.getNombreDocumento();

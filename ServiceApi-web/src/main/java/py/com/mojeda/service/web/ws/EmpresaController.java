@@ -98,7 +98,7 @@ public class EmpresaController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(empresaManager.list(model).size() + "");
+                total = empresaManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;

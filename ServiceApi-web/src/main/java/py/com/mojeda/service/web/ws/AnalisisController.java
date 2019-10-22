@@ -7,6 +7,7 @@ package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,15 +61,8 @@ public class AnalisisController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        //Buscar usuario por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
-        PropuestaSolicitud propuestaSolicitud = new PropuestaSolicitud();
-        propuestaSolicitud.setSucursal(ejSucursales);
-
         EvaluacionSolicitudesCabecera model = new EvaluacionSolicitudesCabecera();
-        model.setPropuestaSolicitud(propuestaSolicitud);
+        model.setIdEmpresa(userDetail.getIdEmpresa());
 
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -101,9 +95,9 @@ public class AnalisisController extends BaseController {
 
             pagina = pagina != null ? pagina : 1;
             Long total = 0L;
-
+            logger.info("INICIO-- "+ new Date(System.currentTimeMillis()));
             if (!todos) {
-                total = Long.parseLong(evaluacionSolicitudesCabeceraManager.list(model).size() + "");
+                total = evaluacionSolicitudesCabeceraManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -112,20 +106,23 @@ public class AnalisisController extends BaseController {
                 inicio = Integer.parseInt(total.toString()) - Integer.parseInt(total.toString()) % cantidad;
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
-
+            
+            logger.info("INICIO LISTAR-- "+ new Date(System.currentTimeMillis()));
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
+            logger.info("FIN LISTAR-- "+ new Date(System.currentTimeMillis()));
             PropuestaSolicitud propuesta;
             TipoSolicitudes tipoSolicitud;
             Funcionarios funcionarios;
             for (Map<String, Object> rpm : listMapGrupos) {
+                
                 propuesta = new PropuestaSolicitud();
                 propuesta.setFechaPresentacion(rpm.get("propuestaSolicitud.fechaPresentacion") == null ? null : date.parse(rpm.get("propuestaSolicitud.fechaPresentacion").toString()));
                 propuesta.setId(rpm.get("propuestaSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.id").toString()));
                 propuesta.setMontoSolicitado(rpm.get("propuestaSolicitud.montoSolicitado") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitado").toString()));
                 propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));               
+                
                 tipoSolicitud = new TipoSolicitudes();
                 tipoSolicitud.setId(rpm.get("propuestaSolicitud.tipoSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.tipoSolicitud.id").toString()));
                 tipoSolicitud.setNombre(rpm.get("propuestaSolicitud.tipoSolicitud.nombre") == null ? null : rpm.get("propuestaSolicitud.tipoSolicitud.nombre").toString());
@@ -174,7 +171,7 @@ public class AnalisisController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-
+            logger.info("FIN-- "+ new Date(System.currentTimeMillis()));
         } catch (Exception e) {
             logger.error("Error: ", e);
             retorno.setStatus(500);
@@ -197,15 +194,8 @@ public class AnalisisController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        //Buscar usuario por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
-        PropuestaSolicitud propuestaSolicitud = new PropuestaSolicitud();
-        propuestaSolicitud.setSucursal(ejSucursales);
-
         EvaluacionSolicitudesCabecera model = new EvaluacionSolicitudesCabecera();
-        model.setPropuestaSolicitud(propuestaSolicitud);
+        model.setIdEmpresa(userDetail.getIdEmpresa());
         model.setFuncionarioAnalisis(new Funcionarios(userDetail.getId()));
 
         List<Map<String, Object>> listMapGrupos = null;
@@ -241,7 +231,7 @@ public class AnalisisController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(evaluacionSolicitudesCabeceraManager.list(model).size() + "");
+                total = evaluacionSolicitudesCabeceraManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -333,16 +323,9 @@ public class AnalisisController extends BaseController {
 
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-
-        //Buscar usuario por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
-        PropuestaSolicitud propuestaSolicitud = new PropuestaSolicitud();
-        propuestaSolicitud.setSucursal(ejSucursales);
-
+        
         EvaluacionSolicitudesCabecera model = new EvaluacionSolicitudesCabecera();
-        model.setPropuestaSolicitud(propuestaSolicitud);
+        model.setIdEmpresa(userDetail.getIdEmpresa());
         model.setEstado(new EstadosSolicitud(3L));
         
         List<Map<String, Object>> listMapGrupos = null;
@@ -553,7 +536,7 @@ public class AnalisisController extends BaseController {
                 return response;
             }
                        
-            model = evaluacionSolicitudesCabeceraManager.guardar(model, userDetail.getId());
+            model = evaluacionSolicitudesCabeceraManager.guardar(model, userDetail.getId(), userDetail.getIdEmpresa());
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);

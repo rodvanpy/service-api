@@ -119,6 +119,12 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
     public int total(T ejemplo) {
         return list(ejemplo, true).size();
     }
+    
+    @Override
+    public Long total(T ejemplo, String orderBy, String orderByDirList) {
+        return new Long(this.listAtributos(ejemplo, "id".split(","), true, 0, null,
+                orderBy.split(","), orderByDirList.split(","), false, true, null, null, null, null, null, null, null, null, null, null, false).size());
+    }
 
     @Override
     public T get(ID id) {

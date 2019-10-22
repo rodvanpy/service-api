@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -256,6 +257,10 @@ public class Creditos extends Base {
     @JoinColumn(name = "ID_SOLICITUD_PROPUESTA", referencedColumnName = "id")
     @ManyToOne
     private PropuestaSolicitud propuestaSolicitud;
+    
+    @JsonIgnore
+    @Column(name = "ID_EMPRESA")
+    private Long idEmpresa;
 
     public Creditos() {
     }
@@ -1073,6 +1078,13 @@ public class Creditos extends Base {
     public void setGastosAdministrativos(BigDecimal gastosAdministrativos) {
         this.gastosAdministrativos = gastosAdministrativos;
     }
-       
-    
+
+    public Long getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+        this.idEmpresa = idEmpresa;
+    }
+          
 }

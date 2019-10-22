@@ -94,7 +94,7 @@ public class PersonaController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = Long.parseLong(personaManager.list(model).size() + "");
+                total = personaManager.total(model,"id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -353,7 +353,8 @@ public class PersonaController extends BaseController {
                 ejPersona.setRuc(model.getRuc());
                 ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                Map<String, Object> clienteMaps = personaManager.getAtributos(ejPersona, "id".split(","), false, false);
+                
                 if (clienteMaps != null
                         && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                     response.setStatus(205);
