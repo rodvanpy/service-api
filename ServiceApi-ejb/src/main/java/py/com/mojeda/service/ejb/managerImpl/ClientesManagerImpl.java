@@ -67,7 +67,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
     private VinculoManager vinculoManager;
 
     @Override
-    public Clientes guardar(Clientes cliente, Long idSucursal) throws Exception {
+    public Clientes guardar(Clientes cliente, Long idSucursal, Long idEmpresa) throws Exception {
         Clientes object = null;
         Documentos ejDocumentos = null;
         if (cliente != null
@@ -79,18 +79,19 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             Personas ejPersona = personaManager.guardar(cliente.getPersona());
 
             cliente.setPersona(new Personas(ejPersona.getId()));
+            cliente.setIdEmpresa(idEmpresa);
             cliente.setSucursal(new Sucursales(idSucursal));
             
             this.save(cliente);
                        
-            object = this.getCliente(new Clientes(cliente.getId()),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
+            object = this.getCliente(new Clientes(cliente.getId()),idEmpresa,"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
 
         }
         return object;
     }
 
     @Override
-    public Clientes editar(Clientes cliente, Long idSucursal) throws Exception {
+    public Clientes editar(Clientes cliente, Long idSucursal, Long idEmpresa) throws Exception {
         Clientes object = null;
         Documentos ejDocumentos = null;
         if (cliente != null
@@ -106,14 +107,14 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             
             this.update(cliente);
                      
-            object = this.getCliente(new Clientes(cliente.getId()),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
+            object = this.getCliente(new Clientes(cliente.getId()),idEmpresa,"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
 
         }
         return object;
     }
 
     @Override
-    public Clientes getCliente(Clientes cliente, String included) throws Exception {
+    public Clientes getCliente(Clientes cliente, Long idEmpresa, String included) throws Exception {
         Clientes model = null;
         Map<String, Object> modelMaps = this.getAtributos(cliente, "id,persona.id,sucursal.id,activo".split(","));       
         

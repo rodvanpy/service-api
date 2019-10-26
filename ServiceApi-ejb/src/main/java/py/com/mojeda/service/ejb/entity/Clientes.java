@@ -52,6 +52,10 @@ public class Clientes extends Base{
     
     @Column(name = "ENTIDAD")
     private String entidad = "CLIENTES";
+    
+    @JsonIgnore
+    @Column(name = "ID_EMPRESA")
+    private Long idEmpresa;
    
     
     public Clientes() {
@@ -133,4 +137,14 @@ public class Clientes extends Base{
     public void setEntidad(String entidad) {
         this.entidad = entidad;
     }       
+
+    public Long getIdEmpresa() {
+        return idEmpresa;
+    }
+
+    public void setIdEmpresa(Long idEmpresa) {
+        this.idEmpresa = idEmpresa;
+    }
+    
+    
 }

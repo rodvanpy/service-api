@@ -275,7 +275,25 @@ public class PersonaController extends BaseController {
                 response.setMessage("Ya existe una persona con el mismo documento.");
                 return response;
             }
+            
+            if (model.getRuc() != null
+                    && model.getRuc().trim().compareToIgnoreCase("") != 0
+                    && model.getRuc().contains("-")) {
 
+                ejPersona = new Personas();
+                ejPersona.setRuc(model.getRuc());
+                ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+
+                Map<String, Object> clienteMaps = personaManager.getAtributos(ejPersona, "id".split(","), false, false);
+                
+                if (clienteMaps != null
+                        && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
+                    response.setStatus(205);
+                    response.setMessage("Ya existe una persona con el mismo ruc.");
+                    return response;
+                }
+            }
+            
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
@@ -347,7 +365,8 @@ public class PersonaController extends BaseController {
             }
 
             if (model.getRuc() != null
-                    && model.getRuc().trim().compareToIgnoreCase("") != 0) {
+                    && model.getRuc().trim().compareToIgnoreCase("") != 0
+                    && model.getRuc().contains("-")) {
 
                 ejPersona = new Personas();
                 ejPersona.setRuc(model.getRuc());

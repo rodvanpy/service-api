@@ -19,10 +19,10 @@ import py.com.mojeda.service.ejb.entity.Clientes;
 @Local
 public interface ClientesManager extends GenericDao<Clientes, Long>{  
     
-    public Clientes guardar(Clientes cliente, Long idSucursal) throws Exception;
+    public Clientes guardar(Clientes cliente, Long idSucursal, Long idEmpresa) throws Exception;
     
-    public Clientes editar(Clientes cliente, Long idSucursal) throws Exception;
+    public Clientes editar(Clientes cliente, Long idSucursal, Long idEmpresa) throws Exception;
     
-    public Clientes getCliente(Clientes cliente, String included) throws Exception;
+    public Clientes getCliente(Clientes cliente, Long idEmpresa, String included) throws Exception;
     
 }

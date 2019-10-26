@@ -58,12 +58,9 @@ public class ClienteController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         
         //Buscar por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-        
         Clientes model = new Clientes();
         model.setActivo("S");
-        model.setSucursal(ejSucursales);
+        model.setIdEmpresa(userDetail.getIdEmpresa());
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -164,7 +161,7 @@ public class ClienteController extends BaseController {
         try {
             inicializarClientesManager();
             
-            Clientes model = clientesManager.getCliente(new Clientes(id), included);            
+            Clientes model = clientesManager.getCliente(new Clientes(id), userDetail.getIdEmpresa(), included);            
             
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
@@ -209,7 +206,7 @@ public class ClienteController extends BaseController {
             Clientes ejCliente = new Clientes();
             ejCliente.setPersona(ejPersonas);
             
-            ejCliente =clientesManager.getCliente(ejCliente, included);
+            ejCliente =clientesManager.getCliente(ejCliente, userDetail.getIdEmpresa(), included);
             if(ejCliente == null){
                ejCliente = new Clientes();
                ejCliente.setPersona(personaManager.getPersona(ejPersonas, included));
@@ -286,7 +283,7 @@ public class ClienteController extends BaseController {
             model.setIdUsuarioModificacion(userDetail.getId());
             
             
-            model = clientesManager.guardar(model, userDetail.getIdSusursal());
+            model = clientesManager.guardar(model, userDetail.getIdSusursal(), userDetail.getIdEmpresa());
                         
             response.setModel(model);
             response.setStatus(200);
@@ -356,9 +353,9 @@ public class ClienteController extends BaseController {
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
             
-            clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()));
+            clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()), userDetail.getIdEmpresa());
             
-            model = clientesManager.getCliente(new Clientes(id),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
+            model = clientesManager.getCliente(new Clientes(id), userDetail.getIdEmpresa(),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
             
             response.setModel(model);
             response.setStatus(200);

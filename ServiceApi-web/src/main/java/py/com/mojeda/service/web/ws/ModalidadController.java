@@ -39,7 +39,7 @@ import py.com.mojeda.service.web.utils.ReglaDTO;
 @RequestMapping(value = "/modalidades")
 public class ModalidadController extends BaseController {
     
-    String atributos = "id,nombre,codigo,montoMaximo,montoMinimo,interes,descripcion,tipoCalculos.id,activo";
+    String atributos = "id,nombre,codigo,montoMaximo,montoMinimo,interes,descripcion,periodoCapital,vencimientoInteres,periodoGracia,tipoCalculos.id,activo";
     
     @GetMapping
     public @ResponseBody

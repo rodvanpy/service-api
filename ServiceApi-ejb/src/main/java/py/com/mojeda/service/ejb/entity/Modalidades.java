@@ -53,6 +53,15 @@ public class Modalidades extends Base {
     @Column(name = "INTERES")
     private Double interes;
     
+    @Column(name = "PERIODO_CAPITAL")
+    private Short periodoCapital;
+    
+    @Column(name = "VENCIMIENTO_INTERES")
+    private Long vencimientoInteres;
+    
+    @Column(name = "PERIODO_GRACIA")
+    private Short periodoGracia;
+    
     @Column(name = "DESCRIPCION")
     private String descripcion;
     
@@ -208,5 +217,31 @@ public class Modalidades extends Base {
     public void setEntidad(String entidad) {
         this.entidad = entidad;
     }
+
+    public Short getPeriodoCapital() {
+        return periodoCapital;
+    }
+
+    public void setPeriodoCapital(Short periodoCapital) {
+        this.periodoCapital = periodoCapital;
+    }
+
+    public Long getVencimientoInteres() {
+        return vencimientoInteres;
+    }
+
+    public void setVencimientoInteres(Long vencimientoInteres) {
+        this.vencimientoInteres = vencimientoInteres;
+    }
+
+    public Short getPeriodoGracia() {
+        return periodoGracia;
+    }
+
+    public void setPeriodoGracia(Short periodoGracia) {
+        this.periodoGracia = periodoGracia;
+    }
+    
+    
     
 }

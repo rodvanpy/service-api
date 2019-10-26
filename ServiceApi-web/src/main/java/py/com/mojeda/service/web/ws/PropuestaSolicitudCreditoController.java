@@ -127,7 +127,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
 
             for (Map<String, Object> rpm : listMapGrupos) {
 
-                Clientes cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString())),
+                Clientes cliente = clientesManager.getCliente(new Clientes(Long.parseLong(rpm.get("cliente.id").toString())), userDetail.getIdEmpresa(),
                         null);
 
                 Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
@@ -334,7 +334,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
         Gson gson = new Gson();
         try {
             inicializarPropuestaSolicitudManager();
-
+            logger.info(gson.toJson(model));
             if (errors.hasErrors()) {
 
                 response.setStatus(400);
@@ -410,10 +410,10 @@ public class PropuestaSolicitudCreditoController extends BaseController {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        Gson gson = new Gson();
         try {
             inicializarPropuestaSolicitudManager();
-
+            logger.info(gson.toJson(model));
             if (errors.hasErrors()) {
 
                 response.setStatus(400);

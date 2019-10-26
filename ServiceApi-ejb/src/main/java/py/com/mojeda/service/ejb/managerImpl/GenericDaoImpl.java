@@ -84,36 +84,6 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
 //
 //        return (Long) query.getSingleResult();
 //    }
-    @Override
-    public List<T> listCartera(Long estado, String tipoPersona) {
-        
-        final StringBuffer queryString = new StringBuffer(
-                "SELECT o from ");
-        queryString.append(getEntityBeanType().getSimpleName()).append(" o ");
-        queryString.append("where o.").append("estado").append(" = ").append(estado).append(" ");
-        queryString.append("and o.").append("tipoPersona").append(" = '").append(tipoPersona).append("' ");
-        Query query = null;
-       
-        try {
-            query = this.em.createQuery(queryString.toString());
-        } catch (Exception e) {
-            return (List<T>) null;
-        }       
-        return (List<T>) query.getResultList();
-    }
-
-    @Override
-    public T getIdHandler(ID id) {
-
-        final StringBuffer queryString = new StringBuffer(
-                "SELECT o from ");
-        queryString.append(getEntityBeanType().getSimpleName()).append(" o ");
-        queryString.append("where o.").append("controlCarteraInformconfPK.cedulaIdentidad").append(" = '").append(id).append("'");
-
-        final Query query = this.em.createQuery(queryString.toString());
-
-        return (T) query.getSingleResult();
-    }
 
     @Override
     public int total(T ejemplo) {
@@ -124,6 +94,54 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
     public Long total(T ejemplo, String orderBy, String orderByDirList) {
         return new Long(this.listAtributos(ejemplo, "id".split(","), true, 0, null,
                 orderBy.split(","), orderByDirList.split(","), false, true, null, null, null, null, null, null, null, null, null, null, false).size());
+    }
+    
+    @Override
+    public int total(T ejemplo, boolean like) {
+        JPASearchProcessor jpaSP = new JPASearchProcessor(
+                HibernateMetadataUtil.getInstanceForSessionFactory(this
+                        .getSessionFactory()));
+
+        Search searchConfig = this.getSearchConfig(jpaSP, ejemplo, null, true,
+                null, null, null,
+                null, like, true, null, null, null, null, null,
+                null, null, null, null, null, true, null, null);
+
+        return jpaSP.count(em, searchConfig);
+    }
+
+    @Override
+    public int total(T ejemplo, String[] atributos,
+            List<String> atrMayIgual, List<Object> objMayIgual, List<String> atrMenIgual, List<Object> objMenIgual,
+            String campoComparacion, List<Object> valoresComparacion, String tipoFiltro, String[] camposNotNull, String tipoFiltroNull) {
+        JPASearchProcessor jpaSP = new JPASearchProcessor(
+                HibernateMetadataUtil.getInstanceForSessionFactory(this
+                        .getSessionFactory()));
+
+        Search searchConfig = this.getSearchConfig(jpaSP, ejemplo, atributos, true,
+                null, null, null,
+                null, true, true, null, null, campoComparacion, valoresComparacion, tipoFiltro,
+                atrMayIgual, objMayIgual, atrMenIgual, objMenIgual, null, true, camposNotNull, tipoFiltroNull);
+
+        return jpaSP.count(em, searchConfig);
+    }
+
+    @Override
+    public int total(T ejemplo, String[] atributos,
+            String[] orderByAttrList, String[] orderByDirList,
+            String camposDistintos, boolean distintos,
+            String[] camposNotNull, String tipoFiltroNull) {
+        
+        JPASearchProcessor jpaSP = new JPASearchProcessor(
+                HibernateMetadataUtil.getInstanceForSessionFactory(this
+                        .getSessionFactory()));
+
+        Search searchConfig = this.getSearchConfig(jpaSP, ejemplo, null, true,
+                null, null, orderByAttrList,
+                orderByDirList, true, true, null, null, null, null, null,
+                null, null, null, null, camposDistintos, distintos, camposNotNull, tipoFiltroNull);
+
+        return jpaSP.count(em, searchConfig);
     }
 
     @Override
@@ -213,20 +231,6 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
     }
 
     @Override
-    public void updateApliUsuarios(String[] ids) throws Exception {
-        String update = " UPDATE ADMIN.APLICACIONES_USUARIOS  "
-                + " set COD_PERSONA =  " + ids[3] + ", "
-                + " COD_APLICACION =  " + ids[4] + ", "
-                + " PG_ENTIDAD = " + ids[5] + ""
-                + " where COD_PERSONA = " + ids[0]
-                + " and COD_APLICACION = " + ids[1]
-                + " and PG_ENTIDAD = " + ids[2];
-
-        Query cq = this.getEm().createNativeQuery(update);
-        int retorno = cq.executeUpdate();
-    }
-
-    @Override
     public void delete(ID id) throws Exception {
         T entity = this.get(id);
 
@@ -242,35 +246,6 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
             this.getEm().remove(entity);
         }
 
-    }
-
-    @Override
-    public void updateRetorno(String[] ids) throws Exception {
-        String update = " UPDATE admin.COD_RET_EMISORA  "
-                + " set DESC_COD_RET =  '" + ids[2] + "', "
-                + " ALERTA =  '" + ids[3] + "', "
-                + " COD_ESTADO = '" + ids[4] + "'"
-                + " where COD_SERVICIO = " + ids[0]
-                + " and COD_RET = " + ids[1];
-
-        Query cq = this.getEm().createNativeQuery(update);
-        int retorno = cq.executeUpdate();
-    }
-
-    @Override
-    public int updateApi(String[] ids) throws Exception {
-        String update = " UPDATE admin.API_SERVICIO_CAMPO  "
-                + " set COD_CAMPO =  " + ids[2] + ", "
-                + " IN_OUT =  '" + ids[3] + "', "
-                + " TIPO_SERVICIO =  " + ids[4] + ", "
-                + " TIPO_TRX = '" + ids[5] + "'"
-                + " where COD_CAMPO = " + ids[0]
-                + " and COD_SERVICIO = " + ids[1];
-
-        Query cq = this.getEm().createNativeQuery(update);
-        int retorno = cq.executeUpdate();
-
-        return retorno;
     }
 
     @Override
@@ -340,6 +315,7 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
         JPASearchProcessor jpaSP = new JPASearchProcessor(
                 HibernateMetadataUtil.getInstanceForSessionFactory(this
                         .getSessionFactory()));
+        
         Search searchConfig = this.getSearchConfig(jpaSP, ejemplo, null, all,
                 primerResultado, cantResultados, orderByAttrList,
                 orderByDirList, like, caseSensitive, null, null, campoComparacion, valoresComparacion, tipoFiltro,
@@ -487,6 +463,168 @@ public abstract class GenericDaoImpl<T, ID extends Serializable> implements
                     f.setProperty(lista[i]);
                     f.setValue("%" + valores[j] + "%");
                     f.setOperator(Filter.OP_ILIKE);
+                    filtros[index] = f;
+                    index++;
+                }
+                searchConfig.addFilterOr(filtros);
+            }
+
+        }
+
+        if (!all && primerResultado != null && cantResultados != null) {
+            searchConfig.setFirstResult(primerResultado);
+            searchConfig.setMaxResults(cantResultados);
+        }
+
+        if (atributos != null && atributos.length > 0) {
+            for (String a : atributos) {
+                searchConfig.addField(a);
+            }
+            searchConfig.setResultMode(Search.RESULT_MAP);
+        }
+
+        if (distintos && camposDistintos != null) {
+            String[] lista = camposDistintos.split(",");
+            searchConfig.setDistinct(distintos);
+            for (String atributo : lista) {
+                searchConfig.addField(atributo);
+            }
+
+        } else {
+
+            if (orderByAttrList != null && orderByDirList != null
+                    && orderByAttrList.length == orderByDirList.length) {
+                for (int i = 0; i < orderByAttrList.length; i++) {
+                    if (orderByDirList[i].equalsIgnoreCase("desc")) {
+                        searchConfig.addSortDesc(orderByAttrList[i]);
+                    } else {
+                        searchConfig.addSortAsc(orderByAttrList[i]);
+                    }
+                }
+            } else if ((orderByAttrList != null && orderByDirList == null)
+                    || (orderByAttrList == null && orderByDirList != null)) {
+                throw new RuntimeException("No puede proporcionarse una lista de "
+                        + "atributos para ordenamiento sin la correspondiente "
+                        + "lista de direcciones de ordenamiento, o viceversa");
+            } else if (orderByAttrList != null && orderByDirList != null
+                    && orderByAttrList.length != orderByDirList.length) {
+                throw new RuntimeException("No puede proporcionarse una lista de "
+                        + "atributos para ordenamiento de tamaño dieferente a la "
+                        + "lista de direcciones de ordenamiento");
+            }
+
+        }
+        return searchConfig;
+    }
+    
+    private Search getSearchConfig(JPASearchProcessor jpaSP, T ejemplo,
+            String[] atributos, boolean all, Integer primerResultado,
+            Integer cantResultados, String[] orderByAttrList,
+            String[] orderByDirList, boolean like, boolean caseSensitive,
+            String propiedadFiltroComunes, String valorComun,
+            String campoComparacion, List<Object> valoresComparacion, String tipoFiltro,
+            List<String> atrMayIgual, List<Object> objMayIgual,
+            List<String> atrMenIgual, List<Object> objMenIgual,
+            String camposDistintos, boolean distintos, String[] camposNotNull, String tipoFiltroNull) {
+
+        Search searchConfig = new Search(this.getEntityBeanType());
+
+        if (ejemplo != null) {
+            ExampleOptions exampleOptions = new ExampleOptions();
+            exampleOptions.setExcludeNulls(true);
+
+            if (like) {
+                exampleOptions.setLikeMode(ExampleOptions.ANYWHERE);
+            }
+
+            exampleOptions.setIgnoreCase(caseSensitive);
+
+            searchConfig.addFilter(jpaSP.getFilterFromExample(ejemplo,
+                    exampleOptions));
+        }
+
+        if (atrMayIgual != null && objMayIgual != null && atrMayIgual.size() == objMayIgual.size()) {
+            int index = 0;
+            for (String atr : atrMayIgual) {
+                if (objMayIgual.get(index) != null) {
+                    Filter[] filtros = new Filter[2];
+                    filtros[0] = Filter.isNull(atr);
+                    filtros[1] = Filter.greaterOrEqual(atr, objMayIgual.get(index));
+                    searchConfig.addFilterOr(filtros);
+                }
+                index++;
+            }
+        }
+
+        if (atrMenIgual != null && objMenIgual != null && atrMenIgual.size() == objMenIgual.size()) {
+            int index = 0;
+
+            for (String atr : atrMenIgual) {
+                if (objMenIgual.get(index) != null) {
+                    Filter[] filtros = new Filter[2];
+                    filtros[0] = Filter.isNull(atr);
+                    filtros[1] = Filter.lessOrEqual(atr, objMenIgual.get(index));
+                    searchConfig.addFilterOr(filtros);
+                }
+                index++;
+            }
+        }
+
+        if (valoresComparacion != null && campoComparacion != null && tipoFiltro != null) {
+            int tam = valoresComparacion.size() / 1000;
+            tam++;
+
+            int inicio = 0;
+
+            Filter[] filtros = new Filter[tam];
+            for (int i = 0; i < tam; i++) {
+                if (tipoFiltro.compareTo("OP_IN") == 0) {
+                    filtros[i] = Filter.in(campoComparacion, valoresComparacion.subList(inicio, Math.min(valoresComparacion.size(), inicio + 1000)));
+                } else {
+                    filtros[i] = Filter.notIn(campoComparacion, valoresComparacion.subList(inicio, Math.min(valoresComparacion.size(), inicio + 1000)));
+                }
+                inicio += 1000;
+            }
+            if (tipoFiltro.compareTo("OP_IN") == 0) {
+                searchConfig.addFilterOr(filtros);
+            } else {
+                searchConfig.addFilterAnd(filtros);
+            }
+        }
+
+        if (tipoFiltroNull != null && camposNotNull != null) {
+
+            Filter[] filtros = new Filter[camposNotNull.length];
+
+            for (int j = 0; j < camposNotNull.length; j++) {
+                if (tipoFiltroNull.compareTo("NOT_NULL") == 0) {
+                    filtros[j] = Filter.isNotNull(camposNotNull[j]);
+                } else {
+                    filtros[j] = Filter.isNull(camposNotNull[j]);
+                }
+            }
+
+            searchConfig.addFilterAnd(filtros);
+        }
+
+        if (valorComun != null && propiedadFiltroComunes != null) {
+
+            String[] lista = propiedadFiltroComunes.split(",");
+            String[] valores = valorComun.split(" ");
+
+            for (int j = 0; j < valores.length; j++) {
+                int index = 0;
+                Filter[] filtros = new Filter[lista.length];
+
+                for (int i = 0; i < lista.length; i++) {
+                    Filter f = new Filter();
+                    f.setProperty(lista[i]);
+                    
+                    
+                        f.setValue("%" + valores[j] + "%");
+                        f.setOperator(Filter.OP_ILIKE);
+                    
+                    
                     filtros[index] = f;
                     index++;
                 }

@@ -173,7 +173,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/EvaluacionSolicitudesDetallesManagerImpl")
     private EvaluacionSolicitudesDetallesManager evaluacionSolicitudesDetallesManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/CuotasManagerImpl")
     private CuotasManager cuotasManager;
 
@@ -196,18 +196,21 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
             Clientes ejCliente = new Clientes();
             ejCliente.setPersona(new Personas(propuestaSolicitud.getCliente().getPersona().getId()));
-            ejCliente.setSucursal(new Sucursales(idSucursal));
+            ejCliente.setIdEmpresa(idEmpresa);
 
             Map<String, Object> modelMaps = clientesManager.getAtributos(ejCliente, "id".split(","));
 
             if (modelMaps != null) {
                 propuestaSolicitud.getCliente().setId(Long.parseLong(modelMaps.get("id").toString()));
             } else {
+
+                ejCliente.setSucursal(new Sucursales(idSucursal));
                 ejCliente.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
                 ejCliente.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
                 ejCliente.setActivo("S");
                 ejCliente.setIdUsuarioCreacion(propuestaSolicitud.getIdUsuarioCreacion());
                 ejCliente.setIdUsuarioModificacion(propuestaSolicitud.getIdUsuarioCreacion());
+                ejCliente.setIdEmpresa(idEmpresa);
 
                 clientesManager.save(ejCliente);
 
@@ -295,21 +298,20 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
                 if (conyugeMap != null) {
                     ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
-                    if(deudor.getSeparacionBienes() != null && deudor.getSeparacionBienes()){
+
+                    if (deudor.getSeparacionBienes() != null && deudor.getSeparacionBienes()) {
                         ejSolicitantes.setConsiderarConyuge(true);
-                    }else{
-                        ejSolicitantes.setConsiderarConyuge(false);
                     }
-                    
+
                     solicitantesManager.save(ejSolicitantes);
 
                     this.guardarDatosConyugeSolicitudes(deudor.getId(), Long.parseLong(conyugeMap.get("personaVinculo.id").toString()),
                             propuestaSolicitud.getId(), propuestaSolicitud.getTipoGarantia().getId(), propuestaSolicitud.getFuncionario().getId(), "DEUDOR");
 
                 }
-            } else {
-                solicitantesManager.save(ejSolicitantes);
             }
+
+            solicitantesManager.save(ejSolicitantes);
 
             Garantias ejGarantias = new Garantias();
             ejGarantias.setIdEmpresa(idEmpresa);
@@ -336,21 +338,21 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             IngresosEgresos ejIngresosEgresos = new IngresosEgresos();
             ejIngresosEgresos.setActivo("S");
             ejIngresosEgresos.setPersona(new Personas(deudor.getId()));
-            
+
             this.guardarIngresosEgresosSolicitud(ingresosEgresosManager.list(ejIngresosEgresos), propuestaSolicitud.getId(), propuestaSolicitud.getFuncionario().getId());
 
             //GUARDAR OCUPACIONES
             OcupacionPersona ejOcupacionPersona = new OcupacionPersona();
             ejOcupacionPersona.setPersona(new Personas(deudor.getId()));
             ejOcupacionPersona.setActivo("S");
-            
+
             this.guardarOcupaciones(ocupacionPersonaManager.list(ejOcupacionPersona), propuestaSolicitud.getId(), propuestaSolicitud.getFuncionario().getId());
 
             //GUARDAR REFERENCIAS
             Referencias ejReferencias = new Referencias();
             ejReferencias.setPersona(new Personas(deudor.getId()));
             ejReferencias.setActivo("S");
-            
+
             this.guardarReferencias(referenciaManager.list(ejReferencias), propuestaSolicitud.getId(), propuestaSolicitud.getFuncionario().getId());
 
             if (propuestaSolicitud.getCodeudor() != null
@@ -396,13 +398,12 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo,
                             "personaVinculo.id".split(","));
 
-                    if (conyugeMap != null) {                        
-                        ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));                       
-                        if(propuestaSolicitud.getCodeudor().getSeparacionBienes() != null && propuestaSolicitud.getCodeudor().getSeparacionBienes()){
+                    if (conyugeMap != null) {
+                        ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
+                        if (propuestaSolicitud.getCodeudor().getSeparacionBienes() != null && propuestaSolicitud.getCodeudor().getSeparacionBienes()) {
                             ejSolicitantes.setConsiderarConyuge(true);
-                        }else{
-                            ejSolicitantes.setConsiderarConyuge(false);
-                        }                       
+                        } 
+                        
                         solicitantesManager.save(ejSolicitantes);
 
                         this.guardarDatosConyugeSolicitudes(propuestaSolicitud.getCodeudor().getId(), Long.parseLong(conyugeMap.get("personaVinculo.id").toString()),
@@ -410,9 +411,9 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
                     }
 
-                } else {
-                    solicitantesManager.save(ejSolicitantes);
                 }
+                
+                solicitantesManager.save(ejSolicitantes);
 
                 ejGarantias = new Garantias();
                 ejGarantias.setIdEmpresa(idEmpresa);
@@ -588,7 +589,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                         Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id,personaVinculo.profesion.id,personaVinculo.numeroHijos,personaVinculo.numeroDependientes".split(","));
 
                         if (conyugeMap != null) {
-                            ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));                            
+                            ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
                             ejSolicitantes.setConsiderarConyuge(ejPropuestaSolicitud.getCodeudor().getSeparacionBienes() == null ? false : ejPropuestaSolicitud.getCodeudor().getSeparacionBienes());
                             ejSolicitantes.setCantPersonasACargoCony(conyugeMap.get("numeroDependientes") == null ? null : Integer.parseInt(conyugeMap.get("numeroDependientes").toString()));
                             ejSolicitantes.setCantHijosCony(conyugeMap.get("numeroHijos") == null ? null : Integer.parseInt(conyugeMap.get("numeroHijos").toString()));
@@ -1132,8 +1133,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         ejSolicitantes.setTelefonoParticular(ejPersona.getTelefonoParticular()
                 + ((ejPersona.getTelefonoSecundario() == null || ejPersona.getTelefonoSecundario().compareToIgnoreCase("") == 0) ? "" : " / " + ejPersona.getTelefonoSecundario()));
 
-        if (ejPersona.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0
-                && ejPersona.getSeparacionBienes()) {
+        if (ejPersona.getEstadoCivil().compareToIgnoreCase("CASADO/A") == 0) {
 
             Vinculos ejVinculo = new Vinculos();
             ejVinculo.setPersona(new Personas(ejPersona.getId()));
@@ -1143,8 +1143,13 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             Map<String, Object> conyugeMap = vinculoManager.getAtributos(ejVinculo, "personaVinculo.id,personaVinculo.profesion.id,personaVinculo.numeroHijos,personaVinculo.numeroDependientes".split(","));
 
             if (conyugeMap != null) {
+
+                if (ejPersona.getSeparacionBienes() != null && ejPersona.getSeparacionBienes()) {
+                    ejSolicitantes.setConsiderarConyuge(true);
+                } else {
+                    ejSolicitantes.setConsiderarConyuge(false);
+                }
                 ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
-                ejSolicitantes.setConsiderarConyuge(true);
                 ejSolicitantes.setCantPersonasACargoCony(conyugeMap.get("numeroDependientes") == null ? null : Integer.parseInt(conyugeMap.get("numeroDependientes").toString()));
                 ejSolicitantes.setCantHijosCony(conyugeMap.get("numeroHijos") == null ? null : Integer.parseInt(conyugeMap.get("numeroHijos").toString()));
                 ejSolicitantes.setFechaDireccionCony(new Timestamp(System.currentTimeMillis()));
@@ -1317,9 +1322,9 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @Override
     public void delete(Long idSolicitud, Long idFuncionario) throws Exception {
-        
+
         PropuestaSolicitud model = this.get(idSolicitud);
-        
+
         model.setActivo("N");
         model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
         model.setIdUsuarioModificacion(idFuncionario);
@@ -1327,13 +1332,13 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
 
         this.update(model);
-        
+
         //Actualizar las garantias con el idCredito
         Garantias garantias = new Garantias();
         garantias.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
-        
+
         List<Garantias> listGarantias = garantiasManager.list(garantias);
-        for(Garantias rpc : listGarantias){
+        for (Garantias rpc : listGarantias) {
             rpc.setEstado("INACTIVO");
             rpc.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             garantiasManager.update(rpc);
@@ -1351,9 +1356,9 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             ejIngresosEgresosSolicitudes.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             ejIngresosEgresosSolicitudes.setIdUsuarioModificacion(idUsuarioAlta);
             ejIngresosEgresosSolicitudes.setIdUsuarioCreacion(idUsuarioAlta);
-            ejIngresosEgresosSolicitudes.setPersona(rpm.getPersona());
+            ejIngresosEgresosSolicitudes.setPersona(new Personas(rpm.getPersona().getId()));
             ejIngresosEgresosSolicitudes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
-            ejIngresosEgresosSolicitudes.setTipoIngresosEgresos(rpm.getTipoIngresosEgresos());
+            ejIngresosEgresosSolicitudes.setTipoIngresosEgresos(new TipoIngresosEgresos(rpm.getTipoIngresosEgresos().getId()));
             ejIngresosEgresosSolicitudes.setMonto(rpm.getMonto());
 
             ingresosEgresosSolicitudesManager.guardarIngresosEgresos(ejIngresosEgresosSolicitudes);

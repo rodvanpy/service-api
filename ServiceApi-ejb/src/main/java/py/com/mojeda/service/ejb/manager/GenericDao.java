@@ -41,14 +41,21 @@ public interface GenericDao<T, ID extends Serializable> {
 	public Map<String, Object> getLike(T ejemplo, String[] atributos);
 
 	public T get(T ejemplo);
-                
-        public T getIdHandler(ID id);
-        
-        public List<T> listCartera(Long estado, String tipoPersona);
         
         public int total(T ejemplo);
         
         public Long total(T ejemplo, String orderBy, String dir);
+        
+        public int total(T ejemplo, boolean like);
+        
+        public int total(T ejemplo, String[] atributos,
+                List<String> atrMayIgual, List<Object> objMayIgual, List<String> atrMenIgual, List<Object> objMenIgual,
+                String campoComparacion, List<Object> valoresComparacion, String tipoFiltro, String[] camposNotNull, String tipoFiltroNull);
+        
+        public int total(T ejemplo, String[] atributos,
+                String[] orderByAttrList,String[] orderByDirList,
+		String camposDinamicos, boolean distintos,
+                String[] camposNotNull, String tipoFiltroNull);
                 
         //public long countAll(List<CountAll> params);       
 	
@@ -58,17 +65,11 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public void save(T entity) throws Exception;
 
-	public void update(T entity) throws Exception;
-        
-        public void updateApliUsuarios(String[] ids) throws Exception;
+	public void update(T entity) throws Exception;       
 
 	public void delete(ID id) throws Exception;
         
         public void delete(T ejemplo) throws Exception;
-        
-        public void updateRetorno(String[] ids) throws Exception;
-        
-        public int updateApi(String[] ids) throws Exception;
 	
 	public List<T> list();
 

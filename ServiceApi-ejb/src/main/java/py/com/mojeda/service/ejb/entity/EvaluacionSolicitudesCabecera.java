@@ -99,7 +99,6 @@ public class EvaluacionSolicitudesCabecera extends Base {
     private PropuestaSolicitud propuestaSolicitud;
     
     @JsonIgnore
-    @Index(name="empresa_id_idx")
     @Column(name = "ID_EMPRESA")
     private Long idEmpresa;
 

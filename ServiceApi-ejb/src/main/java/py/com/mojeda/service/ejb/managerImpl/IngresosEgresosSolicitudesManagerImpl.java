@@ -41,41 +41,37 @@ public class IngresosEgresosSolicitudesManagerImpl extends GenericDaoImpl<Ingres
     public IngresosEgresosSolicitudes guardarIngresosEgresos(IngresosEgresosSolicitudes ingresosEgresos) throws Exception {
         IngresosEgresosSolicitudes object = null;
         try {
-            IngresosEgresosSolicitudes ejIngresosEgresos = new IngresosEgresosSolicitudes();
+            object = new IngresosEgresosSolicitudes();
             if (ingresosEgresos.getId() == null) {
                 
-                ejIngresosEgresos.setActivo("S");
-                ejIngresosEgresos.setPersona(ingresosEgresos.getPersona());
-                ejIngresosEgresos.setPropuestaSolicitud(ingresosEgresos.getPropuestaSolicitud());
-                ejIngresosEgresos.setTipoIngresosEgresos(ingresosEgresos.getTipoIngresosEgresos());
+                object.setActivo("S");
+                object.setPersona(ingresosEgresos.getPersona());
+                object.setPropuestaSolicitud(ingresosEgresos.getPropuestaSolicitud());
+                object.setTipoIngresosEgresos(ingresosEgresos.getTipoIngresosEgresos());
                 
-                ejIngresosEgresos = this.get(ejIngresosEgresos);
+                object = this.get(object);
                 
-                if (ejIngresosEgresos != null) {
-                    ejIngresosEgresos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                    ejIngresosEgresos.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
-                    ejIngresosEgresos.setMonto(ingresosEgresos.getMonto());
+                if (object != null) {
+                    object.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    object.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
+                    object.setMonto(ingresosEgresos.getMonto());
                     
-                    this.update(ejIngresosEgresos);
+                    this.update(object);
                 } else {
+                    
                     this.save(ingresosEgresos);
+                    
+                    object = ingresosEgresos;
                 }
             } else {
 
-                ejIngresosEgresos = this.get(ingresosEgresos.getId());
-                ejIngresosEgresos.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                ejIngresosEgresos.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
-                ejIngresosEgresos.setMonto(ingresosEgresos.getMonto());
+                object = this.get(ingresosEgresos.getId());
+                object.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                object.setIdUsuarioModificacion(ingresosEgresos.getIdUsuarioModificacion());
+                object.setMonto(ingresosEgresos.getMonto());
 
-                this.update(ejIngresosEgresos);
+                this.update(object);
             }
-            
-            ejIngresosEgresos = new IngresosEgresosSolicitudes();
-            ejIngresosEgresos.setPersona(ingresosEgresos.getPersona());
-            ejIngresosEgresos.setTipoIngresosEgresos(ingresosEgresos.getTipoIngresosEgresos());
-            ejIngresosEgresos.setPropuestaSolicitud(ingresosEgresos.getPropuestaSolicitud());
-            
-            object = this.get(ejIngresosEgresos);
             
         } catch (Exception e) {
             logger.error("Error al guardar ingreso/egreso", e);
