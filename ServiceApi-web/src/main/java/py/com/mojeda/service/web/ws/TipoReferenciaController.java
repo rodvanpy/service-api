@@ -57,6 +57,7 @@ public class TipoReferenciaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoReferencias model = new TipoReferencias();
+        model.setActivo("S");
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
