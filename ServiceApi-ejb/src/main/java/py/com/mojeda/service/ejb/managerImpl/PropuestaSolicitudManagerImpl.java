@@ -402,8 +402,8 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                         ejSolicitantes.setIdPersonaConyuge(new Personas(Long.parseLong(conyugeMap.get("personaVinculo.id").toString())));
                         if (propuestaSolicitud.getCodeudor().getSeparacionBienes() != null && propuestaSolicitud.getCodeudor().getSeparacionBienes()) {
                             ejSolicitantes.setConsiderarConyuge(true);
-                        } 
-                        
+                        }
+
                         solicitantesManager.save(ejSolicitantes);
 
                         this.guardarDatosConyugeSolicitudes(propuestaSolicitud.getCodeudor().getId(), Long.parseLong(conyugeMap.get("personaVinculo.id").toString()),
@@ -412,7 +412,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     }
 
                 }
-                
+
                 solicitantesManager.save(ejSolicitantes);
 
                 ejGarantias = new Garantias();
@@ -1212,6 +1212,44 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         personaManager.update(ejPersona);
 
         return ejPersona;
+    }
+
+    @Override
+    public void abandonarPropuesta(Long idSolicitud, Long idFuncionario, Long idEmpresa) throws Exception {
+
+        PropuestaSolicitud ejPropuestaSolicitud = this.get(idSolicitud);
+
+        //Cambiar estado solicitud
+        ejPropuestaSolicitud.setEstado(new EstadosSolicitud(7L));
+        ejPropuestaSolicitud.setFechaEstado(new Date(System.currentTimeMillis()));
+
+        this.update(ejPropuestaSolicitud);
+
+        //Actualizar las garantias con el idCredito
+        Garantias garantias = new Garantias();
+        garantias.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+        List<Garantias> listGarantias = garantiasManager.list(garantias);
+        for (Garantias rpc : listGarantias) {
+            rpc.setEstado("INACTIVO");
+            rpc.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            garantiasManager.update(rpc);
+        }
+
+        //Cargar estado evaluacion
+        EvaluacionSolicitudesCabecera evaluacionCabecera = new EvaluacionSolicitudesCabecera();
+        evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+
+        evaluacionCabecera = evaluacionSolicitudesCabeceraManager.get(evaluacionCabecera);
+        
+        if (evaluacionCabecera != null) {
+            evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            evaluacionCabecera.setIdUsuarioModificacion(idFuncionario);
+            evaluacionCabecera.setEstado(new EstadosSolicitud(7L));
+
+            evaluacionSolicitudesCabeceraManager.update(evaluacionCabecera);
+        }
+
     }
 
     @Override

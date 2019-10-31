@@ -32,5 +32,7 @@ public interface PropuestaSolicitudManager extends GenericDao<PropuestaSolicitud
     
     public void tranferirPropuesta(Long idSolicitud, Long idFuncionario, Long idEmpresa) throws Exception;
     
+    public void abandonarPropuesta(Long idSolicitud, Long idFuncionario, Long idEmpresa) throws Exception;
+    
     public void delete(Long idSolicitud, Long idFuncionario) throws Exception;
 }

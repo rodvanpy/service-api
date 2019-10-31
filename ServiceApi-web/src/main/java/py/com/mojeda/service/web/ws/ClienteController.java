@@ -254,16 +254,13 @@ public class ClienteController extends BaseController {
 				.collect(Collectors.joining(",")));
                 return response;
             }
-            //Buscar cliente por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
            
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
             
             Clientes ejCliente = new Clientes();
-            ejCliente.setSucursal(ejSucursales);
             ejCliente.setPersona(ejPersona);
+            ejCliente.setIdEmpresa(userDetail.getIdEmpresa());
             ejCliente.setActivo("S");
             
             Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente,"id".split(","));
@@ -275,7 +272,7 @@ public class ClienteController extends BaseController {
             }
             
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setSucursal(ejSucursales);
+            ejCliente.setIdEmpresa(userDetail.getIdEmpresa());
             model.setActivo("S");
             model.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
@@ -330,13 +327,9 @@ public class ClienteController extends BaseController {
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
             
-            //Buscar cliente por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            
             Clientes ejCliente = new Clientes();
             ejCliente.setPersona(ejPersona);
-            ejCliente.setSucursal(ejSucursales);
+            ejCliente.setIdEmpresa(userDetail.getIdEmpresa());
             ejCliente.setActivo("S");
             
             Map<String,Object> clienteMaps = clientesManager.getLike(ejCliente, "id".split(","));
@@ -352,6 +345,7 @@ public class ClienteController extends BaseController {
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
+            ejCliente.setIdEmpresa(userDetail.getIdEmpresa());
             
             clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()), userDetail.getIdEmpresa());
             

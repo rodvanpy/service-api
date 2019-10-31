@@ -107,9 +107,10 @@ public class ArchivoController extends BaseController {
                 File fos = new File(CONTENT_PATH + path);
                 //Reducir Calidad Imagen en un 30%
                 if (ejDocumento.getTipoArchivo().compareToIgnoreCase("image/jpeg") == 0) {
+                    String tipoArchivo = ejDocumento.getTipoArchivo().split("/")[1];
                     file.transferTo(fos);
                     
-                    fos = this.reduceImageQuality(120000, CONTENT_PATH + path , CONTENT_PATH + path);
+                    fos = this.reduceImageQuality(130000, CONTENT_PATH + path , CONTENT_PATH + path);
 //                    BufferedImage originalImage = ImageIO.read(file.getInputStream());
 //
 //                    Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");

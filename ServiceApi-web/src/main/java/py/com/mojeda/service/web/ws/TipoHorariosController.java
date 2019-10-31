@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +55,7 @@ public class TipoHorariosController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoHorarios model = new TipoHorarios();
+        model.setActivo("S");
         model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
@@ -289,6 +291,38 @@ public class TipoHorariosController extends BaseController {
         return response;
     }
     
-    
+    /**
+     * Mapping para el metodo DELETE de la vista.(eliminar TipoHorarios)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO deleteObject(
+            @ModelAttribute("id") Long id) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarTipoHorariosManager();
+
+            TipoHorarios model = tipoHorariosManager.get(id);
+            model.setActivo("N");
+            model.setIdUsuarioEliminacion(userDetail.getId());
+            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+
+            tipoHorariosManager.update(model);
+
+            response.setModel(model);
+            response.setStatus(200);
+            response.setMessage("Registro eliminado con exito.");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
     
 }

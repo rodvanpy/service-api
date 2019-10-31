@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ import py.com.mojeda.service.ejb.utils.ResponseListDTO;
 import py.com.mojeda.service.web.spring.config.User;
 import py.com.mojeda.service.web.utils.FilterDTO;
 import py.com.mojeda.service.web.utils.ReglaDTO;
+import static py.com.mojeda.service.web.ws.BaseController.logger;
 
 /**
  *
@@ -57,6 +59,7 @@ public class TipoVinculoController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoVinculos model = new TipoVinculos();
+        model.setActivo("S");
         
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -259,6 +262,38 @@ public class TipoVinculoController extends BaseController {
         return response;
     }
     
-    
+    /**
+     * Mapping para el metodo DELETE de la vista.(eliminar TipoVinculos)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public @ResponseBody
+    ResponseDTO deleteObject(
+            @ModelAttribute("id") Long id) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarTipoVinculoManager();
+
+            TipoVinculos model = tipoVinculoManager.get(id);
+            model.setActivo("N");
+            model.setIdUsuarioEliminacion(userDetail.getId());
+            model.setFechaEliminacion(new Timestamp(System.currentTimeMillis()));
+
+            tipoVinculoManager.update(model);
+
+            response.setModel(model);
+            response.setStatus(200);
+            response.setMessage("Registro eliminado con exito.");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
     
 }

@@ -7,6 +7,7 @@ package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,8 @@ public class AnalisisController extends BaseController {
         model.setIdEmpresa(userDetail.getIdEmpresa());
 
         List<Map<String, Object>> listMapGrupos = null;
+        List<Object> estadoAbandonado = new ArrayList<>();
+        estadoAbandonado.add("ABA");
         try {
             inicializarPropuestaSolicitudManager();
             inicializarFuncionarioManager();
@@ -97,7 +100,7 @@ public class AnalisisController extends BaseController {
             Long total = 0L;
             logger.info("INICIO-- "+ new Date(System.currentTimeMillis()));
             if (!todos) {
-                total = evaluacionSolicitudesCabeceraManager.total(model,"id", "desc");
+                total = new Long(evaluacionSolicitudesCabeceraManager.total(model, "id".split(","), null, null, null, null, "estado.codigo", estadoAbandonado, "NOT_IN", null, null));
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -107,11 +110,10 @@ public class AnalisisController extends BaseController {
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
             
-            logger.info("INICIO LISTAR-- "+ new Date(System.currentTimeMillis()));
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
-                    null, null, null, null, null, null, null, null, true);
-            logger.info("FIN LISTAR-- "+ new Date(System.currentTimeMillis()));
+                    "estado.codigo", estadoAbandonado, "NOT_IN", null, null, null, null, null, true);
+
             PropuestaSolicitud propuesta;
             TipoSolicitudes tipoSolicitud;
             Funcionarios funcionarios;
@@ -199,6 +201,8 @@ public class AnalisisController extends BaseController {
         model.setFuncionarioAnalisis(new Funcionarios(userDetail.getId()));
 
         List<Map<String, Object>> listMapGrupos = null;
+        List<Object> estadoAbandonado = new ArrayList<>();
+        estadoAbandonado.add("ABA");
         try {
             inicializarPropuestaSolicitudManager();
             inicializarFuncionarioManager();
@@ -231,7 +235,7 @@ public class AnalisisController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = evaluacionSolicitudesCabeceraManager.total(model,"id", "desc");
+                total = new Long(evaluacionSolicitudesCabeceraManager.total(model, "id".split(","), null, null, null, null, "estado.codigo", estadoAbandonado, "NOT_IN", null, null));
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -243,7 +247,7 @@ public class AnalisisController extends BaseController {
 
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
-                    null, null, null, null, null, null, null, null, true);
+                    "estado.codigo", estadoAbandonado, "NOT_IN", null, null, null, null, null, true);
             
             PropuestaSolicitud propuesta;
             TipoSolicitudes tipoSolicitud;

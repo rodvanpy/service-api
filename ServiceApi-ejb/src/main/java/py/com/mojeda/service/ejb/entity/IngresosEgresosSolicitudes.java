@@ -27,8 +27,8 @@ import javax.persistence.Table;
 @Table(name = "INGRESOS_EGRESOS_SOLICITUDES")
 public class IngresosEgresosSolicitudes extends Base {
 
-    private static final long serialVersionUID = 1L;
-    private static final String SECUENCIA = "seq_ingreso_egreso_id";
+    private static final long serialVersionUID = 1654L;
+    private static final String SECUENCIA = "seq_ingreso_egreso_sol_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = SECUENCIA)

@@ -55,6 +55,7 @@ public class TipoMotivosRetiroController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
         TipoMotivosRetiro model = new TipoMotivosRetiro();
+        model.setActivo("S");
         model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
         
         List<Map<String, Object>> listMapGrupos = null;
@@ -317,7 +318,6 @@ public class TipoMotivosRetiroController extends BaseController {
 
         return response;
     }
-    
     
     
 }

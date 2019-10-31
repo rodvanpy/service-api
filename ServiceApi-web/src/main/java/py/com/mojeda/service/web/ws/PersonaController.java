@@ -278,7 +278,8 @@ public class PersonaController extends BaseController {
             
             if (model.getRuc() != null
                     && model.getRuc().trim().compareToIgnoreCase("") != 0
-                    && model.getRuc().contains("-")) {
+                    && model.getRuc().contains("-")
+                    && model.getRuc().length() > 5) {
 
                 ejPersona = new Personas();
                 ejPersona.setRuc(model.getRuc());

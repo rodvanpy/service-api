@@ -274,6 +274,61 @@ public class PropuestaSolicitudCreditoController extends BaseController {
 
         return response;
     }
+    
+    /**
+     * Mapping para el metodo GET de la vista abandonar.(abandonar propuesta)
+     *
+     * @param id de la entidad
+     * @return
+     */
+    @PutMapping("/abandonar/{id}")
+    public @ResponseBody
+    ResponseDTO abandonar(
+            @ModelAttribute("id") Long id) {
+        User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        ResponseDTO response = new ResponseDTO();
+        try {
+            inicializarPropuestaSolicitudManager();
+            
+            Map<String, Object> sucursal = propuestaSolicitudManager.getAtributos(new PropuestaSolicitud(id),
+                        "estado.codigo".split(","));
+            
+            if(sucursal != null
+                    && sucursal.get("estado.codigo").toString().compareToIgnoreCase("APR") == 0){
+                response.setStatus(205);
+                response.setMessage("La solicitud ya fue aprobada.");
+                return response;
+                
+            }
+            
+            if(sucursal != null
+                    && sucursal.get("estado.codigo").toString().compareToIgnoreCase("REC") == 0){
+                response.setStatus(205);
+                response.setMessage("La solicitud fue rechazada.");
+                return response;
+                
+            }
+            
+            if(sucursal != null
+                    && sucursal.get("estado.codigo").toString().compareToIgnoreCase("ABA") == 0){
+                response.setStatus(205);
+                response.setMessage("La solicitud ya fue abandonada.");
+                return response;
+                
+            }
+            
+            propuestaSolicitudManager.abandonarPropuesta(id, userDetail.getId(), userDetail.getIdEmpresa());
+
+            response.setStatus(200);
+            response.setMessage("Propuesta abandonada correctamente.");
+        } catch (Exception e) {
+            logger.error("Error: ", e);
+            response.setStatus(500);
+            response.setMessage("Error interno del servidor.");
+        }
+
+        return response;
+    }
 
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Usuario)
@@ -517,7 +572,8 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             }
 
             if (model.getRuc() != null
-                    && model.getRuc().trim().compareToIgnoreCase("") != 0) {
+                    && model.getRuc().trim().compareToIgnoreCase("") != 0
+                    && model.getRuc().contains("-")) {
 
                 ejPersona = new Personas();
                 ejPersona.setRuc(model.getRuc());
