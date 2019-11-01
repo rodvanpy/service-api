@@ -14,11 +14,13 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,28 +47,28 @@ public class ImagenController extends BaseController {
         try {
 
             inicializarDocumentoManager();
-            
+
             response.setHeader("Pragma", "no-cache");
             response.addHeader("Cache-Control", "no-cache");
 
             // Si es un agregar entidadId es 0
             if (entidadId != 0) { // Si es un editar
-                
+
                 Documentos imagen = new Documentos();
                 imagen.setEntidad(entidad);
                 imagen.setIdEntidad(entidadId);
                 imagen.setEmpresa(new Empresas(idEmpresa));
-                
+
                 imagen = documentoManager.get(imagen);
 
                 if (imagen != null) { // Si existe la imagen
                     File file;
-                    if(imagen.getArchivo() != null){
+                    if (imagen.getArchivo() != null) {
                         file = convertirImagen(imagen.getArchivo(), 640);
-                    }else{
+                    } else {
                         file = new File(imagen.getPath());
                     }
-                    
+
                     BufferedImage bufferedImage = ImageIO.read(file);
                     OutputStream output = response.getOutputStream();
                     ImageIO.write(bufferedImage, "jpg", output);
@@ -86,7 +88,7 @@ public class ImagenController extends BaseController {
                 Documentos imagen = new Documentos();
                 imagen.setEntidad(entidad);
                 imagen.setIdEntidad(0l);
-                
+
                 imagen = documentoManager.get(imagen);
 
                 if (imagen != null) { // Si existe la imagen temporal
@@ -110,6 +112,45 @@ public class ImagenController extends BaseController {
         } catch (Exception e) {
             logger.error("descargar imagen", e);
         }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/view/{idEmpresa}/{entidad}/{entidadId}", method = RequestMethod.GET)
+    public byte[] view(
+            @PathVariable("idEmpresa") Long idEmpresa,
+            @PathVariable("entidad") String entidad,
+            @PathVariable("entidadId") Long entidadId,
+            HttpServletRequest request, HttpServletResponse response) {
+
+        try {
+            inicializarDocumentoManager();
+
+            if (entidadId != 0) { // Si es un editar
+                Documentos imagen = new Documentos();
+                imagen.setEntidad(entidad);
+                imagen.setIdEntidad(entidadId);
+                imagen.setEmpresa(new Empresas(idEmpresa));
+
+                imagen = documentoManager.get(imagen);
+
+                if (imagen != null) { // Si existe la imagen
+                    File file;
+                    if (imagen.getArchivo() != null) {
+                        file = convertirImagen(imagen.getArchivo(), 640);
+                    } else {
+                        file = new File(imagen.getPath());
+                    }
+
+                    InputStream targetStream = new FileInputStream(file);
+
+                    return IOUtils.toByteArray(targetStream);
+
+                }
+            }
+        } catch (Exception e) {
+        }
+        return null;
+
     }
 
     public static File convertirImagen(byte[] bytes, Integer width) {

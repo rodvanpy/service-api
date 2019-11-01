@@ -7,6 +7,7 @@ package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -91,7 +93,7 @@ public class ArchivoController extends BaseController {
                 documentoManager.update(ejDocumento);
 
             } else {
-                
+
                 ejDocumento.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
                 ejDocumento.setActivo("S");
                 ejDocumento.setIdUsuarioCreacion(userDetail.getId());
@@ -102,35 +104,44 @@ public class ArchivoController extends BaseController {
                 ejDocumento.setSize(file.getSize());
 
                 Files.createDirectories(Paths.get(CONTENT_PATH + ejDocumento.getEntidad() + "/" + ejDocumento.getIdEntidad() + "/" + ejDocumento.getTipoDocumento().getCodigo()));
+
                 String path = ejDocumento.getEntidad() + "/" + ejDocumento.getIdEntidad() + "/" + ejDocumento.getTipoDocumento().getCodigo() + "/" + file.getOriginalFilename();
 
-                File fos = new File(CONTENT_PATH + path);
                 //Reducir Calidad Imagen en un 30%
-                if (ejDocumento.getTipoArchivo().compareToIgnoreCase("image/jpeg") == 0) {
+                if (ejDocumento.getTipoArchivo().contains("image")) {
+
                     String tipoArchivo = ejDocumento.getTipoArchivo().split("/")[1];
-                    file.transferTo(fos);
+                    logger.info("tipoArchivo: " + tipoArchivo);
+                    String nombreArchivo = file.getOriginalFilename().replace(tipoArchivo, "jpeg").replace("jfif", "jpeg");
+                    logger.info("nombreArchivo: " + nombreArchivo);
+
+                    ejDocumento.setTipoArchivo("image/jpeg");
+                    ejDocumento.setNombreDocumento(nombreArchivo);
+
+                    InputStream in = new ByteArrayInputStream(file.getBytes());
+                    BufferedImage bImageFromConvert = ImageIO.read(in);
+
+                    BufferedImage result = new BufferedImage(
+                            bImageFromConvert.getWidth(),
+                            bImageFromConvert.getHeight(),
+                            BufferedImage.TYPE_INT_RGB);
                     
-                    fos = this.reduceImageQuality(130000, CONTENT_PATH + path , CONTENT_PATH + path);
-//                    BufferedImage originalImage = ImageIO.read(file.getInputStream());
-//
-//                    Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
-//                    ImageWriter writer = (ImageWriter) iter.next();
-//                    ImageWriteParam iwp = writer.getDefaultWriteParam();
-//
-//                    iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-//                    float quality = 0.5f;  // reduce quality by 30%  
-//                    iwp.setCompressionQuality(quality);
-//
-//                    FileImageOutputStream output = new FileImageOutputStream(fos);
-//                    writer.setOutput(output);
-//
-//                    IIOImage image = new IIOImage(originalImage, null, null);
-//                    writer.write(null, image, iwp);
-//                    writer.dispose();
-//
-//                    fos = new File(CONTENT_PATH + path);
+                    result.createGraphics().drawImage(bImageFromConvert, 0, 0, Color.WHITE, null);
+                    
+
+                    path = ejDocumento.getEntidad() + "/" + ejDocumento.getIdEntidad() + "/" + ejDocumento.getTipoDocumento().getCodigo() + "/" + nombreArchivo;
+                    logger.info("nombreArchivo: " + nombreArchivo);
+                    
+                    File fos = new File(CONTENT_PATH + path);
+                    
+                    ImageIO.write(result, "jpg", fos);
+                    
+
+                    fos = this.reduceImageQuality(130000, CONTENT_PATH + path, CONTENT_PATH + path);
+
                     ejDocumento.setSize(fos.length());
                 } else {
+                    File fos = new File(CONTENT_PATH + path);
                     file.transferTo(fos);
                 }
 
@@ -142,11 +153,6 @@ public class ArchivoController extends BaseController {
 
             ejDocumento = documentoManager.get(ejDocumento.getId());
 
-//            Tesseract tesseract = new Tesseract();
-//            tesseract.setDatapath("/image/");
-//            
-//            String text = tesseract.doOCR(new File(ejDocumento.getPath()));
-//            logger.info("TEXTO IMAGEN: " + text);
             response.setModel(ejDocumento);
             response.setStatus(ejDocumento == null ? 404 : 200);
             response.setMessage(ejDocumento == null ? "No se pudo guardar el registro." : "Registro creado/modificado con exito");
@@ -256,28 +262,20 @@ public class ArchivoController extends BaseController {
         try {
             inicializarDocumentoManager();
 
-            List<Map<String, Object>> model = documentoManager.listAtributos(new Documentos(id), "path,tipoArchivo".split(","));
-            List<String> listBase64 = new ArrayList<>();
-            for (Map<String, Object> rpc : model) {
-                if (rpc.get("tipoArchivo").toString().compareToIgnoreCase("image/jpeg") == 0) {
+            Documentos documento = documentoManager.get(id);
 
-                }
-                File f = new File(rpc.get("path").toString());
-
-                String base64 = encodeFileToBase64Binary(f);
-                listBase64.add(base64);
-            }
-
-            response.setModel(listBase64);
-            response.setStatus(listBase64.size() == 0 ? 404 : 200);
-            response.setMessage(listBase64.size() == 0 ? "Registro no encontrado" : "Registro encontrado");
+            response.setModel(documento);
+            response.setStatus(documento == null ? 404 : 200);
+            response.setMessage(documento == null ? "Registro no encontrado" : "Registro encontrado");
 
             return response;
         } catch (Exception e) {
+            response.setStatus(404);
+            response.setMessage("Error interno del servidor.");
             logger.error("Error: ", e);
         }
 
-        return null;
+        return response;
     }
 
     /**
@@ -470,7 +468,7 @@ public class ArchivoController extends BaseController {
         }
 
         writer.dispose();
-        
+
         return fileOut2;
     }
 

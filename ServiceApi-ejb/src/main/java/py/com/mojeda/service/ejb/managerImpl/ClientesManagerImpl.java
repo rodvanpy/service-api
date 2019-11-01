@@ -104,6 +104,7 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
 
             cliente.setPersona(new Personas(ejPersona.getId()));
             cliente.setSucursal(new Sucursales(idSucursal));
+            cliente.setIdEmpresa(idEmpresa);
             
             this.update(cliente);
                      

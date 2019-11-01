@@ -49,7 +49,7 @@ public class DisplayImage extends HttpServlet {
 //                String extension = nombreExtension[1];
                 String extension = url.substring(url.lastIndexOf(".") + 1, url.length());
 
-                if (extension.equalsIgnoreCase("png") || extension.equalsIgnoreCase("jpeg") || extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("bmp")) {
+                if (extension.equalsIgnoreCase("png") || extension.equalsIgnoreCase("jfif") || extension.equalsIgnoreCase("jpeg") || extension.equalsIgnoreCase("jpg") || extension.equalsIgnoreCase("bmp")) {
                     response.setContentType("image/" + extension);
                 } else {
                     String nombre = url.substring(5);

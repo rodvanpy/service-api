@@ -524,6 +524,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             //Cargar Solicitantes de la propuesta
             //EDITAR SOLICITUD/GARANTIA DEUDOR
             Solicitantes ejSolicitantes = new Solicitantes();
+            ejSolicitantes.setTipoRelacion("DEUDOR");
             ejSolicitantes.setPropuestaSolicitud(new PropuestaSolicitud(ejPropuestaSolicitud.getId()));
 
             ejSolicitantes = solicitantesManager.get(ejSolicitantes);

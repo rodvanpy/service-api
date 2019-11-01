@@ -322,17 +322,20 @@ public class ClienteController extends BaseController {
 				.map(x -> x.getDefaultMessage())
 				.collect(Collectors.joining(",")));
                 return response;
-            }            
+            }
+            //Seteart la empresa
+            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             
             Personas ejPersona = new Personas();
             ejPersona.setDocumento(model.getPersona().getDocumento());
             
-            Clientes ejCliente = new Clientes();
-            ejCliente.setPersona(ejPersona);
-            ejCliente.setIdEmpresa(userDetail.getIdEmpresa());
-            ejCliente.setActivo("S");
+            Clientes cliente = new Clientes();
+            cliente.setPersona(ejPersona);
+            cliente.setIdEmpresa(userDetail.getIdEmpresa());
+            cliente.setActivo("S");
             
-            Map<String,Object> clienteMaps = clientesManager.getLike(ejCliente, "id".split(","));
+            Map<String,Object> clienteMaps = clientesManager.getLike(cliente, "id,sucursal.id".split(","));
+            
             if (clienteMaps != null
                     && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -340,15 +343,15 @@ public class ClienteController extends BaseController {
                 return response;
             }           
             
-            clienteMaps = clientesManager.getLike(new Clientes(id), "sucursal.id".split(","));
-                     
-            model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            model.setIdUsuarioModificacion(userDetail.getId());
-            ejCliente.setIdEmpresa(userDetail.getIdEmpresa());
+            cliente = clientesManager.get(new Clientes(id));
             
-            clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()), userDetail.getIdEmpresa());
+            cliente.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            cliente.setIdUsuarioModificacion(userDetail.getId());
+            cliente.setPersona(model.getPersona());
             
+            clientesManager.editar(cliente, Long.parseLong(clienteMaps.get("sucursal.id").toString()), userDetail.getIdEmpresa());
+            
+            //Obtener cliente
             model = clientesManager.getCliente(new Clientes(id), userDetail.getIdEmpresa(),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
             
             response.setModel(model);
