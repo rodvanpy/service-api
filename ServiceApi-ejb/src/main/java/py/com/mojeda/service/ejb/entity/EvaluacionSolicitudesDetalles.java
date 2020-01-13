@@ -31,7 +31,7 @@ import org.hibernate.annotations.Index;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "EVALUACION_SOLICITUDES_DETALLES")
+@Table(name = "EVALUACION_SOLICITUDES_DETALLES", schema = "PUBLIC")
 public class EvaluacionSolicitudesDetalles extends Base {
 
     private static final long serialVersionUID = 1L;
@@ -219,6 +219,9 @@ public class EvaluacionSolicitudesDetalles extends Base {
     
     @Column(name = "DEUDA_CUOTA_REFERENCIA")
     private Long deudaCuotaReferencia;
+    
+    @Column(name = "OBSERVACION_REFERENCIA", length = 4000)
+    private String observacionReferencia;
     
     @Column(name = "TOTAL_DEUDA_CUOTA_EXTERIOR")
     private Long totalDeudaCuotaExterior;
@@ -1139,6 +1142,14 @@ public class EvaluacionSolicitudesDetalles extends Base {
 
     public void setIdEmpresa(Long idEmpresa) {
         this.idEmpresa = idEmpresa;
+    }
+
+    public String getObservacionReferencia() {
+        return observacionReferencia;
+    }
+
+    public void setObservacionReferencia(String observacionReferencia) {
+        this.observacionReferencia = observacionReferencia;
     }
         
         

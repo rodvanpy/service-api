@@ -21,7 +21,7 @@ import javax.persistence.Table;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "SITUACIONES_CREDITO")
+@Table(name = "SITUACIONES_CREDITO", schema = "PUBLIC")
 public class SituacionesCredito implements Serializable {
 
     private static final long serialVersionUID = 1L;

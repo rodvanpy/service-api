@@ -25,7 +25,7 @@ import javax.persistence.Table;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "INGRESOS_EGRESOS")
+@Table(name = "INGRESOS_EGRESOS", schema = "PUBLIC")
 public class IngresosEgresos extends Base {
 
     private static final long serialVersionUID = 1L;

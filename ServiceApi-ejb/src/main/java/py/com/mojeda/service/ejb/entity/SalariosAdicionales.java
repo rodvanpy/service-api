@@ -22,7 +22,7 @@ import javax.persistence.Table;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "SALARIOS_ADICIONALES")
+@Table(name = "SALARIOS_ADICIONALES", schema = "PUBLIC")
 public class SalariosAdicionales extends Base {
 
     private static final long serialVersionUID = 1574657L;

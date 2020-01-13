@@ -29,7 +29,7 @@ import javax.validation.Valid;
  */
 
 @Entity
-@Table(name = "CLIENTES", uniqueConstraints = @UniqueConstraint(name = "clientes_persona_uq", columnNames = { "ID_PERSONA" }) )
+@Table(name = "CLIENTES", schema = "PUBLIC", uniqueConstraints = @UniqueConstraint(name = "clientes_persona_uq", columnNames = { "ID_PERSONA" }) )
 public class Clientes extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;

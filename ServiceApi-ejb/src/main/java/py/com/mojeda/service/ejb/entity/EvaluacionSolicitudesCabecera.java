@@ -30,7 +30,7 @@ import org.hibernate.annotations.Index;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "EVALUACION_SOLICITUDES_CABECERA")
+@Table(name = "EVALUACION_SOLICITUDES_CABECERA", schema = "PUBLIC")
 public class EvaluacionSolicitudesCabecera extends Base {
 
     private static final long serialVersionUID = 1L;
@@ -347,4 +347,5 @@ public class EvaluacionSolicitudesCabecera extends Base {
         this.idEmpresa = idEmpresa;
     }   
 
+        
 }

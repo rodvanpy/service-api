@@ -21,7 +21,7 @@ import javax.persistence.Table;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "TIPO_VINCULOS")
+@Table(name = "TIPO_VINCULOS", schema = "PUBLIC")
 public class TipoVinculos extends Base{
 
     private static final long serialVersionUID = 1574657L;

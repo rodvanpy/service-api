@@ -29,7 +29,7 @@ import org.hibernate.annotations.Index;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "GARANTIAS")
+@Table(name = "GARANTIAS", schema = "PUBLIC")
 public class Garantias implements Serializable {
 
     private static final long serialVersionUID = 1L;

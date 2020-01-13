@@ -263,7 +263,7 @@ public class ClienteController extends BaseController {
             ejCliente.setIdEmpresa(userDetail.getIdEmpresa());
             ejCliente.setActivo("S");
             
-            Map<String,Object> usuarioMaps = clientesManager.getLike(ejCliente,"id".split(","));
+            Map<String,Object> usuarioMaps = clientesManager.getAtributos(ejCliente,"id".split(","),false,false);
             
             if(usuarioMaps != null){
                 response.setStatus(205);
@@ -334,7 +334,7 @@ public class ClienteController extends BaseController {
             cliente.setIdEmpresa(userDetail.getIdEmpresa());
             cliente.setActivo("S");
             
-            Map<String,Object> clienteMaps = clientesManager.getLike(cliente, "id,sucursal.id".split(","));
+            Map<String,Object> clienteMaps = clientesManager.getAtributos(cliente, "id,sucursal.id".split(","),false,false);
             
             if (clienteMaps != null
                     && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
@@ -343,20 +343,18 @@ public class ClienteController extends BaseController {
                 return response;
             }           
             
-            cliente = clientesManager.get(new Clientes(id));
+            model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            model.setIdUsuarioModificacion(userDetail.getId());
             
-            cliente.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            cliente.setIdUsuarioModificacion(userDetail.getId());
-            cliente.setPersona(model.getPersona());
-            
-            clientesManager.editar(cliente, Long.parseLong(clienteMaps.get("sucursal.id").toString()), userDetail.getIdEmpresa());
+            clientesManager.editar(model, Long.parseLong(clienteMaps.get("sucursal.id").toString()), userDetail.getIdEmpresa());
             
             //Obtener cliente
             model = clientesManager.getCliente(new Clientes(id), userDetail.getIdEmpresa(),"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
             
             response.setModel(model);
-            response.setStatus(200);
-            response.setMessage("Registro modificado con exito");
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Error al modificar el registro" : "Registro modificado con exito");
+            
         } catch (Exception e) {
             logger.error("Error: ",e);
             response.setStatus(500);

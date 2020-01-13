@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
  * @author Miguel
  */
 @Entity
-@Table(name = "HORARIOS_FUNCIONARIOS")
+@Table(name = "HORARIOS_FUNCIONARIOS", schema = "PUBLIC")
 public class HorariosUsuarios extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;

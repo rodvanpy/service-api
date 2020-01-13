@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "DEPARTAMENTOS_SUCURSAL", uniqueConstraints = @UniqueConstraint(name = "departamento_suc_alias_uq", columnNames = { "alias","id_sucursal" }) )
+@Table(name = "DEPARTAMENTOS_SUCURSAL", schema = "PUBLIC", uniqueConstraints = @UniqueConstraint(name = "departamento_suc_alias_uq", columnNames = { "alias","id_sucursal" }) )
 public class DepartamentosSucursal extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;

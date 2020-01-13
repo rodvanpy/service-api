@@ -30,7 +30,7 @@ import py.com.mojeda.service.ejb.utils.Avatar;
  */
 //@JsonInclude(Include.NON_NULL)
 @Entity
-@Table(name = "PERSONAS")
+@Table(name = "PERSONAS", schema = "PUBLIC")
 public class Personas extends Base {
 
     private static final long serialVersionUID = -9149680520407250259L;

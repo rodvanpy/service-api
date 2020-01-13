@@ -29,7 +29,7 @@ import org.hibernate.annotations.Index;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "PROPUESTA_SOLICITUD")
+@Table(name = "PROPUESTA_SOLICITUD", schema = "PUBLIC")
 public class PropuestaSolicitud extends Base{
 
     private static final long serialVersionUID = 1L;

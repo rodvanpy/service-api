@@ -23,7 +23,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "TIPO_FUNCIONARIOS")
+@Table(name = "TIPO_FUNCIONARIOS", schema = "PUBLIC")
 public class TipoFuncionarios extends Base{
 
     private static final long serialVersionUID = 1574657L;

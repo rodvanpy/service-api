@@ -11,7 +11,7 @@ import javax.persistence.*;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "TOKENS")
+@Table(name = "TOKENS", schema = "PUBLIC")
 public class Tokens implements Serializable {
     private static long serialVersionUID = 85387603479861808L;
     private static final String SECUENCIA = "seq_token_id";

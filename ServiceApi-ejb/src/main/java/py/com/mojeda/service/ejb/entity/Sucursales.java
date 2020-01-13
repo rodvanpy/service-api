@@ -29,7 +29,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "SUCURSALES" ,uniqueConstraints = @UniqueConstraint(name = "sucursal_cod_uq", columnNames = { "codigo_sucursal" }) )
+@Table(name = "SUCURSALES" , schema = "PUBLIC" ,uniqueConstraints = @UniqueConstraint(name = "sucursal_cod_uq", columnNames = { "codigo_sucursal" }) )
 public class Sucursales extends Base {
 
     private static final long serialVersionUID = 79861856088L;

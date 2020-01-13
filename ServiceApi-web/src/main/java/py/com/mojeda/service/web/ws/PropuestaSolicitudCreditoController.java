@@ -6,6 +6,7 @@
 package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -101,7 +102,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                         }
                     }
                 } else {
-                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                    generarEjemplo(filtro, model);
                 }
 
             }
@@ -137,7 +138,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                 evaluacion.setPropuestaSolicitud(new PropuestaSolicitud(Long.parseLong(rpm.get("id").toString())));
                 
                 Map<String, Object> analisisCabecera = evaluacionSolicitudesCabeceraManager.getAtributos(evaluacion,
-                        "id,estado.id".split(","));
+                        "id,estado.id".split(","),false,false);
 
                 rpm.put("sucursal", sucursal);
                 rpm.put("cliente", cliente);
@@ -259,6 +260,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             @ModelAttribute("id") Long id) {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        Gson gson = new Gson();
         try {
             inicializarPropuestaSolicitudManager();
 
@@ -495,6 +497,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             if (modelMaps != null 
                     && modelMaps.get("estado.codigo") != null
                     && modelMaps.get("estado.codigo").toString().compareToIgnoreCase("RET") == 0
+                    && new BigDecimal(modelMaps.get("montoSolicitado").toString()).longValue() > 0
                     && new BigDecimal(modelMaps.get("montoSolicitado").toString()).longValue() < model.getMontoSolicitado().longValue()) {
                 
                 response.setModel(null);
@@ -562,7 +565,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
                 ejPersona.setDocumento(model.getDocumento());
                 ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                Map<String, Object> clienteMaps = personaManager.getAtributos(ejPersona, "id".split(","),false,false);
                 if (clienteMaps != null
                         && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                     response.setStatus(205);
@@ -573,13 +576,14 @@ public class PropuestaSolicitudCreditoController extends BaseController {
 
             if (model.getRuc() != null
                     && model.getRuc().trim().compareToIgnoreCase("") != 0
-                    && model.getRuc().contains("-")) {
+                    && model.getRuc().contains("-")
+                    && model.getRuc().length() > 5) {
 
                 ejPersona = new Personas();
                 ejPersona.setRuc(model.getRuc());
                 ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                Map<String, Object> clienteMaps = personaManager.getAtributos(ejPersona, "id".split(","),false, false);
                 if (clienteMaps != null
                         && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                     response.setStatus(205);
@@ -601,6 +605,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
+            e.printStackTrace();
         }
 
         return response;
@@ -632,6 +637,36 @@ public class PropuestaSolicitudCreditoController extends BaseController {
         }
 
         return response;
+    }
+    
+    public void generarEjemplo(FilterDTO filtro, PropuestaSolicitud model) {
+        PropuestaSolicitud entidad;
+        
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();
+        if(filtro.getData() != null){
+            
+            entidad = gson.fromJson(filtro.getData(), PropuestaSolicitud.class);
+            
+            if(entidad.getId() != null){
+                model.setId(entidad.getId());
+            }
+            
+            if(entidad.getCliente() != null){
+                model.setCliente(entidad.getCliente());
+            }
+            
+            if(entidad.getFuncionario() != null){
+                model.setFuncionario(new Funcionarios(entidad.getFuncionario().getId()));
+            }
+            
+            if(entidad.getEstado() != null){
+                model.setEstado(entidad.getEstado());
+            }
+            
+            if(entidad.getSucursal() != null){
+                model.setSucursal(entidad.getSucursal());
+            }
+        }
     }
 
 }

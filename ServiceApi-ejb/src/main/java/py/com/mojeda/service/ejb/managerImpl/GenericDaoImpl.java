@@ -10,14 +10,15 @@ import javax.persistence.PersistenceContext;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.ejb.HibernateEntityManager;
+//import org.hibernate.ejb.HibernateEntityManager;
 
 import com.googlecode.genericdao.search.ExampleOptions;
 import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
 import com.googlecode.genericdao.search.hibernate.HibernateMetadataUtil;
 import com.googlecode.genericdao.search.jpa.JPASearchProcessor;
-import javax.persistence.Query;
+//import javax.persistence.Query;
+import org.hibernate.jpa.HibernateEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import py.com.mojeda.service.ejb.manager.GenericDao;

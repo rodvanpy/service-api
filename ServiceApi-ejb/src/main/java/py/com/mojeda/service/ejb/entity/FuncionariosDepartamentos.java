@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author Miguel
  */
 @Entity
-@Table(name = "FUNCIONARIO_DEPARTAMENTOS")
+@Table(name = "FUNCIONARIO_DEPARTAMENTOS", schema = "PUBLIC")
 public class FuncionariosDepartamentos{
     
     private static final long serialVersionUID = 7986185608L;

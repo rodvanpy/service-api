@@ -55,7 +55,7 @@ public class DisplayImage extends HttpServlet {
                     String nombre = url.substring(5);
                     response.setContentType("application/" + extension);
                     response.setHeader("Content-Disposition", "attachment; filename=\"" + nombre + "");
-                    url = CONTENT_PATH + extension + ".png";
+                    //url = CONTENT_PATH + extension;
                 }
                 String link = url;
                 fin = new FileInputStream(link);

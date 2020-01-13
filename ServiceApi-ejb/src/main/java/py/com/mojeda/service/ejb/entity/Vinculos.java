@@ -24,7 +24,7 @@ import javax.validation.constraints.NotNull;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "VINCULOS")
+@Table(name = "VINCULOS", schema = "PUBLIC")
 public class Vinculos extends Base {
 
     private static final long serialVersionUID = -9149680520407250259L;

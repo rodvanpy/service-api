@@ -312,6 +312,7 @@ public class PersonaController extends BaseController {
             logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
+            e.printStackTrace();
         }
 
         return response;
@@ -335,10 +336,11 @@ public class PersonaController extends BaseController {
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        Gson gson = new Gson();
         try {
             inicializarPersonaManager();
             inicializarPropuestaSolicitudManager();
-
+            logger.info("EDITAR FUNCIONARIO : " + gson.toJson(model));
             if (errors.hasErrors()) {
 
                 response.setStatus(400);
@@ -355,8 +357,7 @@ public class PersonaController extends BaseController {
 
                 ejPersona.setDocumento(model.getDocumento());
                 ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
-                Map<String, Object> clienteMaps = personaManager.getLike(ejPersona, "id".split(","));
+                Map<String, Object> clienteMaps = personaManager.getAtributos(ejPersona, "id".split(","),false,false);
                 if (clienteMaps != null
                         && clienteMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                     response.setStatus(205);
@@ -367,7 +368,8 @@ public class PersonaController extends BaseController {
 
             if (model.getRuc() != null
                     && model.getRuc().trim().compareToIgnoreCase("") != 0
-                    && model.getRuc().contains("-")) {
+                    && model.getRuc().contains("-")
+                    && model.getRuc().length() > 5) {
 
                 ejPersona = new Personas();
                 ejPersona.setRuc(model.getRuc());
@@ -397,6 +399,7 @@ public class PersonaController extends BaseController {
             logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
+            e.printStackTrace();
         }
 
         return response;

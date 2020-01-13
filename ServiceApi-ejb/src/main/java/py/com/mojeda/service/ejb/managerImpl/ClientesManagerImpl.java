@@ -101,12 +101,14 @@ public class ClientesManagerImpl extends GenericDaoImpl<Clientes, Long>
             cliente.getPersona().setIdUsuarioCreacion(cliente.getIdUsuarioCreacion());
 
             Personas ejPersona = personaManager.editar(cliente.getPersona());
-
-            cliente.setPersona(new Personas(ejPersona.getId()));
-            cliente.setSucursal(new Sucursales(idSucursal));
-            cliente.setIdEmpresa(idEmpresa);
             
-            this.update(cliente);
+            object = this.get(cliente.getId());
+            
+            object.setPersona(new Personas(ejPersona.getId()));
+            object.setSucursal(new Sucursales(idSucursal));
+            object.setIdEmpresa(idEmpresa);
+            
+            this.update(object);
                      
             object = this.getCliente(new Clientes(cliente.getId()),idEmpresa,"inmuebles,vehiculos,referencias,ingresos,egresos,ocupaciones");
 

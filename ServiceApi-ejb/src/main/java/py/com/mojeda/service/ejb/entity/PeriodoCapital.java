@@ -22,7 +22,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "PERIODO_CAPITAL")
+@Table(name = "PERIODO_CAPITAL", schema = "PUBLIC")
 public class PeriodoCapital extends Base{
 
     private static final long serialVersionUID = 1574657L;

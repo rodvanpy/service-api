@@ -22,7 +22,7 @@ import javax.persistence.Table;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "ESTUDIOS")
+@Table(name = "ESTUDIOS", schema = "PUBLIC")
 public class Estudios extends Base {
 
     private static final long serialVersionUID = 1574657L;

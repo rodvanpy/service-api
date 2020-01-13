@@ -21,7 +21,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "PERMISOS")
+@Table(name = "PERMISOS", schema = "PUBLIC")
 public class Permisos implements Serializable {
 
     private static long serialVersionUID = -9149680520407250259L;

@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "MONEDAS")
+@Table(name = "MONEDAS", schema = "PUBLIC")
 public class Monedas extends Base{
 
     private static final long serialVersionUID = 1L;

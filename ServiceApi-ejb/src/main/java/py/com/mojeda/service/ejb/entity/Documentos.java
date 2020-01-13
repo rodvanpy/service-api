@@ -19,12 +19,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 /**
  *
  * @author Miguel
  */
 @Entity
+@Table(name = "DOCUMENTOS", schema = "PUBLIC")
 public class Documentos extends Base implements Serializable {
 
     /**

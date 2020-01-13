@@ -27,7 +27,7 @@ import javax.persistence.TemporalType;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "CUOTAS")
+@Table(name = "CUOTAS", schema = "PUBLIC")
 public class Cuotas implements Serializable {
 
     private static final long serialVersionUID = 1L;

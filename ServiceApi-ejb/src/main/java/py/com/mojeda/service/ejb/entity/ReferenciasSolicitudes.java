@@ -25,7 +25,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Entity
-@Table(name = "REFERENCIAS_SOLICITUDES")
+@Table(name = "REFERENCIAS_SOLICITUDES", schema = "PUBLIC")
 public class ReferenciasSolicitudes extends Base {
 
     private static final long serialVersionUID = -9149680520407250259L;

@@ -15,7 +15,7 @@ import javax.persistence.*;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "SOLICITANTES")
+@Table(name = "SOLICITANTES", schema = "PUBLIC")
 public class Solicitantes implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final String SECUENCIA = "SEQ_SOLICITANTES";   

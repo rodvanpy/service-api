@@ -137,7 +137,7 @@ public class ArchivoController extends BaseController {
                     ImageIO.write(result, "jpg", fos);
                     
 
-                    fos = this.reduceImageQuality(130000, CONTENT_PATH + path, CONTENT_PATH + path);
+                    fos = this.reduceImageQuality(150000, CONTENT_PATH + path, CONTENT_PATH + path);
 
                     ejDocumento.setSize(fos.length());
                 } else {

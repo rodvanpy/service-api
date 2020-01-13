@@ -20,7 +20,7 @@ public interface EvaluacionSolicitudesCabeceraManager extends GenericDao<Evaluac
     
     public EvaluacionSolicitudesCabecera guardar(EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera, Long idFuncionario, Long idEmpresa) throws Exception;
     
-    public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion) throws Exception;
+    public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion, Long idEmpresa) throws Exception;
     
     public EvaluacionSolicitudesCabecera getEvaluacion(EvaluacionSolicitudesCabecera evaluacion) throws Exception;
     

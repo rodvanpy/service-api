@@ -54,14 +54,17 @@ import py.com.mojeda.service.ejb.manager.TipoOcupacionesManager;
 import py.com.mojeda.service.ejb.manager.VinculoManager;
 import py.com.mojeda.service.ejb.manager.FuncionarioDepartamentosManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
+import py.com.mojeda.service.ejb.manager.InformconfSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.IngresosEgresosSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.OcupacionSolicitudesManager;
+import py.com.mojeda.service.ejb.manager.ParametrosManager;
 import py.com.mojeda.service.ejb.manager.ReferenciaSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.TipoCargosManager;
 import py.com.mojeda.service.ejb.manager.TipoEstudiosManager;
 import py.com.mojeda.service.ejb.manager.TipoFuncionariosManager;
 import py.com.mojeda.service.ejb.manager.TipoHorariosManager;
 import py.com.mojeda.service.ejb.manager.TipoMotivosRetiroManager;
+import py.com.mojeda.service.web.jwt.TokenHandler;
 
 /**
  *
@@ -71,7 +74,7 @@ public class BaseController {
     
     protected static final String CONTENT_IMAGE = "C:\\imagen\\";
     
-    protected static final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    protected static final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm");    
     
     private Context context;
     
@@ -177,8 +180,46 @@ public class BaseController {
     
     protected CreditosManager creditosManager;
     
+    protected InformconfSolicitudesManager informconfSolicitudesManager;
+    
+    protected ParametrosManager parametrosManager;
+    
             
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
+    
+    protected void inicializarParametrosManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (parametrosManager == null) {
+            try {
+                parametrosManager = (ParametrosManager) context.lookup("java:app/ServiceApi-ejb/ParametrosManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
+    
+    protected void inicializarInformconfSolicitudesManager() throws Exception {
+        if (context == null) {
+            try {
+                context = new InitialContext();
+            } catch (NamingException e1) {
+                throw new RuntimeException("No se puede inicializar el contexto", e1);
+            }
+        }
+        if (informconfSolicitudesManager == null) {
+            try {
+                informconfSolicitudesManager = (InformconfSolicitudesManager) context.lookup("java:app/ServiceApi-ejb/InformconfSolicitudesManagerImpl");
+            } catch (NamingException ne) {
+                throw new RuntimeException("No se encuentra EJB valor Manager: ", ne);
+            }
+        }
+    }
     
     protected void inicializarCreditosManager() throws Exception {
         if (context == null) {

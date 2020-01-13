@@ -21,7 +21,7 @@ import javax.persistence.Table;
  * @author Miguel
  */
 @Entity
-@Table(name = "DOCUMENTOS_ENTIDADES")
+@Table(name = "DOCUMENTOS_ENTIDADES", schema = "PUBLIC")
 public class DocumentosEntidades extends Base{
     
     private static final long serialVersionUID = 8538760347986185608L;

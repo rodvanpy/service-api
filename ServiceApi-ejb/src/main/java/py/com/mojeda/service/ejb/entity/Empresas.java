@@ -29,7 +29,7 @@ import py.com.mojeda.service.ejb.utils.Avatar;
  * @author daniel
  */
 @Entity
-@Table(name = "EMPRESAS", uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = {"ruc"}))
+@Table(name = "EMPRESAS", schema = "PUBLIC", uniqueConstraints = @UniqueConstraint(name = "empresa_ruc_uq", columnNames = {"ruc"}))
 public class Empresas extends Base {
 
     private static final long serialVersionUID = 79861856088L;

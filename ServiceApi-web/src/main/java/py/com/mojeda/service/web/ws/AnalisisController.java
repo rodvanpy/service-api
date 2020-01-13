@@ -6,6 +6,7 @@
 package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
 import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
+import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesDetalles;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.entity.Sucursales;
@@ -43,7 +46,7 @@ import static py.com.mojeda.service.web.ws.BaseController.logger;
 @Controller
 @RequestMapping(value = "/analisis_solicitudes")
 public class AnalisisController extends BaseController {
-
+    
     String atributos = "id,fechaInicioAnalisis,fechaFinAnalisis,fechaPrimeraAprobRech,fechaSegundaAprobRech,funcionarioAprobacion.id,funcionarioAprobacion.alias,estado.id,"
             + "montoAprobado,funcionarioAnalisis.id,funcionarioAnalisis.alias,funcionarioVerificador.id,funcionarioVerificador.alias,obsApro,propuestaSolicitud.id,"
             + "propuestaSolicitud.fechaPresentacion,propuestaSolicitud.montoSolicitado,propuestaSolicitud.tipoSolicitud.nombre,propuestaSolicitud.tipoSolicitud.id,"
@@ -73,7 +76,7 @@ public class AnalisisController extends BaseController {
             inicializarFuncionarioManager();
             inicializarEvaluacionSolicitudesCabeceraManager();
             inicializarEstadosSolicitudManager();
-            
+
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -90,7 +93,7 @@ public class AnalisisController extends BaseController {
                         }
                     }
                 } else {
-                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                    generarEjemplo(filtro, model);
                 }
 
             }
@@ -98,7 +101,7 @@ public class AnalisisController extends BaseController {
 
             pagina = pagina != null ? pagina : 1;
             Long total = 0L;
-            logger.info("INICIO-- "+ new Date(System.currentTimeMillis()));
+            logger.info("INICIO-- " + new Date(System.currentTimeMillis()));
             if (!todos) {
                 total = new Long(evaluacionSolicitudesCabeceraManager.total(model, "id".split(","), null, null, null, null, "estado.codigo", estadoAbandonado, "NOT_IN", null, null));
             }
@@ -109,7 +112,7 @@ public class AnalisisController extends BaseController {
                 inicio = Integer.parseInt(total.toString()) - Integer.parseInt(total.toString()) % cantidad;
                 pagina = Integer.parseInt(total.toString()) / cantidad;
             }
-            
+
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     "estado.codigo", estadoAbandonado, "NOT_IN", null, null, null, null, null, true);
@@ -118,37 +121,37 @@ public class AnalisisController extends BaseController {
             TipoSolicitudes tipoSolicitud;
             Funcionarios funcionarios;
             for (Map<String, Object> rpm : listMapGrupos) {
-                
+
                 propuesta = new PropuestaSolicitud();
                 propuesta.setFechaPresentacion(rpm.get("propuestaSolicitud.fechaPresentacion") == null ? null : date.parse(rpm.get("propuestaSolicitud.fechaPresentacion").toString()));
                 propuesta.setId(rpm.get("propuestaSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.id").toString()));
                 propuesta.setMontoSolicitado(rpm.get("propuestaSolicitud.montoSolicitado") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitado").toString()));
-                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));               
-                
+                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));
+
                 tipoSolicitud = new TipoSolicitudes();
                 tipoSolicitud.setId(rpm.get("propuestaSolicitud.tipoSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.tipoSolicitud.id").toString()));
                 tipoSolicitud.setNombre(rpm.get("propuestaSolicitud.tipoSolicitud.nombre") == null ? null : rpm.get("propuestaSolicitud.tipoSolicitud.nombre").toString());
-                propuesta.setTipoSolicitud(tipoSolicitud);                
-                rpm.put("propuestaSolicitud", propuesta); 
+                propuesta.setTipoSolicitud(tipoSolicitud);
+                rpm.put("propuestaSolicitud", propuesta);
                 rpm.put("sucursal", rpm.get("propuestaSolicitud.sucursal.nombre"));
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioAprobacion.id") == null ? null : Long.parseLong(rpm.get("funcionarioAprobacion.id").toString()));
-                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());                
+                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());
                 rpm.put("funcionarioAprobacion", funcionarios.getId() == null ? null : funcionarios);
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioAnalisis.id") == null ? null : Long.parseLong(rpm.get("funcionarioAnalisis.id").toString()));
-                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());                
+                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());
                 rpm.put("funcionarioAnalisis", funcionarios.getId() == null ? null : funcionarios);
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioVerificador.id") == null ? null : Long.parseLong(rpm.get("funcionarioVerificador.id").toString()));
                 funcionarios.setAlias(rpm.get("funcionarioVerificador.alias") == null ? null : rpm.get("funcionarioVerificador.alias").toString());
                 rpm.put("funcionarioVerificador", funcionarios.getId() == null ? null : funcionarios);
-                
+
                 rpm.put("estado", estadosSolicitudManager.getEstadosSolicitud(new EstadosSolicitud(Long.parseLong(rpm.get("estado.id").toString()))));
-                
+
                 rpm.remove("funcionarioAnalisis.id");
                 rpm.remove("funcionarioVerificador.id");
                 rpm.remove("funcionarioAprobacion.id");
@@ -173,7 +176,7 @@ public class AnalisisController extends BaseController {
             retorno.setPage(pagina);
             retorno.setStatus(200);
             retorno.setMessage("OK");
-            logger.info("FIN-- "+ new Date(System.currentTimeMillis()));
+            logger.info("FIN-- " + new Date(System.currentTimeMillis()));
         } catch (Exception e) {
             logger.error("Error: ", e);
             retorno.setStatus(500);
@@ -208,7 +211,7 @@ public class AnalisisController extends BaseController {
             inicializarFuncionarioManager();
             inicializarEvaluacionSolicitudesCabeceraManager();
             inicializarEstadosSolicitudManager();
-            
+
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -225,7 +228,7 @@ public class AnalisisController extends BaseController {
                         }
                     }
                 } else {
-                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                    generarEjemplo(filtro, model);
                 }
 
             }
@@ -248,7 +251,7 @@ public class AnalisisController extends BaseController {
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     "estado.codigo", estadoAbandonado, "NOT_IN", null, null, null, null, null, true);
-            
+
             PropuestaSolicitud propuesta;
             TipoSolicitudes tipoSolicitud;
             Funcionarios funcionarios;
@@ -257,30 +260,30 @@ public class AnalisisController extends BaseController {
                 propuesta.setFechaPresentacion(rpm.get("propuestaSolicitud.fechaPresentacion") == null ? null : date.parse(rpm.get("propuestaSolicitud.fechaPresentacion").toString()));
                 propuesta.setId(rpm.get("propuestaSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.id").toString()));
                 propuesta.setMontoSolicitado(rpm.get("propuestaSolicitud.montoSolicitado") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitado").toString()));
-                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));               
+                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));
                 tipoSolicitud = new TipoSolicitudes();
                 tipoSolicitud.setId(rpm.get("propuestaSolicitud.tipoSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.tipoSolicitud.id").toString()));
                 tipoSolicitud.setNombre(rpm.get("propuestaSolicitud.tipoSolicitud.nombre") == null ? null : rpm.get("propuestaSolicitud.tipoSolicitud.nombre").toString());
-                propuesta.setTipoSolicitud(tipoSolicitud);                
-                rpm.put("propuestaSolicitud", propuesta); 
+                propuesta.setTipoSolicitud(tipoSolicitud);
+                rpm.put("propuestaSolicitud", propuesta);
                 rpm.put("sucursal", rpm.get("propuestaSolicitud.sucursal.nombre"));
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioAprobacion.id") == null ? null : Long.parseLong(rpm.get("funcionarioAprobacion.id").toString()));
-                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());                
+                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());
                 rpm.put("funcionarioAprobacion", funcionarios.getId() == null ? null : funcionarios);
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioAnalisis.id") == null ? null : Long.parseLong(rpm.get("funcionarioAnalisis.id").toString()));
-                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());                
+                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());
                 rpm.put("funcionarioAnalisis", funcionarios.getId() == null ? null : funcionarios);
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioVerificador.id") == null ? null : Long.parseLong(rpm.get("funcionarioVerificador.id").toString()));
                 funcionarios.setAlias(rpm.get("funcionarioVerificador.alias") == null ? null : rpm.get("funcionarioVerificador.alias").toString());
                 rpm.put("funcionarioVerificador", funcionarios.getId() == null ? null : funcionarios);
                 rpm.put("estado", estadosSolicitudManager.getEstadosSolicitud(new EstadosSolicitud(Long.parseLong(rpm.get("estado.id").toString()))));
-                
+
                 rpm.remove("funcionarioAnalisis.id");
                 rpm.remove("funcionarioVerificador.id");
                 rpm.remove("funcionarioAprobacion.id");
@@ -314,7 +317,7 @@ public class AnalisisController extends BaseController {
 
         return retorno;
     }
-    
+
     @GetMapping("/pre-aprobados")
     public @ResponseBody
     ResponseListDTO listarPreAprobados(@ModelAttribute("_search") boolean filtrar,
@@ -327,18 +330,18 @@ public class AnalisisController extends BaseController {
 
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        
+
         EvaluacionSolicitudesCabecera model = new EvaluacionSolicitudesCabecera();
         model.setIdEmpresa(userDetail.getIdEmpresa());
         model.setEstado(new EstadosSolicitud(3L));
-        
+
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarPropuestaSolicitudManager();
             inicializarFuncionarioManager();
             inicializarEvaluacionSolicitudesCabeceraManager();
             inicializarEstadosSolicitudManager();
-            
+
             Gson gson = new Gson();
             String camposFiltros = null;
             String valorFiltro = null;
@@ -355,7 +358,7 @@ public class AnalisisController extends BaseController {
                         }
                     }
                 } else {
-                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                    generarEjemplo(filtro, model);
                 }
 
             }
@@ -378,7 +381,7 @@ public class AnalisisController extends BaseController {
             listMapGrupos = evaluacionSolicitudesCabeceraManager.listAtributos(model, atributos.split(","), todos, inicio, cantidad,
                     ordenarPor.split(","), sentidoOrdenamiento.split(","), true, true, camposFiltros, valorFiltro,
                     null, null, null, null, null, null, null, null, true);
-            
+
             PropuestaSolicitud propuesta;
             TipoSolicitudes tipoSolicitud;
             Funcionarios funcionarios;
@@ -388,30 +391,30 @@ public class AnalisisController extends BaseController {
                 propuesta.setFechaPresentacion(rpm.get("propuestaSolicitud.fechaPresentacion") == null ? null : date.parse(rpm.get("propuestaSolicitud.fechaPresentacion").toString()));
                 propuesta.setId(rpm.get("propuestaSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.id").toString()));
                 propuesta.setMontoSolicitado(rpm.get("propuestaSolicitud.montoSolicitado") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitado").toString()));
-                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));               
+                propuesta.setMontoSolicitadoOriginal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal") == null ? null : new BigDecimal(rpm.get("propuestaSolicitud.montoSolicitadoOriginal").toString()));
                 tipoSolicitud = new TipoSolicitudes();
                 tipoSolicitud.setId(rpm.get("propuestaSolicitud.tipoSolicitud.id") == null ? null : Long.parseLong(rpm.get("propuestaSolicitud.tipoSolicitud.id").toString()));
                 tipoSolicitud.setNombre(rpm.get("propuestaSolicitud.tipoSolicitud.nombre") == null ? null : rpm.get("propuestaSolicitud.tipoSolicitud.nombre").toString());
-                propuesta.setTipoSolicitud(tipoSolicitud);                
-                rpm.put("propuestaSolicitud", propuesta); 
+                propuesta.setTipoSolicitud(tipoSolicitud);
+                rpm.put("propuestaSolicitud", propuesta);
                 rpm.put("sucursal", rpm.get("propuestaSolicitud.sucursal.nombre"));
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioAprobacion.id") == null ? null : Long.parseLong(rpm.get("funcionarioAprobacion.id").toString()));
-                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());                
+                funcionarios.setAlias(rpm.get("funcionarioAprobacion.alias") == null ? null : rpm.get("funcionarioAprobacion.alias").toString());
                 rpm.put("funcionarioAprobacion", funcionarios.getId() == null ? null : funcionarios);
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioAnalisis.id") == null ? null : Long.parseLong(rpm.get("funcionarioAnalisis.id").toString()));
-                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());                
+                funcionarios.setAlias(rpm.get("funcionarioAnalisis.alias") == null ? null : rpm.get("funcionarioAnalisis.alias").toString());
                 rpm.put("funcionarioAnalisis", funcionarios.getId() == null ? null : funcionarios);
-                
+
                 funcionarios = new Funcionarios();
                 funcionarios.setId(rpm.get("funcionarioVerificador.id") == null ? null : Long.parseLong(rpm.get("funcionarioVerificador.id").toString()));
                 funcionarios.setAlias(rpm.get("funcionarioVerificador.alias") == null ? null : rpm.get("funcionarioVerificador.alias").toString());
                 rpm.put("funcionarioVerificador", funcionarios.getId() == null ? null : funcionarios);
                 rpm.put("estado", estadosSolicitudManager.getEstadosSolicitud(new EstadosSolicitud(Long.parseLong(rpm.get("estado.id").toString()))));
-                
+
                 rpm.remove("funcionarioAnalisis.id");
                 rpm.remove("funcionarioVerificador.id");
                 rpm.remove("funcionarioAprobacion.id");
@@ -469,12 +472,12 @@ public class AnalisisController extends BaseController {
                 response.setModel(null);
                 response.setStatus(404);
                 response.setMessage("El analisis ya fue asignado a otro funcionario.");
-                
+
                 return response;
             }
-            
-            EvaluacionSolicitudesCabecera model = evaluacionSolicitudesCabeceraManager.evaluar(userDetail.getId(), id);
 
+            EvaluacionSolicitudesCabecera model = evaluacionSolicitudesCabeceraManager.evaluar(userDetail.getId(), id, userDetail.getIdEmpresa());
+        
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Registro no encontrado" : "Registro encontrado");
@@ -486,7 +489,7 @@ public class AnalisisController extends BaseController {
 
         return response;
     }
-    
+
     /**
      * Mapping para el metodo GET de la vista visualizar.(visualizar Analisis)
      *
@@ -501,7 +504,7 @@ public class AnalisisController extends BaseController {
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarEvaluacionSolicitudesCabeceraManager();
-            
+
             EvaluacionSolicitudesCabecera model = evaluacionSolicitudesCabeceraManager.getEvaluacion(new EvaluacionSolicitudesCabecera(id));
 
             response.setModel(model);
@@ -515,8 +518,8 @@ public class AnalisisController extends BaseController {
 
         return response;
     }
-    
-     /**
+
+    /**
      * Mapping para el metodo PUT de la vista actualizar.(actualizar Analisis)
      *
      * @param id de la entidad
@@ -530,22 +533,22 @@ public class AnalisisController extends BaseController {
             @ModelAttribute("id") Long id,
             @RequestBody @Valid EvaluacionSolicitudesCabecera model,
             Errors errors) {
-        
+
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
         try {
             inicializarEvaluacionSolicitudesCabeceraManager();
-            
-            if(errors.hasErrors()){
-                
+
+            if (errors.hasErrors()) {
+
                 response.setStatus(400);
                 response.setMessage(errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
+                        .stream()
+                        .map(x -> x.getDefaultMessage())
+                        .collect(Collectors.joining(",")));
                 return response;
-            }            
-            
+            }
+
             Map<String, Object> modelMaps = evaluacionSolicitudesCabeceraManager.getAtributos(new EvaluacionSolicitudesCabecera(id),
                     "estado.id,propuestaSolicitud.montoSolicitado".split(","));
 
@@ -555,10 +558,10 @@ public class AnalisisController extends BaseController {
                 response.setModel(null);
                 response.setStatus(404);
                 response.setMessage("El analisis ya no puede ser modificado.");
-                
+
                 return response;
             }
-            
+
             if (modelMaps != null
                     && modelMaps.get("propuestaSolicitud.montoSolicitado") != null
                     && model.getEstado().getId() == 6
@@ -567,22 +570,45 @@ public class AnalisisController extends BaseController {
                 response.setModel(null);
                 response.setStatus(404);
                 response.setMessage("El monto aprobado no puede ser mayor al solicitado.");
-                
+
                 return response;
             }
-                       
+
             model = evaluacionSolicitudesCabeceraManager.guardar(model, userDetail.getId(), userDetail.getIdEmpresa());
-            
+
             response.setModel(model);
             response.setStatus(model == null ? 404 : 200);
             response.setMessage(model == null ? "Error al modificar registro" : "Registro modificado con exito");
-            
+
         } catch (Exception e) {
-            logger.error("Error: ",e);
+            logger.error("Error: ", e);
             response.setStatus(500);
             response.setMessage("Error interno del servidor.");
         }
 
         return response;
     }
+
+    public void generarEjemplo(FilterDTO filtro, EvaluacionSolicitudesCabecera model) {
+        EvaluacionSolicitudesCabecera entidad;
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();
+        if (filtro.getData() != null) {
+
+            entidad = gson.fromJson(filtro.getData(), EvaluacionSolicitudesCabecera.class);
+            if (entidad.getId() != null) {
+                model.setId(entidad.getId());
+            }
+            if (entidad.getPropuestaSolicitud() != null) {
+                model.setPropuestaSolicitud(entidad.getPropuestaSolicitud());
+            }
+            if (entidad.getEstado() != null) {
+                model.setEstado(entidad.getEstado());
+            }
+            if (entidad.getFuncionarioAnalisis() != null) {
+                model.setFuncionarioAnalisis(new Funcionarios(entidad.getFuncionarioAnalisis().getId()));
+            }
+
+        }
+    }
+
 }

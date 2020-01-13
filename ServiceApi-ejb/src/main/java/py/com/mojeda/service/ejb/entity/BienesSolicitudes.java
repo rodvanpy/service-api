@@ -25,7 +25,7 @@ import javax.persistence.TemporalType;
  * @author miguel.ojeda
  */
 @Entity
-@Table(name = "BIENES_SOLICITUDES")
+@Table(name = "BIENES_SOLICITUDES", schema = "PUBLIC")
 public class BienesSolicitudes extends Base {
 
     private static final long serialVersionUID = 1L;

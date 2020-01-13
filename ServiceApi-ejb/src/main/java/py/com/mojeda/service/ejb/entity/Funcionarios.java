@@ -5,12 +5,8 @@
  */
 package py.com.mojeda.service.ejb.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -32,7 +28,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Miguel
  */
 @Entity
-@Table(name = "FUNCIONARIOS", uniqueConstraints = @UniqueConstraint(name = "funcionario_alias_uq", columnNames = {"alias"}))
+@Table(name = "FUNCIONARIOS", schema = "PUBLIC", uniqueConstraints = @UniqueConstraint(name = "funcionario_alias_uq", columnNames = {"alias"}))
 public class Funcionarios extends Base {
 
     private static final long serialVersionUID = 8538760347986185608L;
@@ -107,6 +103,10 @@ public class Funcionarios extends Base {
     
     @Column(name = "RETIRADO")
     private Boolean retirado;
+    
+    @ManyToOne
+    @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "id")
+    private Empresas empresa;
     
     @Column(name = "ENTIDAD")
     private String entidad = "FUNCIONARIOS";
@@ -349,6 +349,14 @@ public class Funcionarios extends Base {
 
     public void setObservacionRetiro(String observacionRetiro) {
         this.observacionRetiro = observacionRetiro;
+    } 
+
+    public Empresas getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(Empresas empresa) {
+        this.empresa = empresa;
     }    
 
 }

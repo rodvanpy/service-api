@@ -5,6 +5,7 @@
  */
 package py.com.mojeda.service.ejb.managerImpl;
 
+import com.google.gson.Gson;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -21,6 +22,8 @@ import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesDetalles;
 import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.Garantias;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
+import py.com.mojeda.service.ejb.informconf.IfcPMorosidadesActividadDb;
+import py.com.mojeda.service.ejb.informconf.InformconfPersonas;
 import py.com.mojeda.service.ejb.manager.CreditosManager;
 import py.com.mojeda.service.ejb.manager.CuotasManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
@@ -28,7 +31,10 @@ import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesDetallesManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 import py.com.mojeda.service.ejb.manager.GarantiasManager;
+import py.com.mojeda.service.ejb.manager.InformconfSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.PropuestaSolicitudManager;
+import py.com.mojeda.service.ejb.utils.ApplicationLogger;
+import py.com.mojeda.service.ejb.utils.ResponseDTO;
 
 /**
  *
@@ -44,6 +50,7 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
     }
     protected static final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     protected static final DateFormat dateFormatHHMM = new SimpleDateFormat("HH:mm");
+    protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/FuncionariosManagerImpl")
     private FuncionariosManager funcionariosManager;
@@ -66,10 +73,13 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
     @EJB(mappedName = "java:app/ServiceApi-ejb/CuotasManagerImpl")
     private CuotasManager cuotasManager;
 
-    @Override
-    public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion) throws Exception {
-        EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera = null;
+    @EJB(mappedName = "java:app/ServiceApi-ejb/InformconfSolicitudesManagerImpl")
+    private InformconfSolicitudesManager informconfSolicitudesManager;
 
+    @Override
+    public EvaluacionSolicitudesCabecera evaluar(Long idFuncionario, Long idEvaluacion, Long idEmpresa) throws Exception {
+        EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera = null;
+        Gson gson = new Gson();
         if (idFuncionario == null
                 || idEvaluacion == null) {
             return null;
@@ -88,13 +98,52 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
 
             this.update(evaluacionSolicitudesCabecera);
         }
+
         evaluacionSolicitudesCabecera = new EvaluacionSolicitudesCabecera();
         evaluacionSolicitudesCabecera = this.getEvaluacion(new EvaluacionSolicitudesCabecera(idEvaluacion));
 
         EvaluacionSolicitudesDetalles ejDetalle = new EvaluacionSolicitudesDetalles();
         ejDetalle.setEvaluacionSolicitudCabecera(new EvaluacionSolicitudesCabecera(evaluacionSolicitudesCabecera.getId()));
 
-        evaluacionSolicitudesCabecera.setDetalles(evaluacionSolicitudesDetallesManager.list(ejDetalle));
+        List<EvaluacionSolicitudesDetalles> detalles = evaluacionSolicitudesDetallesManager.list(ejDetalle);
+
+        //CARGAR DATOS DEL REPORTE
+        for (EvaluacionSolicitudesDetalles rpc : detalles) {
+            
+            logger.info("getPropuestaSolicitud() : " + evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId());
+            logger.info("getDocumento() : " + rpc.getPersona().getDocumento());
+            logger.info("getTipoSolicitud() : " + evaluacionSolicitudesCabecera.getPropuestaSolicitud().getTipoSolicitud().getNombre());
+            
+            ResponseDTO<InformconfPersonas> reporteInformconf = informconfSolicitudesManager.get(evaluacionSolicitudesCabecera.getPropuestaSolicitud().getTipoSolicitud().getNombre(),
+                    rpc.getPersona().getDocumento(), evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId(), rpc.getPersona().getId(),
+                    idEmpresa, idFuncionario, "A", false);
+            
+            logger.info(gson.toJson(reporteInformconf));
+            
+            if (reporteInformconf != null && reporteInformconf.getStatus() == 200) {
+                if (reporteInformconf.getModel().getScoring() != null) {
+                    rpc.setFajaInformconf(reporteInformconf.getModel().getScoring().getFaja());
+                    rpc.setInformconf("SCORING " + reporteInformconf.getModel().getScoring().getFaja() + ", PROBABILIDAD DE INCUMPLIMIENTO DEL "
+                            + reporteInformconf.getModel().getScoring().getProbabilidadInicial() + "% AL " + reporteInformconf.getModel().getScoring().getProbabilidadFinal() + "%.\n");
+                }
+                if (reporteInformconf.getModel().getDemandasResumen() != null) {
+                    rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UN TOTAL DE " + reporteInformconf.getModel().getDemandasResumen().getCantTotalDemandas().intValue() + " DEMANDAS.\n");
+                }
+                if (reporteInformconf.getModel().getInhibicionesResumen() != null) {
+                    rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UN TOTAL DE " + reporteInformconf.getModel().getInhibicionesResumen().getCantTotalInhibiciones().intValue()+ " INHIBICIONES.\n");
+                }
+                if (reporteInformconf.getModel().getMorosidadesActividad() != null) {
+                    Long deudaTotal = 0L;
+                    for(IfcPMorosidadesActividadDb rp : reporteInformconf.getModel().getMorosidadesActividad()){
+                        deudaTotal = deudaTotal + rp.getSumaSaldoAcreedor().longValue();
+                    }
+                    rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UNA MOROSIDAD TOTAL CON OTRAS ENTIDADES DE " + deudaTotal+ ".\n");
+                }
+                evaluacionSolicitudesDetallesManager.update(rpc);
+            }
+        }
+
+        evaluacionSolicitudesCabecera.setDetalles(detalles);
 
         return evaluacionSolicitudesCabecera;
 
@@ -243,7 +292,8 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
 
             detalles = evaluacionSolicitudesDetallesManager.get(rpc.getId());
 
-            detalles.setAntiguedadLaboral(BigDecimal.ZERO);
+            detalles.setAntiguedadLaboral(rpc.getAntiguedadLaboral());
+            detalles.setObservacionReferencia(rpc.getObservacionReferencia());
             detalles.setCalificacionCredCanc(rpc.getCalificacionCredCanc());
             detalles.setCalificacionCreditosActual(rpc.getCalificacionCreditosActual());
             detalles.setCantidadHijos(rpc.getCantidadHijos());

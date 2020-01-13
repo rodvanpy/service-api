@@ -137,7 +137,7 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             Personas ejPersona = personaManager.guardar(usuario.getPersona());
 
             usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
-            usuario.setAlias(usuario.getAlias().toUpperCase());
+            usuario.setAlias(usuario.getAlias().toUpperCase().trim());
             usuario.setPersona(new Personas(ejPersona.getId()));
             usuario.setRol(new Rol(usuario.getRol().getId()));
 
@@ -166,20 +166,31 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
         Documentos ejDocumentos = null;
         if (usuario != null
                 && usuario.getPersona() != null) {
+            
             usuario.getPersona().setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
 
             Personas ejPersona = personaManager.editar(usuario.getPersona());
+            
+            object = this.get(usuario.getId());
+            
+            object.setClaveAcceso(usuario.getClaveAcceso());
+            object.setExpirationTimeTokens(usuario.getExpirationTimeTokens());
+            object.setFechaEgreso(usuario.getFechaEgreso());
+            object.setFechaIngreso(usuario.getFechaIngreso());
+            object.setObservacionRetiro(usuario.getObservacionRetiro());
+            object.setRetirado(usuario.getRetirado());
+            object.setSuperUsuario(usuario.getSuperUsuario());
+            object.setTipoFuncionario(usuario.getTipoFuncionario());
+            object.setTipoMotivoRetiro(usuario.getTipoMotivoRetiro());
+            //object.setAlias(usuario.getAlias().toUpperCase());
+            object.setPersona(new Personas(ejPersona.getId()));
+            object.setRol(new Rol(usuario.getRol().getId()));
 
-            usuario.setSucursal(new Sucursales(usuario.getSucursal().getId()));
-            //usuario.setAlias(usuario.getAlias().toUpperCase());
-            usuario.setPersona(new Personas(ejPersona.getId()));
-            usuario.setRol(new Rol(usuario.getRol().getId()));
-
-            this.update(usuario);
+            this.update(object);
 
 
             FuncionariosDepartamentos usuarioDepartamentos = new FuncionariosDepartamentos();
-            usuarioDepartamentos.setFuncionario(usuario);
+            usuarioDepartamentos.setFuncionario(object);
 
             List<FuncionariosDepartamentos> list = funcionariosDepartamentosManager.list(usuarioDepartamentos);
             for (FuncionariosDepartamentos rpc : list) {
@@ -188,7 +199,7 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
 
             for (DepartamentosSucursal rpm : usuario.getDepartamentos()) {
                 usuarioDepartamentos = new FuncionariosDepartamentos();
-                usuarioDepartamentos.setFuncionario(usuario);
+                usuarioDepartamentos.setFuncionario(object);
                 usuarioDepartamentos.setDepartamento(new DepartamentosSucursal(rpm.getId()));
 
                 funcionariosDepartamentosManager.save(usuarioDepartamentos);

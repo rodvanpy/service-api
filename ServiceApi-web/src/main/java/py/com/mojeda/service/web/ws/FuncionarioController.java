@@ -6,6 +6,7 @@
 package py.com.mojeda.service.web.ws;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -60,12 +61,9 @@ public class FuncionarioController extends BaseController {
         ResponseListDTO retorno = new ResponseListDTO();
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         //Buscar usuario por empresa
-        Sucursales ejSucursales = new Sucursales();
-        ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
         Funcionarios model = new Funcionarios();
         model.setActivo("S");
-        model.setSucursal(ejSucursales);
+        model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
         List<Map<String, Object>> listMapGrupos = null;
         try {
@@ -89,7 +87,7 @@ public class FuncionarioController extends BaseController {
                         }
                     }
                 } else {
-                    //ejemplo = generarEjemplo(filtro, ejemplo);
+                    generarEjemplo(filtro, model);
                 }
 
             }
@@ -119,7 +117,8 @@ public class FuncionarioController extends BaseController {
 
                 Map<String, Object> sucursal = sucursalManager.getAtributos(new Sucursales(Long.parseLong(rpm.get("sucursal.id").toString())),
                         "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo".split(","));
-
+                
+                rpm.put("nombre", rpm.get("alias"));
                 rpm.put("sucursal", sucursal);
                 rpm.put("persona", persona);
                 rpm.remove("persona.id");
@@ -210,12 +209,9 @@ public class FuncionarioController extends BaseController {
                 return response;
             }
             //Buscar usuario por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
             Funcionarios ejUsuarios = new Funcionarios();
-            ejUsuarios.setAlias(model.getAlias());
-            ejUsuarios.setSucursal(ejSucursales);
+            ejUsuarios.setAlias(model.getAlias().toUpperCase().trim());
+            ejUsuarios.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             ejUsuarios.setActivo("S");
             
             Map<String, Object> usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "alias".split(","),false,false);
@@ -228,7 +224,7 @@ public class FuncionarioController extends BaseController {
             
             ejUsuarios = new Funcionarios();
             ejUsuarios.setNroLegajo(model.getNroLegajo());
-            ejUsuarios.setSucursal(ejSucursales);
+            ejUsuarios.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             ejUsuarios.setActivo("S");
             
             usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "nroLegajo".split(","),false,false);
@@ -262,6 +258,7 @@ public class FuncionarioController extends BaseController {
             model.setIdUsuarioCreacion(userDetail.getId());
             model.setIdUsuarioModificacion(userDetail.getId());
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
             funcionarioManager.guardar(model);
 
@@ -309,15 +306,12 @@ public class FuncionarioController extends BaseController {
             }
 
             //Buscar usuario por empresa
-            Sucursales ejSucursales = new Sucursales();
-            ejSucursales.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            Funcionarios funcionario = new Funcionarios();
+            funcionario.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            funcionario.setAlias(model.getAlias());
+            funcionario.setActivo("S");
 
-            Funcionarios ejUsuarios = new Funcionarios();
-            ejUsuarios.setAlias(model.getAlias());
-            ejUsuarios.setSucursal(ejSucursales);
-            ejUsuarios.setActivo("S");
-
-            Map<String, Object> usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "id".split(","),false,false);
+            Map<String, Object> usuarioMaps = funcionarioManager.getAtributos(funcionario, "id".split(","),false,false);
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
                 response.setStatus(205);
@@ -329,11 +323,12 @@ public class FuncionarioController extends BaseController {
             ejPersona.setDocumento(model.getPersona().getDocumento());
             ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
-            ejUsuarios = new Funcionarios();
-            ejUsuarios.setPersona(ejPersona);
-            ejUsuarios.setActivo("S");
+            funcionario = new Funcionarios();
+            funcionario.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            funcionario.setPersona(ejPersona);
+            funcionario.setActivo("S");
 
-            usuarioMaps = funcionarioManager.getAtributos(ejUsuarios, "id".split(","),false,false);
+            usuarioMaps = funcionarioManager.getAtributos(funcionario, "id".split(","),false,false);
             
             if (usuarioMaps != null
                     && usuarioMaps.get("id").toString().compareToIgnoreCase(model.getId().toString()) != 0) {
@@ -347,16 +342,21 @@ public class FuncionarioController extends BaseController {
             if (usuarioMaps.get("claveAcceso").toString().compareToIgnoreCase(model.getClaveAcceso()) != 0) {
                 model.setClaveAcceso(passwordEncoder.encode(model.getClaveAcceso()));
             }
-
+            
+            //ASIGNAR EMPRESA
             model.getPersona().setEmpresa(new Empresas(userDetail.getIdEmpresa()));
+            model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());
 
             funcionarioManager.editar(model);
+            
+            model = funcionarioManager.getUsuario(model, "referencias,estudios");
+                    
+            response.setModel(model);
+            response.setStatus(model == null ? 404 : 200);
+            response.setMessage(model == null ? "Error al modificar el registro" : "Registro modificado con exito");
 
-            response.setModel(funcionarioManager.getUsuario(ejUsuarios, "referencias,estudios"));
-            response.setStatus(200);
-            response.setMessage("Registro modificado con exito");
         } catch (Exception e) {
             logger.error("Error: ", e);
             response.setStatus(500);
@@ -456,6 +456,40 @@ public class FuncionarioController extends BaseController {
         }
 
         return response;
+    }
+    
+    public void generarEjemplo(FilterDTO filtro, Funcionarios model) {
+        Funcionarios entidad;
+        
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").create();
+        if(filtro.getData() != null){
+            
+            entidad = gson.fromJson(filtro.getData(), Funcionarios.class);
+            
+            if(entidad.getId() != null){
+                model.setId(entidad.getId());
+            }
+            
+            if(entidad.getPersona() != null){
+                model.setPersona(entidad.getPersona());
+            }
+            
+            if(entidad.getSucursal() != null){
+                model.setSucursal(entidad.getSucursal());
+            }
+            
+            if(entidad.getRol() != null){
+                model.setRol(entidad.getRol());
+            }
+            
+            if(entidad.getAlias() != null){
+                model.setAlias(entidad.getAlias());
+            }
+            
+            if(entidad.getNroLegajo() != null){
+                model.setNroLegajo(entidad.getNroLegajo());
+            }
+        }
     }
 
 }

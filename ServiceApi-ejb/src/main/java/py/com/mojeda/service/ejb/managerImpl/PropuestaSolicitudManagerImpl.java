@@ -59,6 +59,7 @@ import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesDetallesManager;
 import py.com.mojeda.service.ejb.manager.FuncionariosManager;
 import py.com.mojeda.service.ejb.manager.GarantiasManager;
+import py.com.mojeda.service.ejb.manager.InformconfSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.IngresosEgresosManager;
 import py.com.mojeda.service.ejb.manager.IngresosEgresosSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.ModalidadesManager;
@@ -176,6 +177,9 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/CuotasManagerImpl")
     private CuotasManager cuotasManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/InformconfSolicitudesManagerImpl")
+    private InformconfSolicitudesManager informconfSolicitudesManager;
 
     @Override
     public PropuestaSolicitud guardar(PropuestaSolicitud propuestaSolicitud, Long idSucursal, Long idEmpresa) throws Exception {
@@ -480,6 +484,8 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         }
         ejPropuestaSolicitud.setMontoSolicitado(propuestaSolicitud.getMontoSolicitado());
         //ejPropuestaSolicitud.setImporteCuota(propuestaSolicitud.getImporteCuota());
+        ejPropuestaSolicitud.setObservacionesDepartamento(propuestaSolicitud.getObservacionesDepartamento());
+        ejPropuestaSolicitud.setDetalleDestino(propuestaSolicitud.getDetalleDestino());
         ejPropuestaSolicitud.setImporteEntregar(propuestaSolicitud.getImporteEntregar());
         ejPropuestaSolicitud.setModalidad(propuestaSolicitud.getModalidad());
         ejPropuestaSolicitud.setPlazo(propuestaSolicitud.getPlazo());
@@ -489,7 +495,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         ejPropuestaSolicitud.setTipoCalculoImporte(propuestaSolicitud.getTipoCalculoImporte());
         ejPropuestaSolicitud.setTipoGarantia(propuestaSolicitud.getTipoGarantia());
         ejPropuestaSolicitud.setGastosAdministrativos(propuestaSolicitud.getGastosAdministrativos());
-        ejPropuestaSolicitud.setCodeudor(propuestaSolicitud.getCodeudor());
+        ejPropuestaSolicitud.setCodeudor(((propuestaSolicitud.getCodeudor() != null && propuestaSolicitud.getCodeudor().getId() == null) ? null : propuestaSolicitud.getCodeudor()));
         ejPropuestaSolicitud.setMontoSolicitado(propuestaSolicitud.getMontoSolicitado());
 
 //        //Calcular descuentos
@@ -1083,7 +1089,9 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         personaManager.update(ejPersona);
 
         //Guardar Conyuge
-        if (persona.getConyuge() != null) {
+        if (persona.getConyuge() != null
+                && persona.getConyuge().getId() != null) {
+
             Personas ejConyuge = new Personas();
             ejConyuge.setDocumento(persona.getConyuge().getDocumento());
 
@@ -1242,7 +1250,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
 
         evaluacionCabecera = evaluacionSolicitudesCabeceraManager.get(evaluacionCabecera);
-        
+
         if (evaluacionCabecera != null) {
             evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             evaluacionCabecera.setIdUsuarioModificacion(idFuncionario);
@@ -1254,7 +1262,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
     }
 
     @Override
-    public void tranferirPropuesta(Long idSolicitud, Long idPersona, Long idEmpresa) throws Exception {
+    public void tranferirPropuesta(Long idSolicitud, Long idFuncionario, Long idEmpresa) throws Exception {
 
         PropuestaSolicitud ejPropuestaSolicitud = this.get(idSolicitud);
 
@@ -1269,72 +1277,90 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
             //Cargar cabera de la evaluacion
             EvaluacionSolicitudesCabecera evaluacionCabecera = new EvaluacionSolicitudesCabecera();
-            evaluacionCabecera.setIdEmpresa(idEmpresa);
-            evaluacionCabecera.setActivo("S");
-            evaluacionCabecera.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-            evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            evaluacionCabecera.setIdUsuarioCreacion(idPersona);
-            evaluacionCabecera.setIdUsuarioModificacion(idPersona);
-            evaluacionCabecera.setEstado(new EstadosSolicitud(1L));
             evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
-            //Verificar si requiere verificacion del credito
-            Map<String, Object> montoVerificacion = personaManager.getAtributos(new Personas(idPersona), "empresa.montoVerificacionCredito".split(","));
+            evaluacionCabecera = evaluacionSolicitudesCabeceraManager.get(evaluacionCabecera);
 
-            if (montoVerificacion != null) {
-                evaluacionCabecera.setRequiereVerificador(ejPropuestaSolicitud.getMontoSolicitado().longValue() > new BigDecimal(montoVerificacion.get("empresa.montoVerificacionCredito").toString()).longValue());
-            }
-            evaluacionSolicitudesCabeceraManager.save(evaluacionCabecera);
+            if (evaluacionCabecera == null) {
+                
+                evaluacionCabecera = new EvaluacionSolicitudesCabecera();
+                evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+                evaluacionCabecera.setIdEmpresa(idEmpresa);
+                evaluacionCabecera.setActivo("S");
+                evaluacionCabecera.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                evaluacionCabecera.setIdUsuarioCreacion(idFuncionario);
+                evaluacionCabecera.setIdUsuarioModificacion(idFuncionario);
+                evaluacionCabecera.setEstado(new EstadosSolicitud(8L));
 
-            Solicitantes solicitantes = new Solicitantes();
-            solicitantes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
+                //Verificar si requiere verificacion del credito
+                Map<String, Object> montoVerificacion = personaManager.getAtributos(new Personas(idFuncionario), "empresa.montoVerificacionCredito".split(","));
 
-            List<Solicitantes> solicitantesCredito = solicitantesManager.list(solicitantes);
-            EvaluacionSolicitudesDetalles detalle;
-            TipoIngresosEgresos tipoIngresosEgresos;
-            IngresosEgresos ingresosEgresos;
-            for (Solicitantes rpc : solicitantesCredito) {
-                //Cargar detalles de la evaluacion 
-
-                tipoIngresosEgresos = new TipoIngresosEgresos();
-                tipoIngresosEgresos.setTipo("E");
-
-                ingresosEgresos = new IngresosEgresos();
-                ingresosEgresos.setPersona(new Personas(rpc.getIdPersona().getId()));
-                ingresosEgresos.setTipoIngresosEgresos(tipoIngresosEgresos);
-
-                List<IngresosEgresos> egresos = ingresosEgresosManager.list(ingresosEgresos);
-                Long totalEgresos = 0L;
-                for (IngresosEgresos egr : egresos) {
-                    totalEgresos = totalEgresos + egr.getMonto().longValue();
+                if (montoVerificacion != null) {
+                    evaluacionCabecera.setRequiereVerificador(ejPropuestaSolicitud.getMontoSolicitado().longValue() > new BigDecimal(montoVerificacion.get("empresa.montoVerificacionCredito").toString()).longValue());
                 }
+                
+                evaluacionSolicitudesCabeceraManager.save(evaluacionCabecera);
 
-                detalle = new EvaluacionSolicitudesDetalles();
-                detalle.setIdEmpresa(idEmpresa);
-                detalle.setActivo("S");
-                detalle.setGarantiasVigente(ejPropuestaSolicitud.getTipoGarantia().getNombre());
-                detalle.setEgresosTotal(totalEgresos);
-                detalle.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
-                detalle.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-                detalle.setIdUsuarioCreacion(idPersona);
-                detalle.setIdUsuarioModificacion(idPersona);
-                //detalle.setDescripcionProfesion(CONTENT_PATH);
-                detalle.setEdad(new Timestamp(System.currentTimeMillis()).getYear() - rpc.getIdPersona().getFechaNacimiento().getYear());
-                detalle.setEstadoCivil(rpc.getEstadoCivil());
-                detalle.setPersona(new Personas(rpc.getIdPersona().getId()));
-                detalle.setProfesion(rpc.getProfesiones());
-                detalle.setCantidadHijos(rpc.getCantHijos() == null ? null : rpc.getCantHijos().shortValue());
-                detalle.setSeparacionBienes(rpc.getConsiderarConyuge() ? "S" : "N");
-                detalle.setIdConyuge(rpc.getIdPersonaConyuge() == null ? null : rpc.getIdPersonaConyuge().getId());
-                detalle.setNombreConyuge(rpc.getIdPersonaConyuge() == null ? null
-                        : (rpc.getIdPersonaConyuge().getPrimerNombre() == null ? "" : rpc.getIdPersonaConyuge().getPrimerNombre())
-                        + (rpc.getIdPersonaConyuge().getSegundoNombre() == null ? "" : " " + rpc.getIdPersonaConyuge().getSegundoNombre())
-                        + (rpc.getIdPersonaConyuge().getPrimerApellido() == null ? "" : ", " + rpc.getIdPersonaConyuge().getPrimerApellido())
-                        + (rpc.getIdPersonaConyuge().getSegundoApellido() == null ? "" : " " + rpc.getIdPersonaConyuge().getSegundoApellido()));
-                detalle.setTipoRelacion(rpc.getTipoRelacion());
-                detalle.setEvaluacionSolicitudCabecera(new EvaluacionSolicitudesCabecera(evaluacionCabecera.getId()));
+                Solicitantes solicitantes = new Solicitantes();
+                solicitantes.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
 
-                evaluacionSolicitudesDetallesManager.save(detalle);
+                List<Solicitantes> solicitantesCredito = solicitantesManager.list(solicitantes);
+                EvaluacionSolicitudesDetalles detalle;
+                TipoIngresosEgresos tipoIngresosEgresos;
+                IngresosEgresos ingresosEgresos;
+                for (Solicitantes rpc : solicitantesCredito) {
+                    //Cargar detalles de la evaluacion 
+                    tipoIngresosEgresos = new TipoIngresosEgresos();
+                    tipoIngresosEgresos.setTipo("E");
 
+                    ingresosEgresos = new IngresosEgresos();
+                    ingresosEgresos.setPersona(new Personas(rpc.getIdPersona().getId()));
+                    ingresosEgresos.setTipoIngresosEgresos(tipoIngresosEgresos);
+
+                    List<IngresosEgresos> egresos = ingresosEgresosManager.list(ingresosEgresos);
+                    Long totalEgresos = 0L;
+
+                    for (IngresosEgresos egr : egresos) {
+                        totalEgresos = totalEgresos + egr.getMonto().longValue();
+                    }
+
+                    detalle = new EvaluacionSolicitudesDetalles();
+                    detalle.setIdEmpresa(idEmpresa);
+                    detalle.setActivo("S");
+                    detalle.setGarantiasVigente(ejPropuestaSolicitud.getTipoGarantia().getNombre());
+                    //DEUDAS
+                    detalle.setEgresosTotal(totalEgresos);
+                    detalle.setMontoDeudaSolicitud(ejPropuestaSolicitud.getImporteCuota() * ejPropuestaSolicitud.getPlazo());
+                    detalle.setMontoDeudaSolicitudCuotas(ejPropuestaSolicitud.getImporteCuota());
+                    detalle.setMontoDeudaSolicitudCuotaTotal(detalle.getMontoDeudaSolicitudCuotas());                   
+                    detalle.setMontoDeudaSolicitudTotal(detalle.getMontoDeudaSolicitud());
+
+                    detalle.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    detalle.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    detalle.setIdUsuarioCreacion(idFuncionario);
+                    detalle.setIdUsuarioModificacion(idFuncionario);
+                    //detalle.setDescripcionProfesion(CONTENT_PATH);
+                    detalle.setEdad(new Timestamp(System.currentTimeMillis()).getYear() - rpc.getIdPersona().getFechaNacimiento().getYear());
+                    detalle.setEstadoCivil(rpc.getEstadoCivil());
+                    detalle.setPersona(new Personas(rpc.getIdPersona().getId()));
+                    detalle.setProfesion(rpc.getProfesiones());
+                    detalle.setCantidadHijos(rpc.getCantHijos() == null ? null : rpc.getCantHijos().shortValue());
+                    detalle.setSeparacionBienes(rpc.getConsiderarConyuge() ? "S" : "N");
+                    detalle.setIdConyuge(rpc.getIdPersonaConyuge() == null ? null : rpc.getIdPersonaConyuge().getId());
+                    detalle.setNombreConyuge(rpc.getIdPersonaConyuge() == null ? null
+                            : (rpc.getIdPersonaConyuge().getPrimerNombre() == null ? "" : rpc.getIdPersonaConyuge().getPrimerNombre())
+                            + (rpc.getIdPersonaConyuge().getSegundoNombre() == null ? "" : " " + rpc.getIdPersonaConyuge().getSegundoNombre())
+                            + (rpc.getIdPersonaConyuge().getPrimerApellido() == null ? "" : ", " + rpc.getIdPersonaConyuge().getPrimerApellido())
+                            + (rpc.getIdPersonaConyuge().getSegundoApellido() == null ? "" : " " + rpc.getIdPersonaConyuge().getSegundoApellido()));
+                    detalle.setTipoRelacion(rpc.getTipoRelacion());
+                    detalle.setEvaluacionSolicitudCabecera(new EvaluacionSolicitudesCabecera(evaluacionCabecera.getId()));
+
+                    evaluacionSolicitudesDetallesManager.save(detalle);
+
+                    //CARGAR REGISTROS INFORMCONF POR DEUDOR/CODEUDOR ASINCRONO
+                    informconfSolicitudesManager.asyncService(ejPropuestaSolicitud.getTipoSolicitud().getNombre(), rpc.getIdPersona().getDocumento(), ejPropuestaSolicitud.getId(), rpc.getIdPersona().getId(),
+                            idEmpresa, idFuncionario, "A", evaluacionCabecera.getId());
+                }
             }
             //ESTADO RETRANSFERIR
         } else if (ejPropuestaSolicitud.getEstado().getId() == 5) {
@@ -1350,11 +1376,10 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             evaluacionCabecera = evaluacionSolicitudesCabeceraManager.get(evaluacionCabecera);
 
             evaluacionCabecera.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
-            evaluacionCabecera.setIdUsuarioModificacion(idPersona);
+            evaluacionCabecera.setIdUsuarioModificacion(idFuncionario);
             evaluacionCabecera.setEstado(new EstadosSolicitud(2L));
 
             evaluacionSolicitudesCabeceraManager.update(evaluacionCabecera);
-
         }
 
     }
