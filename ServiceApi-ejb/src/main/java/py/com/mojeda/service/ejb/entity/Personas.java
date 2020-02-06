@@ -102,10 +102,10 @@ public class Personas extends Base {
     @Column(name = "DIRECCION_PARTICULAR", nullable = false)
     private String direccionParticular;
 
-    @Column(name = "DIRECCION_DETALLADA")
+    @Column(name = "DIRECCION_DETALLADA", length = 4000)
     private String direccionDetallada;
 
-    @Column(name = "OBSERVACION")
+    @Column(name = "OBSERVACION", length = 4000)
     private String observacion;
     
     @Column(name = "LATITUD")

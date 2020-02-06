@@ -181,7 +181,8 @@ public class PersonaController extends BaseController {
             Personas ejPersonas = new Personas();
             ejPersonas.setDocumento(documento);
             ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
+            ejPersonas.setActivo("S");
+            
             ejPersonas = personaManager.getPersona(ejPersonas, included);
 
             response.setModel(ejPersonas);
@@ -214,7 +215,8 @@ public class PersonaController extends BaseController {
             Personas ejPersonas = new Personas();
             ejPersonas.setRuc(documento);
             ejPersonas.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-
+            ejPersonas.setActivo("S");
+            
             ejPersonas = personaManager.getPersona(ejPersonas);
 
             response.setModel(ejPersonas);
@@ -352,6 +354,8 @@ public class PersonaController extends BaseController {
             }
 
             Personas ejPersona = new Personas();
+            ejPersona.setActivo("S");
+            
             if (model.getDocumento() != null
                     && model.getDocumento().trim().compareToIgnoreCase("") != 0) {
 
@@ -372,6 +376,7 @@ public class PersonaController extends BaseController {
                     && model.getRuc().length() > 5) {
 
                 ejPersona = new Personas();
+                ejPersona.setActivo("S");
                 ejPersona.setRuc(model.getRuc());
                 ejPersona.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
 
@@ -384,7 +389,8 @@ public class PersonaController extends BaseController {
                     return response;
                 }
             }
-
+            
+            model.setActivo("S");
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
             model.setIdUsuarioModificacion(userDetail.getId());

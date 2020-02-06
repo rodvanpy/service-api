@@ -1,3 +1,4 @@
 ServiceApi-ear/target/
 ServiceApi-ejb/target/
 ServiceApi-web/target/
+/target/

@@ -413,7 +413,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             ejPropuestaSolicitud.setActivo("S");
             ejPropuestaSolicitud.setEstado(new EstadosSolicitud(1L));
 
-            if (propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0) {
+            if (propuestaSolicitudManager.total(ejPropuestaSolicitud, false) > 0) {
                 response.setStatus(205);
                 response.setMessage("El cliente cuenta con una solicitud en estado pendiente.");
                 return response;
@@ -424,7 +424,7 @@ public class PropuestaSolicitudCreditoController extends BaseController {
             ejPropuestaSolicitud.setActivo("S");
             ejPropuestaSolicitud.setEstado(new EstadosSolicitud(2L));
 
-            if (propuestaSolicitudManager.total(ejPropuestaSolicitud) > 0) {
+            if (propuestaSolicitudManager.total(ejPropuestaSolicitud, false) > 0) {
                 response.setStatus(205);
                 response.setMessage("El cliente cuenta con una solicitud en analisis.");
                 return response;

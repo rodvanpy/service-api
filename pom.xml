@@ -20,9 +20,9 @@
     </developers>
     
     <modules>
-        <module>ConsultorioApi-ear</module>
-        <module>ConsultorioApi-ejb</module>
-        <module>ConsultorioApi-web</module>
+        <module>ServiceApi-ear</module>
+        <module>ServiceApi-ejb</module>
+        <module>ServiceApi-web</module>
     </modules>
     
     <properties>

@@ -162,13 +162,13 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "ID_CREDITO")
     private String idCredito;
     
-    @Column(name = "OBSERVACIONES_DEPARTAMENTO")
+    @Column(name = "OBSERVACIONES_DEPARTAMENTO", length = 4000)
     private String observacionesDepartamento;
     
-    @Column(name = "OBSERVACIONES_COMITE")
+    @Column(name = "OBSERVACIONES_COMITE", length = 4000)
     private String observacionesComite;
     
-    @Column(name = "OBSERVACIONES_CONSEJO")
+    @Column(name = "OBSERVACIONES_CONSEJO", length = 4000)
     private String observacionesConsejo;
     
     @Column(name = "FECHA_GENERACION")
@@ -188,7 +188,7 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "USER_NUMERO_LEGAJO")
     private Long userNumeroLegajo;
     
-    @Column(name = "OBSERVACION_FORMALIZADOR")
+    @Column(name = "OBSERVACION_FORMALIZADOR", length = 4000)
     private String observacionFormalizador;
     
     @Column(name = "IMPORTE_CUOTA")
@@ -197,7 +197,7 @@ public class PropuestaSolicitud extends Base{
     @Column(name = "IMPORTE_ENTREGAR")
     private Long importeEntregar;
     
-    @Column(name = "DETALLE_DESTINO")
+    @Column(name = "DETALLE_DESTINO", length = 4000)
     private String detalleDestino;
     
     @Column(name = "BENEFICIARIO_CHEQUE")

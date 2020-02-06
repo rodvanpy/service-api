@@ -114,6 +114,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
     @Override
     public Personas guardar(Personas persona) throws Exception {
         Personas ejPersona = new Personas();
+        ejPersona.setActivo("S");
         ejPersona.setDocumento(persona.getDocumento());
         ejPersona.setEmpresa(persona.getEmpresa());
 
@@ -197,6 +198,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                 && persona.getConyuge().getDocumento() != null) {
 
             Personas ejConyuge = new Personas();
+            ejConyuge.setActivo("S");
             ejConyuge.setDocumento(persona.getConyuge().getDocumento());
 
             Map<String, Object> personaMap = this.getAtributos(ejConyuge, "id".split(","));
@@ -415,7 +417,8 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
             }
 
             ejPersona.setEmpresa(persona.getEmpresa());
-
+            ejPersona.setActivo("S");
+            
             ejPersona = this.get(ejPersona);
 
             if (ejPersona != null) {
@@ -498,6 +501,7 @@ public class PersonaManagerImpl extends GenericDaoImpl<Personas, Long>
                     && (persona.getConyuge().getDocumento() != null && !persona.getConyuge().getDocumento().isEmpty())) {
                 
                 Personas ejConyuge = new Personas();
+                ejConyuge.setActivo("S");
                 ejConyuge.setDocumento(persona.getConyuge().getDocumento());
 
                 Map<String, Object> personaMap = this.getAtributos(ejConyuge, "id".split(","));
