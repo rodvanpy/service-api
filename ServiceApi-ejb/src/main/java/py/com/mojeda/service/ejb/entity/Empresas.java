@@ -102,10 +102,13 @@ public class Empresas extends Base {
     private Barrios barrio;
     
     @Column(name = "IMAGE_PATH")
-    private String imagePath;
+    private String imagePath;   
     
     @Column(name = "MONTO_VERIFICACION_CREDITO")
     private BigDecimal montoVerificacionCredito;
+    
+    @Column(name = "PORCENTAJE_ENDEUDAMIENTO")
+    private BigDecimal porcentajeEndeudamiento;
     
     @Column(name = "ENTIDAD")
     private String entidad = "EMPRESAS";
@@ -388,6 +391,16 @@ public class Empresas extends Base {
 
     public void setMontoVerificacionCredito(BigDecimal montoVerificacionCredito) {
         this.montoVerificacionCredito = montoVerificacionCredito;
-    }    
+    } 
+
+
+    public BigDecimal getPorcentajeEndeudamiento() {
+        return porcentajeEndeudamiento;
+    }
+
+    public void setPorcentajeEndeudamiento(BigDecimal porcentajeEndeudamiento) {
+        this.porcentajeEndeudamiento = porcentajeEndeudamiento;
+    }
+    
     
 }

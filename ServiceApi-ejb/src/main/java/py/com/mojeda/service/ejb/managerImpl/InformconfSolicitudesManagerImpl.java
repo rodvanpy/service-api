@@ -23,25 +23,43 @@ import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.apache.tomcat.util.codec.binary.Base64;
+import py.com.mojeda.service.ejb.entity.Ciudades;
+import py.com.mojeda.service.ejb.entity.DepartamentosPais;
 import py.com.mojeda.service.ejb.entity.Empresas;
 import py.com.mojeda.service.ejb.entity.EstadosSolicitud;
 import py.com.mojeda.service.ejb.entity.EvaluacionSolicitudesCabecera;
 import py.com.mojeda.service.ejb.entity.InformconfSolicitudes;
+import py.com.mojeda.service.ejb.entity.Nacionalidades;
+import py.com.mojeda.service.ejb.entity.Paises;
 import py.com.mojeda.service.ejb.entity.Parametros;
+import py.com.mojeda.service.ejb.entity.Personas;
+import py.com.mojeda.service.ejb.entity.Profesiones;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.informconf.InformconfPersonas;
+import py.com.mojeda.service.ejb.manager.CiudadesManager;
+import py.com.mojeda.service.ejb.manager.DepartamentosPaisManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.InformconfSolicitudesManager;
+import py.com.mojeda.service.ejb.manager.NacionalidadesManager;
+import py.com.mojeda.service.ejb.manager.PaisesManager;
 import py.com.mojeda.service.ejb.manager.ParametrosManager;
+import py.com.mojeda.service.ejb.manager.PersonaManager;
+import py.com.mojeda.service.ejb.manager.ProfesionesManager;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
+import py.com.mojeda.service.ejb.utils.Utils;
 
 /**
  *
@@ -56,7 +74,8 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
         return InformconfSolicitudes.class;
     }
     protected static final ApplicationLogger logger = ApplicationLogger.getInstance();
-    protected static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    protected static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    protected static final DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
     public static final String ALGORITHM = "RSA";
     final long EXPIRATIONTIME = 50 * 60 * 1000; 		// 15 minutes
 
@@ -64,6 +83,22 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
     private ParametrosManager parametrosManager;
     @EJB(mappedName = "java:app/ServiceApi-ejb/EvaluacionSolicitudesCabeceraManagerImpl")
     private EvaluacionSolicitudesCabeceraManager evaluacionSolicitudesCabeceraManager;
+    @EJB(mappedName = "java:app/ServiceApi-ejb/PersonaManagerImpl")
+    private PersonaManager personaManager;
+    @EJB(mappedName = "java:app/ServiceApi-ejb/NacionalidadesManagerImpl")
+    private NacionalidadesManager nacionalidadesManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/PaisesManagerImpl")
+    private PaisesManager paisesManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/DepartamentosPaisManagerImpl")
+    private DepartamentosPaisManager departamentosPaisManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/CiudadesManagerImpl")
+    private CiudadesManager ciudadesManager;
+
+    @EJB(mappedName = "java:app/ServiceApi-ejb/ProfesionesManagerImpl")
+    private ProfesionesManager profesionesManager;
 
     @Override
     public ResponseDTO<InformconfPersonas> get(String tipo, String documento, Long nroSolicitud, Long idPersona,
@@ -116,7 +151,7 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
             stringBuilder.append("?documento=");
             stringBuilder.append(documento);
             stringBuilder.append("&fechaConsulta=");
-            stringBuilder.append(dateFormat.format(informconfSolicitudes.getFechaSolicitud()));
+            stringBuilder.append(informconfSolicitudes.getFechaSolicitud().getTime());
             stringBuilder.append("&codLote=");
             stringBuilder.append(informconfSolicitudes.getLote());
             stringBuilder.append("&estado=");
@@ -127,6 +162,8 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
             Map<String, Object> claims = new HashMap<String, Object>();
             claims.put("codFuncionario", idFuncionario);
             claims.put("codEmpresa", parametros.getCodEmpresaInf());
+
+            logger.info("URL: " + stringBuilder.toString());
 
             URL restServiceURL = new URL(stringBuilder.toString());
             HttpURLConnection connection = (HttpURLConnection) restServiceURL.openConnection();
@@ -145,7 +182,7 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
             BufferedReader responseBuffer;
             String output;
             StringBuilder sb = new StringBuilder();
-
+            logger.info("getResponseCode: " + connection.getResponseCode());
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 
                 responseBuffer = new BufferedReader(new InputStreamReader((connection.getInputStream())));
@@ -169,10 +206,14 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
 
                 }
 
+                InformconfPersonas registros = gson.fromJson(gson.toJson(responseService.getModel()), InformconfPersonas.class);
+
+                Collections.sort(registros.getSolicitudesDetalle(), Utils.fechaInformconf);
+
                 response.setStatus(200);
                 response.setMessage("Solicitud procesada.");
-                response.setModel(gson.fromJson(gson.toJson(responseService.getModel()), InformconfPersonas.class));
-                
+                response.setModel(registros);
+
             } else {
                 response.setStatus(305);
                 response.setMessage("Error al procesar instruccion en el cliente.");
@@ -184,6 +225,137 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
             response.setMessage("Error al procesar instruccion.");
             //e.printStackTrace();
         }
+        logger.info("RESPONSE: " + gson.toJson(response));
+        return response;
+    }
+
+    @Override
+    public ResponseDTO<InformconfPersonas> getReport(String tipoReporte, String tipoDocumento, String documento, Long idEmpresa, Long idFuncionario, String estado) throws Exception {
+        ResponseDTO<InformconfPersonas> response = new ResponseDTO<>();
+        List<String> atributoInicio = new ArrayList<>();
+        atributoInicio.add("fechaSolicitud");
+        List<Object> valorInicio = new ArrayList<>();
+        InformconfSolicitudes informconfSolicitudes;
+        Gson gson = new Gson();
+        try {
+            //VERIFICAR SI EL REGISTRO YA NO FUE CONSULTADO   
+            LocalDate localDate = LocalDate.now().minusDays(5);
+            valorInicio.add(java.util.Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+
+            logger.info("********************* REGISTRO INFORMCONF ***********************");
+            logger.info("tipo : " + tipoReporte);
+
+            informconfSolicitudes = new InformconfSolicitudes();
+            informconfSolicitudes.setDocumento(documento);
+            informconfSolicitudes.setEmpresa(new Empresas(idEmpresa));
+
+            List<InformconfSolicitudes> listObject = this.list(informconfSolicitudes, true,
+                    0, 0, "id".split(","), "desc".split(","), true, true,
+                    null, null, null, atributoInicio, valorInicio, null, null, null, true);
+
+            if (!listObject.isEmpty()) {
+                response.setStatus(200);
+                response.setMessage("Solicitud procesada.");
+                response.setModel(gson.fromJson(listObject.get(0).getModel(), InformconfPersonas.class));
+
+                return response;
+            }
+
+            informconfSolicitudes = new InformconfSolicitudes();
+            informconfSolicitudes.setTipoSolicitud(tipoReporte);
+            informconfSolicitudes.setActivo("S");
+            informconfSolicitudes.setDocumento(documento);
+            informconfSolicitudes.setIdUsuarioCreacion(idFuncionario);
+            informconfSolicitudes.setIdUsuarioModificacion(idFuncionario);
+            informconfSolicitudes.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+            informconfSolicitudes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            informconfSolicitudes.setFechaSolicitud(new Timestamp(System.currentTimeMillis()));
+            informconfSolicitudes.setLote(informconfSolicitudes.getFechaSolicitud().getTime() + "-" + tipoReporte);
+            informconfSolicitudes.setEmpresa(new Empresas(idEmpresa));
+
+            Parametros parametros = parametrosManager.get(new Parametros(new Empresas(idEmpresa)));
+
+            StringBuilder stringBuilder = new StringBuilder(parametros.getUrl1() + "/servicios/persona-fisica");
+            stringBuilder.append("?documento=");
+            stringBuilder.append(documento);
+            stringBuilder.append("&fechaConsulta=");
+            stringBuilder.append(informconfSolicitudes.getFechaSolicitud().getTime());
+            stringBuilder.append("&codLote=");
+            stringBuilder.append(informconfSolicitudes.getLote());
+            stringBuilder.append("&estado=");
+            stringBuilder.append(estado);
+            stringBuilder.append("&idPersona=");
+            stringBuilder.append(0L);
+
+            Map<String, Object> claims = new HashMap<String, Object>();
+            claims.put("codFuncionario", idFuncionario);
+            claims.put("codEmpresa", parametros.getCodEmpresaInf());
+
+            logger.info("URL: " + stringBuilder.toString());
+
+            URL restServiceURL = new URL(stringBuilder.toString());
+            HttpURLConnection connection = (HttpURLConnection) restServiceURL.openConnection();
+            //URLConnection connection = restServiceURL.openConnection();
+            connection.setDoOutput(false);
+            connection.setRequestProperty("Authorization", "Bearer-" + parametros.getCodAfiliado() + " " + generate(claims, idEmpresa));
+            connection.setRequestProperty("Accept", "*/*");
+            connection.setUseCaches(false);
+
+            BufferedReader responseBuffer;
+            String output;
+            StringBuilder sb = new StringBuilder();
+            logger.info("getResponseCode: " + connection.getResponseCode());
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+
+                responseBuffer = new BufferedReader(new InputStreamReader((connection.getInputStream())));
+                while ((output = responseBuffer.readLine()) != null) {
+                    sb.append(output);
+                }
+
+                logger.info("RESPONSE: " + sb.toString());
+                ResponseDTO<InformconfPersonas> responseService = gson.fromJson(sb.toString(), ResponseDTO.class);
+
+                if (responseService.getStatus() == 200) {
+                    if (informconfSolicitudes.getId() == null) {
+                        informconfSolicitudes.setModel(gson.toJson(responseService.getModel()));
+                        this.save(informconfSolicitudes);
+                    } else {
+                        informconfSolicitudes.setModel(gson.toJson(responseService.getModel()));
+                        informconfSolicitudes.setIdUsuarioModificacion(idFuncionario);
+                        informconfSolicitudes.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                        this.update(informconfSolicitudes);
+                    }
+
+                }
+
+                InformconfPersonas registros = gson.fromJson(gson.toJson(responseService.getModel()), InformconfPersonas.class);
+
+                //CARGAR LA PERSONA
+                Personas ejPersona = new Personas();
+                ejPersona.setDocumento(documento);
+                if (personaManager.total(ejPersona) == 0) {
+                    logger.info("***************** INSERTAR PERSONA *******************");
+                    this.insertarPersona(registros, idFuncionario, idEmpresa);
+                }
+
+                Collections.sort(registros.getSolicitudesDetalle(), Utils.fechaInformconf);
+
+                response.setStatus(200);
+                response.setMessage("Solicitud procesada.");
+                response.setModel(registros);
+
+            } else {
+                response.setStatus(305);
+                response.setMessage("Error al procesar instruccion en el cliente.");
+            }
+
+        } catch (Exception e) {
+            logger.error("error" + e);
+            response.setStatus(300);
+            response.setMessage("Error al procesar instruccion.");
+            //e.printStackTrace();
+        }
+        logger.info("RESPONSE: " + gson.toJson(response));
         return response;
     }
 
@@ -224,7 +396,7 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
             stringBuilder.append("?documento=");
             stringBuilder.append(documento);
             stringBuilder.append("&fechaConsulta=");
-            stringBuilder.append(dateFormat.format(informconfSolicitudes.getFechaSolicitud()));
+            stringBuilder.append(informconfSolicitudes.getFechaSolicitud().getTime());
             stringBuilder.append("&codLote=");
             stringBuilder.append(informconfSolicitudes.getLote());
             stringBuilder.append("&estado=");
@@ -298,6 +470,140 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
         }
     }
 
+    public void insertarPersona(InformconfPersonas reporteInformconf, Long idFuncionario, Long idEmpresa) throws Exception {
+        try {
+            if (reporteInformconf != null
+                    && reporteInformconf.getDatosPersonales() != null) {
+
+                if (reporteInformconf.getDatosPersonales().getPrimerNombre() != null
+                        && reporteInformconf.getDatosPersonales().getPrimerApellido() != null) {
+
+                    Personas ejPersona = new Personas();
+                    ejPersona.setTipoPersona("FISICA");
+                    ejPersona.setDocumento(reporteInformconf.getDatosPersonales().getCedulaIdentidad().replace(".", ""));
+                    ejPersona.setPrimerNombre(reporteInformconf.getDatosPersonales().getPrimerNombre());
+                    ejPersona.setSegundoNombre(reporteInformconf.getDatosPersonales().getSegundoNombre());
+                    ejPersona.setPrimerApellido(reporteInformconf.getDatosPersonales().getPrimerApellido());
+                    ejPersona.setSegundoApellido(reporteInformconf.getDatosPersonales().getSegundoApellido());
+
+                    if (reporteInformconf.getDatosPersonales().getFechaNacimiento() != null
+                            && reporteInformconf.getDatosPersonales().getFechaNacimiento().contains("/")) {
+                        ejPersona.setFechaNacimiento(new Timestamp(format.parse(reporteInformconf.getDatosPersonales().getFechaNacimiento()).getTime()));
+
+                    } else {
+                        ejPersona.setFechaNacimiento(new Timestamp(System.currentTimeMillis()));
+                    }
+
+                    if (reporteInformconf.getDatosPersonales().getEstadoCivil() != null) {
+                        if (reporteInformconf.getDatosPersonales().getEstadoCivil().equalsIgnoreCase("Soltero(a)")) {
+                            ejPersona.setEstadoCivil("SOLTERO/A");
+                        } else if (reporteInformconf.getDatosPersonales().getEstadoCivil().equalsIgnoreCase("Casado(a)")) {
+                            ejPersona.setEstadoCivil("CASADO/A");
+                        } else if (reporteInformconf.getDatosPersonales().getEstadoCivil().equalsIgnoreCase("Divorciado(a)")) {
+                            ejPersona.setEstadoCivil("DIVORCIADO/A");
+                        } else if (reporteInformconf.getDatosPersonales().getEstadoCivil().equalsIgnoreCase("Separado(a) de bienes")) {
+                            ejPersona.setEstadoCivil("CASADO/A");
+                        } else if (reporteInformconf.getDatosPersonales().getEstadoCivil().equalsIgnoreCase("Otros")) {
+                            ejPersona.setEstadoCivil("OTROS");
+                        } else {
+                            ejPersona.setEstadoCivil("SOLTERO/A");
+                        }
+                    } else {
+                        ejPersona.setEstadoCivil("SOLTERO/A");
+                    }
+
+                    if (reporteInformconf.getDatosPersonales().getSexo() != null) {
+                        if (reporteInformconf.getDatosPersonales().getSexo().equalsIgnoreCase("Masculino")) {
+                            ejPersona.setSexo("MASCULINO");
+                        } else {
+                            ejPersona.setSexo("FEMENINO");
+                        }
+                    } else {
+                        ejPersona.setSexo("MASCULINO");
+                    }
+
+                    if (reporteInformconf.getDatosPersonales().getNacionalidad() != null
+                            && reporteInformconf.getDatosPersonales().getNacionalidad().compareToIgnoreCase("") != 0) {
+
+                        Nacionalidades nacionalidad = new Nacionalidades();
+                        nacionalidad.setNombre(reporteInformconf.getDatosPersonales().getNacionalidad());
+
+                        Map<String, Object> nacMap = nacionalidadesManager.getAtributos(nacionalidad, "id".split(","), true, true);
+
+                        if (nacMap != null) {
+                            ejPersona.setNacionalidad(new Nacionalidades(Long.parseLong(nacMap.get("id").toString())));
+                        } else {
+                            ejPersona.setNacionalidad(new Nacionalidades(2L));
+                        }
+                    } else {
+                        ejPersona.setNacionalidad(new Nacionalidades(2L));
+                    }
+
+                    if (reporteInformconf.getDatosPersonales().getProfesion() != null
+                            && reporteInformconf.getDatosPersonales().getProfesion().compareToIgnoreCase("") != 0) {
+
+                        Profesiones profesion = new Profesiones();
+                        profesion.setNombre(reporteInformconf.getDatosPersonales().getProfesion());
+
+                        Map<String, Object> nacMap = profesionesManager.getAtributos(profesion, "id".split(","), true, true);
+
+                        if (nacMap != null) {
+                            ejPersona.setProfesion(new Profesiones(Long.parseLong(nacMap.get("id").toString())));
+                        }
+                    }
+
+                    if (reporteInformconf.getUltimaDireccion() != null) {
+                        if (reporteInformconf.getUltimaDireccion().getCiudad() != null
+                                && reporteInformconf.getUltimaDireccion().getCiudad().compareToIgnoreCase("") != 0) {
+
+                            Ciudades ciudad = new Ciudades();
+                            ciudad.setNombre(reporteInformconf.getUltimaDireccion().getCiudad());
+
+                            ciudad = ciudadesManager.get(ciudad);
+
+                            if (ciudad != null) {
+                                ejPersona.setPais(ciudad.getDepartamentoPais().getPais());
+                                ejPersona.setDepartamento(new DepartamentosPais(ciudad.getDepartamentoPais().getId()));
+                                ejPersona.setCiudad(ciudad);
+                                ejPersona.setDireccionParticular(reporteInformconf.getUltimaDireccion().getCalle() == null ? "SIN DATO" : reporteInformconf.getUltimaDireccion().getCalle());
+                                ejPersona.setTelefonoParticular(reporteInformconf.getUltimaDireccion().getTelefono());
+                            } else {
+                                ejPersona.setPais(new Paises(999L));
+                                ejPersona.setDepartamento(new DepartamentosPais(999999L));
+                                ejPersona.setCiudad(new Ciudades(999999999999L));
+                                ejPersona.setDireccionParticular("SIN DATO");
+                            }
+                        } else {
+                            ejPersona.setPais(new Paises(999L));
+                            ejPersona.setDepartamento(new DepartamentosPais(999999L));
+                            ejPersona.setCiudad(new Ciudades(999999999999L));
+                            ejPersona.setDireccionParticular(reporteInformconf.getUltimaDireccion().getCalle() == null ? "SIN DATO" : reporteInformconf.getUltimaDireccion().getCalle());
+                            ejPersona.setTelefonoParticular(reporteInformconf.getUltimaDireccion().getTelefono());
+                        }
+                    } else {
+                        ejPersona.setPais(new Paises(999L));
+                        ejPersona.setDepartamento(new DepartamentosPais(999999L));
+                        ejPersona.setCiudad(new Ciudades(999999999999L));
+                        ejPersona.setDireccionParticular("SIN DATO");
+                    }
+
+                    ejPersona.setActivo("S");
+                    ejPersona.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
+                    ejPersona.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+                    ejPersona.setIdUsuarioCreacion(idFuncionario);
+                    ejPersona.setIdUsuarioModificacion(idFuncionario);
+                    ejPersona.setEmpresa(new Empresas(idEmpresa));
+
+                    personaManager.save(ejPersona);
+
+                }
+
+            }
+        } catch (Exception e) {
+            logger.error("Exception " + e);
+        }
+    }
+
     public String generate(Map<String, Object> claims, Long idEmpresa) throws Exception {
         Parametros parametros = parametrosManager.get(new Parametros(new Empresas(idEmpresa)));
         KeyPair kp = this.createKeyPairFromEncodedKeys(Base64.decodeBase64(parametros.getPublicKey()), Base64.decodeBase64(parametros.getPrivateKey()));
@@ -332,4 +638,5 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
         }
         return null;
     }
+
 }

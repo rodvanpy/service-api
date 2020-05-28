@@ -23,6 +23,9 @@ public interface InformconfSolicitudesManager extends GenericDao<InformconfSolic
     public ResponseDTO<InformconfPersonas> get(String tipo, String documento, Long nroSolicitud, Long idPersona,
             Long idEmpresa, Long idFuncionario, String estado, boolean reload)throws Exception;
     
+    public ResponseDTO<InformconfPersonas> getReport(String tipoReporte, String tipoDocumento, String documento,
+            Long idEmpresa, Long idFuncionario, String estado)throws Exception;
+    
     public void asyncService(String tipo, String documento, Long nroSolicitud, Long idPersona,
             Long idEmpresa, Long idFuncionario, String estado, Long idSolicitud)throws Exception;
 }

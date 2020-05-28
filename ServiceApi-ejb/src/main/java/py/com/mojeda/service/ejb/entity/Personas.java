@@ -88,7 +88,7 @@ public class Personas extends Base {
     @Column(name = "SEPARACION_BIENES")
     private Boolean separacionBienes;
     
-    @NotEmpty(message = "Ingrese Email")
+    //@NotEmpty(message = "Ingrese Email")
     @Column(name = "EMAIL")
     private String email;
 

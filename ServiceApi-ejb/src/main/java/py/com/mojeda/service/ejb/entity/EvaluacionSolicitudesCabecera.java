@@ -101,6 +101,9 @@ public class EvaluacionSolicitudesCabecera extends Base {
     @JsonIgnore
     @Column(name = "ID_EMPRESA")
     private Long idEmpresa;
+    
+    @Column(name = "PORCENTAJE_ENDEUDAMIENTO")
+    private BigDecimal porcentajeEndeudamiento;
 
     @Transient
     private List<EvaluacionSolicitudesDetalles> detalles;
@@ -347,5 +350,12 @@ public class EvaluacionSolicitudesCabecera extends Base {
         this.idEmpresa = idEmpresa;
     }   
 
+    public BigDecimal getPorcentajeEndeudamiento() {
+        return porcentajeEndeudamiento;
+    }
+
+    public void setPorcentajeEndeudamiento(BigDecimal porcentajeEndeudamiento) {
+        this.porcentajeEndeudamiento = porcentajeEndeudamiento;
+    }
         
 }

@@ -11,6 +11,8 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,7 @@ import py.com.mojeda.service.ejb.entity.Funcionarios;
 import py.com.mojeda.service.ejb.entity.Garantias;
 import py.com.mojeda.service.ejb.entity.PropuestaSolicitud;
 import py.com.mojeda.service.ejb.informconf.IfcPMorosidadesActividadDb;
+import py.com.mojeda.service.ejb.informconf.IfcPSolicitudesDetalleDb;
 import py.com.mojeda.service.ejb.informconf.InformconfPersonas;
 import py.com.mojeda.service.ejb.manager.CreditosManager;
 import py.com.mojeda.service.ejb.manager.CuotasManager;
@@ -35,6 +38,7 @@ import py.com.mojeda.service.ejb.manager.InformconfSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.PropuestaSolicitudManager;
 import py.com.mojeda.service.ejb.utils.ApplicationLogger;
 import py.com.mojeda.service.ejb.utils.ResponseDTO;
+import py.com.mojeda.service.ejb.utils.Utils;
 
 /**
  *
@@ -109,17 +113,15 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
 
         //CARGAR DATOS DEL REPORTE
         for (EvaluacionSolicitudesDetalles rpc : detalles) {
-            
+
             logger.info("getPropuestaSolicitud() : " + evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId());
             logger.info("getDocumento() : " + rpc.getPersona().getDocumento());
             logger.info("getTipoSolicitud() : " + evaluacionSolicitudesCabecera.getPropuestaSolicitud().getTipoSolicitud().getNombre());
-            
+
             ResponseDTO<InformconfPersonas> reporteInformconf = informconfSolicitudesManager.get(evaluacionSolicitudesCabecera.getPropuestaSolicitud().getTipoSolicitud().getNombre(),
                     rpc.getPersona().getDocumento(), evaluacionSolicitudesCabecera.getPropuestaSolicitud().getId(), rpc.getPersona().getId(),
                     idEmpresa, idFuncionario, "A", false);
-            
-            logger.info(gson.toJson(reporteInformconf));
-            
+
             if (reporteInformconf != null && reporteInformconf.getStatus() == 200) {
                 if (reporteInformconf.getModel().getScoring() != null) {
                     rpc.setFajaInformconf(reporteInformconf.getModel().getScoring().getFaja());
@@ -130,16 +132,23 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
                     rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UN TOTAL DE " + reporteInformconf.getModel().getDemandasResumen().getCantTotalDemandas().intValue() + " DEMANDAS.\n");
                 }
                 if (reporteInformconf.getModel().getInhibicionesResumen() != null) {
-                    rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UN TOTAL DE " + reporteInformconf.getModel().getInhibicionesResumen().getCantTotalInhibiciones().intValue()+ " INHIBICIONES.\n");
+                    rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UN TOTAL DE " + reporteInformconf.getModel().getInhibicionesResumen().getCantTotalInhibiciones().intValue() + " INHIBICIONES.\n");
                 }
                 if (reporteInformconf.getModel().getMorosidadesActividad() != null) {
                     Long deudaTotal = 0L;
-                    for(IfcPMorosidadesActividadDb rp : reporteInformconf.getModel().getMorosidadesActividad()){
+                    for (IfcPMorosidadesActividadDb rp : reporteInformconf.getModel().getMorosidadesActividad()) {
                         deudaTotal = deudaTotal + rp.getSumaSaldoAcreedor().longValue();
                     }
-                    rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UNA MOROSIDAD TOTAL CON OTRAS ENTIDADES DE " + deudaTotal+ ".\n");
+                    rpc.setInformconf((rpc.getInformconf() == null ? null : rpc.getInformconf()) + "PRESENTA UNA MOROSIDAD TOTAL CON OTRAS ENTIDADES DE " + deudaTotal + ".\n");
                 }
+                
                 evaluacionSolicitudesDetallesManager.update(rpc);
+                
+                if (reporteInformconf.getModel() != null
+                        && reporteInformconf.getModel().getSolicitudesDetalle() != null) {
+                    reporteInformconf.getModel().getSolicitudesDetalle().sort(Comparator.comparing(o -> o.getFecha().getTime()));
+                }
+
             }
         }
 
@@ -154,7 +163,7 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
         EvaluacionSolicitudesCabecera evaluacionSolicitudesCabecera = null;
 
         String atributos = "id,fechaInicioAnalisis,fechaFinAnalisis,fechaPrimeraAprobRech,fechaSegundaAprobRech,funcionarioAprobacion.id,estado.id,"
-                + "montoAprobado,funcionarioAnalisis.id,funcionarioVerificador.id,obsApro,observacion,observacionRecomendacion,propuestaSolicitud.id,fechaCreacion,requiereVerificador,"
+                + "montoAprobado,funcionarioAnalisis.id,funcionarioVerificador.id,obsApro,observacion,porcentajeEndeudamiento,observacionRecomendacion,propuestaSolicitud.id,fechaCreacion,requiereVerificador,"
                 + "idUsuarioCreacion,fechaModificacion,idUsuarioModificacion,activo";
 
         Map<String, Object> evaluacionCabecera = this.getAtributos(evaluacion, atributos.split(","));
@@ -180,6 +189,7 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
         evaluacionSolicitudesCabecera.setFechaModificacion(evaluacionCabecera.get("fechaModificacion") == null ? null : new Timestamp(date.parse(evaluacionCabecera.get("fechaModificacion").toString()).getTime()));
         evaluacionSolicitudesCabecera.setIdUsuarioCreacion(evaluacionCabecera.get("idUsuarioCreacion") == null ? null : Long.parseLong(evaluacionCabecera.get("idUsuarioCreacion").toString()));
         evaluacionSolicitudesCabecera.setIdUsuarioModificacion(evaluacionCabecera.get("idUsuarioModificacion") == null ? null : Long.parseLong(evaluacionCabecera.get("idUsuarioModificacion").toString()));
+        evaluacionSolicitudesCabecera.setPorcentajeEndeudamiento(evaluacionCabecera.get("porcentajeEndeudamiento") == null ? BigDecimal.valueOf(30L) : new BigDecimal(evaluacionCabecera.get("porcentajeEndeudamiento").toString()));
 
         EvaluacionSolicitudesDetalles ejDetalle = new EvaluacionSolicitudesDetalles();
         ejDetalle.setEvaluacionSolicitudCabecera(new EvaluacionSolicitudesCabecera(evaluacionSolicitudesCabecera.getId()));
@@ -357,4 +367,5 @@ public class EvaluacionSolicitudesCabeceraManagerImpl extends GenericDaoImpl<Eva
         return evaluacionSolicitudesCabecera;
 
     }
+
 }

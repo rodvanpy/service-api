@@ -54,6 +54,7 @@ import py.com.mojeda.service.ejb.manager.BienesManager;
 import py.com.mojeda.service.ejb.manager.BienesSolicitudesManager;
 import py.com.mojeda.service.ejb.manager.ClientesManager;
 import py.com.mojeda.service.ejb.manager.CuotasManager;
+import py.com.mojeda.service.ejb.manager.EmpresaManager;
 import py.com.mojeda.service.ejb.manager.EstadosSolicitudManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesCabeceraManager;
 import py.com.mojeda.service.ejb.manager.EvaluacionSolicitudesDetallesManager;
@@ -105,6 +106,9 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/PersonaManagerImpl")
     private PersonaManager personaManager;
+    
+    @EJB(mappedName = "java:app/ServiceApi-ejb/EmpresaManagerImpl")
+    private EmpresaManager empresaManager;
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/TipoDesembolsosManagerImpl")
     private TipoDesembolsosManager tipoDesembolsosManager;
@@ -1293,10 +1297,11 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                 evaluacionCabecera.setEstado(new EstadosSolicitud(8L));
 
                 //Verificar si requiere verificacion del credito
-                Map<String, Object> montoVerificacion = personaManager.getAtributos(new Personas(idFuncionario), "empresa.montoVerificacionCredito".split(","));
+                Map<String, Object> montoVerificacion = empresaManager.getAtributos(new Empresas(idEmpresa), "montoVerificacionCredito,porcentajeEndeudamiento".split(","));
 
                 if (montoVerificacion != null) {
-                    evaluacionCabecera.setRequiereVerificador(ejPropuestaSolicitud.getMontoSolicitado().longValue() > new BigDecimal(montoVerificacion.get("empresa.montoVerificacionCredito").toString()).longValue());
+                    evaluacionCabecera.setRequiereVerificador(ejPropuestaSolicitud.getMontoSolicitado().longValue() > new BigDecimal(montoVerificacion.get("montoVerificacionCredito").toString()).longValue());
+                    evaluacionCabecera.setPorcentajeEndeudamiento(montoVerificacion.get("porcentajeEndeudamiento") == null ? BigDecimal.valueOf(30L) : new BigDecimal(montoVerificacion.get("porcentajeEndeudamiento").toString()));
                 }
                 
                 evaluacionSolicitudesCabeceraManager.save(evaluacionCabecera);

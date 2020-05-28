@@ -74,7 +74,9 @@ public class BaseController {
     
     protected static final String CONTENT_IMAGE = "C:\\imagen\\";
     
-    protected static final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm");    
+    protected static final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm");   
+    protected static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat fecha = new SimpleDateFormat("yyyy-MM-dd");
     
     private Context context;
     
