@@ -539,7 +539,8 @@ public class EmpresaController extends BaseController {
                 response.setMessage("Ya existe una empresa con el mismo ruc.");
                 return response;
             }
-
+            
+            model.setActivo(dato.getActivo());
             model.setNombre(model.getNombre().toUpperCase());
             model.setNombreFantasia(model.getNombreFantasia().toUpperCase());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));

@@ -106,7 +106,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @EJB(mappedName = "java:app/ServiceApi-ejb/PersonaManagerImpl")
     private PersonaManager personaManager;
-    
+
     @EJB(mappedName = "java:app/ServiceApi-ejb/EmpresaManagerImpl")
     private EmpresaManager empresaManager;
 
@@ -1077,6 +1077,8 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
         ejPersona.setTelefonoParticular(persona.getTelefonoParticular());
         ejPersona.setTelefonoSecundario(persona.getTelefonoSecundario());
         //ejPersona.setTipoPersona(persona.getTipoPersona());
+        ejPersona.setLatitud(persona.getLatitud());
+        ejPersona.setLongitud(persona.getLongitud());
         ejPersona.setDireccionParticular(persona.getDireccionParticular());
         ejPersona.setFechaNacimiento(persona.getFechaNacimiento());
         ejPersona.setDireccionDetallada(persona.getDireccionDetallada());
@@ -1229,12 +1231,16 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
 
     @Override
     public void abandonarPropuesta(Long idSolicitud, Long idFuncionario, Long idEmpresa) throws Exception {
-
+        logger.info("****** Abandonar Propuesta********");
+        logger.info("idSolicitud: " + idSolicitud);
+        logger.info("idFuncionario: " + idFuncionario);
         PropuestaSolicitud ejPropuestaSolicitud = this.get(idSolicitud);
 
         //Cambiar estado solicitud
         ejPropuestaSolicitud.setEstado(new EstadosSolicitud(7L));
         ejPropuestaSolicitud.setFechaEstado(new Date(System.currentTimeMillis()));
+        ejPropuestaSolicitud.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+        ejPropuestaSolicitud.setIdUsuarioModificacion(idFuncionario);
 
         this.update(ejPropuestaSolicitud);
 
@@ -1276,6 +1282,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             ejPropuestaSolicitud.setEstado(new EstadosSolicitud(2L));
             ejPropuestaSolicitud.setFechaEstado(new Date(System.currentTimeMillis()));
             ejPropuestaSolicitud.setFechaAnalisis(new Date(System.currentTimeMillis()));
+            ejPropuestaSolicitud.setIdUsuarioModificacion(idFuncionario);
 
             this.update(ejPropuestaSolicitud);
 
@@ -1285,7 +1292,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
             evaluacionCabecera = evaluacionSolicitudesCabeceraManager.get(evaluacionCabecera);
 
             if (evaluacionCabecera == null) {
-                
+
                 evaluacionCabecera = new EvaluacionSolicitudesCabecera();
                 evaluacionCabecera.setPropuestaSolicitud(new PropuestaSolicitud(idSolicitud));
                 evaluacionCabecera.setIdEmpresa(idEmpresa);
@@ -1303,7 +1310,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     evaluacionCabecera.setRequiereVerificador(ejPropuestaSolicitud.getMontoSolicitado().longValue() > new BigDecimal(montoVerificacion.get("montoVerificacionCredito").toString()).longValue());
                     evaluacionCabecera.setPorcentajeEndeudamiento(montoVerificacion.get("porcentajeEndeudamiento") == null ? BigDecimal.valueOf(30L) : new BigDecimal(montoVerificacion.get("porcentajeEndeudamiento").toString()));
                 }
-                
+
                 evaluacionSolicitudesCabeceraManager.save(evaluacionCabecera);
 
                 Solicitantes solicitantes = new Solicitantes();
@@ -1337,7 +1344,7 @@ public class PropuestaSolicitudManagerImpl extends GenericDaoImpl<PropuestaSolic
                     detalle.setEgresosTotal(totalEgresos);
                     detalle.setMontoDeudaSolicitud(ejPropuestaSolicitud.getImporteCuota() * ejPropuestaSolicitud.getPlazo());
                     detalle.setMontoDeudaSolicitudCuotas(ejPropuestaSolicitud.getImporteCuota());
-                    detalle.setMontoDeudaSolicitudCuotaTotal(detalle.getMontoDeudaSolicitudCuotas());                   
+                    detalle.setMontoDeudaSolicitudCuotaTotal(detalle.getMontoDeudaSolicitudCuotas());
                     detalle.setMontoDeudaSolicitudTotal(detalle.getMontoDeudaSolicitud());
 
                     detalle.setFechaCreacion(new Timestamp(System.currentTimeMillis()));

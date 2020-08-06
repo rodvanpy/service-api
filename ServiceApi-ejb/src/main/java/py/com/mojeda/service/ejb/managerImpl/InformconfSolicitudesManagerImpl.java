@@ -475,8 +475,8 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
             if (reporteInformconf != null
                     && reporteInformconf.getDatosPersonales() != null) {
 
-                if (reporteInformconf.getDatosPersonales().getPrimerNombre() != null
-                        && reporteInformconf.getDatosPersonales().getPrimerApellido() != null) {
+                if ((reporteInformconf.getDatosPersonales().getPrimerNombre() != null && reporteInformconf.getDatosPersonales().getPrimerNombre().compareToIgnoreCase("") != 0)
+                        && reporteInformconf.getDatosPersonales().getPrimerApellido() != null && reporteInformconf.getDatosPersonales().getPrimerApellido().compareToIgnoreCase("") != 0) {
 
                     Personas ejPersona = new Personas();
                     ejPersona.setTipoPersona("FISICA");
@@ -565,19 +565,19 @@ public class InformconfSolicitudesManagerImpl extends GenericDaoImpl<InformconfS
                                 ejPersona.setPais(ciudad.getDepartamentoPais().getPais());
                                 ejPersona.setDepartamento(new DepartamentosPais(ciudad.getDepartamentoPais().getId()));
                                 ejPersona.setCiudad(ciudad);
-                                ejPersona.setDireccionParticular(reporteInformconf.getUltimaDireccion().getCalle() == null ? "SIN DATO" : reporteInformconf.getUltimaDireccion().getCalle());
+                                ejPersona.setDireccionParticular((reporteInformconf.getUltimaDireccion().getCalle() == null || reporteInformconf.getUltimaDireccion().getCalle().isEmpty()) ? "SIN DATO" : reporteInformconf.getUltimaDireccion().getCalle());
                                 ejPersona.setTelefonoParticular(reporteInformconf.getUltimaDireccion().getTelefono());
                             } else {
                                 ejPersona.setPais(new Paises(999L));
                                 ejPersona.setDepartamento(new DepartamentosPais(999999L));
                                 ejPersona.setCiudad(new Ciudades(999999999999L));
-                                ejPersona.setDireccionParticular("SIN DATO");
+                                ejPersona.setDireccionParticular((reporteInformconf.getUltimaDireccion().getCalle() == null || reporteInformconf.getUltimaDireccion().getCalle().isEmpty()) ? "SIN DATO" : reporteInformconf.getUltimaDireccion().getCalle());
                             }
                         } else {
                             ejPersona.setPais(new Paises(999L));
                             ejPersona.setDepartamento(new DepartamentosPais(999999L));
                             ejPersona.setCiudad(new Ciudades(999999999999L));
-                            ejPersona.setDireccionParticular(reporteInformconf.getUltimaDireccion().getCalle() == null ? "SIN DATO" : reporteInformconf.getUltimaDireccion().getCalle());
+                            ejPersona.setDireccionParticular((reporteInformconf.getUltimaDireccion().getCalle() == null || reporteInformconf.getUltimaDireccion().getCalle().isEmpty())? "SIN DATO" : reporteInformconf.getUltimaDireccion().getCalle());
                             ejPersona.setTelefonoParticular(reporteInformconf.getUltimaDireccion().getTelefono());
                         }
                     } else {

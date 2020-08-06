@@ -53,11 +53,11 @@ public class UserSession implements AuthenticationProvider {
             String cod = passwordEncoder.encode(passwordLogin);
             
             Funcionarios ejObjeto = new Funcionarios();
-            ejObjeto.setAlias(userLogin);
+            ejObjeto.setAlias(userLogin.toUpperCase());
             ejObjeto.setActivo("S");
             ejObjeto.setRetirado(Boolean.FALSE);
             
-            Map<String, Object> objetoMap = usuarioManager.getAtributos(ejObjeto,"id,alias,claveAcceso,nroLegajo,persona.id,persona.primerNombre,persona.segundoNombre,persona.primerApellido,persona.segundoApellido,persona.imagePath,sucursal.id,sucursal.empresa.id,rol.id,rol.nombre".split(","));           
+            Map<String, Object> objetoMap = usuarioManager.getAtributos(ejObjeto,"id,alias,claveAcceso,nroLegajo,persona.id,persona.primerNombre,persona.segundoNombre,persona.primerApellido,persona.segundoApellido,persona.imagePath,sucursal.id,sucursal.empresa.id,rol.id,rol.nombre".split(","),false,false);           
             if (objetoMap != null) {
 
                 if (passwordEncoder.matches(passwordLogin, objetoMap.get("claveAcceso").toString())) {

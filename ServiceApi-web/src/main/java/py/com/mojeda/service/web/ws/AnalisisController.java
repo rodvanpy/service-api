@@ -536,6 +536,7 @@ public class AnalisisController extends BaseController {
 
         User userDetail = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         ResponseDTO response = new ResponseDTO();
+        Gson gson = new Gson();
         try {
             inicializarEvaluacionSolicitudesCabeceraManager();
 
@@ -554,7 +555,8 @@ public class AnalisisController extends BaseController {
 
             if (modelMaps != null
                     && modelMaps.get("estado.id") != null
-                    && modelMaps.get("estado.id").toString().compareToIgnoreCase("2") != 0) {
+                    && modelMaps.get("estado.id").toString().compareToIgnoreCase("2") != 0
+                    && modelMaps.get("estado.id").toString().compareToIgnoreCase("3") != 0) {
                 response.setModel(null);
                 response.setStatus(404);
                 response.setMessage("El analisis ya no puede ser modificado.");
@@ -573,7 +575,7 @@ public class AnalisisController extends BaseController {
 
                 return response;
             }
-
+            logger.info(gson.toJson(model));
             model = evaluacionSolicitudesCabeceraManager.guardar(model, userDetail.getId(), userDetail.getIdEmpresa());
 
             response.setModel(model);

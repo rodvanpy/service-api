@@ -65,7 +65,7 @@ public class SucursalController extends BaseController {
         Sucursales model = new Sucursales();
         model.setActivo("S");
         model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
-        
+
         List<Map<String, Object>> listMapGrupos = null;
         try {
             inicializarSucursalManager();
@@ -94,7 +94,7 @@ public class SucursalController extends BaseController {
             Long total = 0L;
 
             if (!todos) {
-                total = sucursalManager.total(model,"id", "desc");
+                total = sucursalManager.total(model, "id", "desc");
             }
 
             Integer inicio = ((pagina - 1) < 0 ? 0 : pagina - 1) * cantidad;
@@ -229,37 +229,45 @@ public class SucursalController extends BaseController {
             inicializarDepartamentosPaisManager();
             inicializarCiudadesManager();
             inicializarBarriosManager();
-            
-            Map<String,Object> model = sucursalManager.getAtributos(new Sucursales(id),
+
+            Map<String, Object> model = sucursalManager.getAtributos(new Sucursales(id),
                     "id,codigoSucursal,nombre,descripcion,direccion,telefono,fax,telefonoMovil,email,observacion,latitud,longitud,activo,empresa.id,pais.id,ciudad.id,departamento.id,barrio.id".split(","));
 
             DepartamentosSucursal ejDepSuc = new DepartamentosSucursal();
             ejDepSuc.setSucursal(new Sucursales(id));
             ejDepSuc.setActivo("S");
-            
+
             List<Map<String, Object>> listDep = departamentosSucursalManager.listAtributos(ejDepSuc, "id,alias,nombreArea,descripcionArea,activo".split(","));
-            
+
             Empresas empresa = new Empresas();
             empresa.setId(Long.parseLong(model.get("id").toString()));
-            
+
+            model.put("empresa", empresa);
             model.remove("empresa.id");
-            model.put("empresa",empresa);
-            model.put("departamentos",listDep);
-            
+            model.put("departamentos", listDep);
+
             Map<String, Object> pais = paisesManager.getAtributos(new Paises(Long.parseLong(model.get("pais.id") == null ? "0" : model.get("pais.id").toString())), "id,nombre,activo".split(","));
-            model.put("pais", pais);
+            if (pais != null) {
+                model.put("pais", pais);
+            }
             model.remove("pais.id");
 
             Map<String, Object> departamento = departamentosPaisManager.getAtributos(new DepartamentosPais(Long.parseLong(model.get("departamento.id") == null ? "0" : model.get("departamento.id").toString())), "id,nombre,activo".split(","));
-            model.put("departamento", departamento);
+            if (departamento != null) {
+                model.put("departamento", departamento);
+            }
             model.remove("departamento.id");
 
             Map<String, Object> ciudad = ciudadesManager.getAtributos(new Ciudades(Long.parseLong(model.get("ciudad.id") == null ? "0" : model.get("ciudad.id").toString())), "id,nombre,activo".split(","));
-            model.put("ciudad", ciudad);
+            if (ciudad != null) {
+                model.put("ciudad", ciudad);
+            }
             model.remove("ciudad.id");
 
             Map<String, Object> barrio = barriosManager.getAtributos(new Barrios(Long.parseLong(model.get("barrio.id") == null ? "0" : model.get("barrio.id").toString())), "id,nombre,activo".split(","));
-            model.put("barrio", barrio);
+            if (barrio != null) {
+                model.put("barrio", barrio);
+            }           
             model.remove("barrio.id");
 
             response.setModel(model);
@@ -330,7 +338,7 @@ public class SucursalController extends BaseController {
             Integer numeroSucursal = sucursalManager.total(sucursal) + 1;
             //Cantidad Sucursales
             Integer cantidadSucursal = sucursalManager.total(new Sucursales()) + 1;
-            
+
             model.setEmpresa(new Empresas(userDetail.getIdEmpresa()));
             model.setCodigoSucursal(codigoNombre + "-" + numeroSucursal + "-" + cantidadSucursal);
             model.setActivo("S");
@@ -355,7 +363,7 @@ public class SucursalController extends BaseController {
                 rpm.setSucursal(sucursal);
                 rpm.setNombreArea(rpm.getNombreArea().toUpperCase());
                 rpm.setAlias(rpm.getAlias().toUpperCase());
-                
+
                 departamentosSucursalManager.save(rpm);
             }
 
@@ -421,7 +429,7 @@ public class SucursalController extends BaseController {
                 response.setMessage("Ya existe una sucursal con el mismo nombre.");
                 return response;
             }
-            
+
             model.setCodigoSucursal(dato.getCodigoSucursal());
             model.setEmpresa(dato.getEmpresa());
             model.setFechaModificacion(new Timestamp(System.currentTimeMillis()));

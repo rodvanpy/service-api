@@ -182,6 +182,8 @@ public class FuncionariosManagerImpl extends GenericDaoImpl<Funcionarios, Long>
             object.setSuperUsuario(usuario.getSuperUsuario());
             object.setTipoFuncionario(usuario.getTipoFuncionario());
             object.setTipoMotivoRetiro(usuario.getTipoMotivoRetiro());
+            object.setFechaModificacion(new Timestamp(System.currentTimeMillis()));
+            object.setIdUsuarioModificacion(usuario.getIdUsuarioModificacion());
             //object.setAlias(usuario.getAlias().toUpperCase());
             object.setPersona(new Personas(ejPersona.getId()));
             object.setRol(new Rol(usuario.getRol().getId()));

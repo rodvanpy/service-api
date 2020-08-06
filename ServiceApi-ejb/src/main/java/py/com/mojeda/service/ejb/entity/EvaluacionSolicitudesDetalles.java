@@ -175,7 +175,7 @@ public class EvaluacionSolicitudesDetalles extends Base {
     @Column(name = "ID_REUNION")
     private Integer idReunion;
 
-    @ManyToOne(optional = false)
+//    @ManyToOne(optional = false)
     @JoinColumn(name = "ID_PROFESION", referencedColumnName = "id")
     private Profesiones profesion;
 

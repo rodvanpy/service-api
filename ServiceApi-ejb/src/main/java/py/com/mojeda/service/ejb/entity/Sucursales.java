@@ -27,7 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  * @author daniel
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
+
 @Entity
 @Table(name = "SUCURSALES" , schema = "PUBLIC" ,uniqueConstraints = @UniqueConstraint(name = "sucursal_cod_uq", columnNames = { "codigo_sucursal" }) )
 public class Sucursales extends Base {
@@ -52,6 +52,7 @@ public class Sucursales extends Base {
     @Column(name = "DESCRIPCION")
     private String descripcion;   
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotEmpty(message = "Ingrese Direccion")
     @Column(name = "DIRECCION")
     private String direccion;
@@ -65,6 +66,7 @@ public class Sucursales extends Base {
     @Column(name = "telefono_movil")
     private String telefonoMovil;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotEmpty(message = "Ingrese Email")
     @Column(name = "EMAIL")
     private String email;
@@ -78,21 +80,25 @@ public class Sucursales extends Base {
     @Column(name = "LONGITUD")
     private Double longitud;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotNull(message = "Ingrese Pais")
     @ManyToOne
     @JoinColumn(name = "ID_PAIS", referencedColumnName = "id")
     private Paises pais;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotNull(message = "Ingrese Departamento")
     @ManyToOne
     @JoinColumn(name = "ID_DEPARTAMENTO_PAIS", referencedColumnName = "id")
     private DepartamentosPais departamento;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @NotNull(message = "Ingrese Ciudad")
     @ManyToOne
     @JoinColumn(name = "ID_CIUDAD", referencedColumnName = "id")
     private Ciudades ciudad;
     
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @ManyToOne
     @JoinColumn(name = "ID_BARRIO", referencedColumnName = "id")
     private Barrios barrio;
